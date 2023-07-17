@@ -1,0 +1,25 @@
+{
+    "name": "A Svelte Tailwind Chrome Extension",
+    "description": "Sample Extension using Svelte and Tailwind",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+      "service_worker": "src/chrome/background.ts"
+    },
+    "action": {},
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["src/chrome/svelteContent.ts"],
+        "run_at": "document_end"
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["src/chrome/content.ts"],
+        "matches": ["<all_urls>"],
+        "type": "module"
+      }
+    ],
+    "permissions": ["activeTab", "downloads", "scripting"]
+  }
