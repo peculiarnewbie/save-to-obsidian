@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         
         
     }
-
+    
     document.body.appendChild(root);
 
     sendResponse({success: true});
