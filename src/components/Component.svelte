@@ -3,6 +3,9 @@
   export let root: HTMLElement;
 
   let clicked = "not clicked"
+  let selectedElement;
+  let hoveredElement;
+  let data = ""
 
   const closePopup = () => {
     root.remove();
@@ -10,7 +13,7 @@
 
   const download = () => {
     console.log("clicked download")
-        chrome.runtime.sendMessage({ action: "download" }, (response) => {
+        chrome.runtime.sendMessage({ action: "download", data: data}, (response) => {
             console.log("sent message")
             if (response.success) {
                 console.log("success")
@@ -30,31 +33,72 @@
     //   console.log("done")
     // })
 
-    document.addEventListener('click', function (event) {
+    root.style.opacity = "0";
+    root.style.pointerEvents = "none";
+    
+    let click_count = 0;
+
+    function InspectElement (event) {
+      console.log(click_count)
+      click_count++;
       event.preventDefault();
       event.stopPropagation();
       const element = event.target;
       console.log("clicked")
       console.log("element: ", element)
-      if(element.nodeName == "IMG"){
-        console.log("src: ", element.src)
-      }
-      console.log("innerText: ", element.innerText)
-      // console.log("nodeType: ", element.nodeType)
-      // console.log("nodeValue: ", element.nodeValue)
-      // console.log("nodeName: ", element.nodeName)
-      // console.log("innerHTML: ", element.innerHTML)
+      selectedElement = element;
+      determineNodeType()
       console.log("outerHTML: ", element.outerHTML)
-      clicked = element.innerText;
-    }, true);
+
+      if(click_count == 1){
+        root.style.opacity = "1";
+        root.style.pointerEvents = "all";
+        document.removeEventListener('click', InspectElement, true);
+        document.removeEventListener('mouseover', HoverElement, true);
+      }
+    }
+
+    function HoverElement (event){
+      if(hoveredElement) hoveredElement.style.boxShadow = "none";
+      event.preventDefault();
+      event.stopPropagation();
+      const element = event.target as HTMLElement;
+      hoveredElement = element;
+      hoveredElement.style.boxShadow = "inset 0 0 100px 100px rgba(255, 255, 255, 0.1)";
+      console.log(hoveredElement)
+    }
+
+    document.addEventListener('click', InspectElement, true);
+    document.addEventListener('mouseover', HoverElement, true);
 
   }
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if(request.action === "clicked"){
-      clicked = request.element;
+  const getParent = () => {
+    console.log("element: ", selectedElement)
+    console.log("parent: ", selectedElement.parentElement)
+    if(selectedElement.parentElement == null){
+      console.log("no parent")
+      return;
     }
-  })
+    else{
+      selectedElement = selectedElement.parentElement
+      determineNodeType()
+    }
+  }
+
+  const determineNodeType = () => {
+    if(selectedElement.nodeName == "IMG"){
+      console.log("src: ", selectedElement.src)
+      data = selectedElement.src
+      clicked = data;
+    }
+    else{
+      console.log("innerText: ", selectedElement.innerText)
+      data = selectedElement.innerText;
+      clicked = data;
+    }
+  }
+
 </script>
 
 <div class="ActualRoot">
@@ -65,6 +109,7 @@
   </div>
   <div>
     <p>{clicked}</p>
+    <button on:click={getParent}>Prev</button>
     <button on:click={inspect}>Inspect</button>
   </div>
 </div>

@@ -19,7 +19,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.action === "download"){  
-    let markdownText = "# Hello World";
+    let markdownText = request.data;
       const blob = new Blob([markdownText], { type: "text/markdown" });
 
       // use BlobReader object to read Blob data
