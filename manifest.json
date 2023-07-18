@@ -14,12 +14,5 @@
         "run_at": "document_end"
       }
     ],
-    "web_accessible_resources": [
-      {
-        "resources": ["src/chrome/content.ts"],
-        "matches": ["<all_urls>"],
-        "type": "module"
-      }
-    ],
     "permissions": ["activeTab", "downloads", "scripting"]
   }

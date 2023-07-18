@@ -1,9 +1,13 @@
 <script lang="ts">
+    import select from '../../public/Select.svg'
+    import trash from '../../public/Delete.svg'
     import { createEventDispatcher } from "svelte";
     export let index = 0;
     export let key = "key"
     export let value = "value"
     export let parentInspect;
+    
+    const dispatch = createEventDispatcher()
 
     const selectElement = async () => {
         const selectedElement = await parentInspect();
@@ -23,22 +27,22 @@
 
         determineNodeType(selectedElement)
     }
+
+    const deleteField = () => {
+        dispatch("deleteField", index)
+    }
 </script>
   
 <div class="FieldRoot">
     <!-- <p>{index}</p> -->
-    <input style="width: 100%; font-weight:700; font-size:16px" type="text" placeholder="enter key" bind:value={key}>
-    <div style="padding-left: 20px">
-        <div class="FieldComponent">
-        </div>
-        <div style="display: flex; justify-content:space-between">
-            <div class="FieldComponent">
-                <input type="text" placeholder="select data or type here" bind:value={value}>
-            </div>
-            <button on:click={selectElement}>Select Data</button>
-        </div>
-
+    <input style="font-weight:700; font-size:16px" type="text" placeholder="enter key" bind:value={key}>
+    <div class="FieldComponent">
+        
+        <button on:click={selectElement}><img src={select} alt="select" width="15px"></button>
+        <input type="text" placeholder="select data or type here" bind:value={value}>
+        
     </div>
+    <button on:click={deleteField}><img src={trash} alt="select" width="15px"></button>
 </div>
   
 <style>
@@ -46,9 +50,9 @@
     padding: 0 10px 0 0;
     margin: 10px 0;
 }
-h4{
+/* h4{
     margin: 10px 0px 5px 5px;
-}
+} */
 input{
     width: 100%;
     min-width: 40px;
@@ -56,24 +60,31 @@ input{
     background-color: transparent;
     border: none;
     border-bottom: 1px solid #3e4446;
-    padding: 0 0 0 10px;
+    padding: 0 0 0;
 }
-.divider{
+/* .divider{
     width: 100%;
     height: 2px;
     background-color: #3e4446;
-}
+} */
 .FieldComponent{
     display: flex;
-    gap: 10px;
-    align-items: baseline;
-    padding: 5px 0 0 0;
+    gap: 5px;
+    align-items: center;
+    padding: 5px 0 0 0px;
 }
-p{
+/* p{
     margin: 5px 0;
-}
+} */
 button{
-    padding: 0.5rem 1rem;
+    padding: 7px 7px 3px 7px;
     font-weight: 200;
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+}
+button:hover{
+    background-color: #363636;
+    color: white;
 }
 </style>
