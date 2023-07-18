@@ -1,0 +1,46 @@
+<!-- <script>
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+    };
+
+    fetch("https://letterboxd.com/film/nimona-2023/",
+        requestOptions
+    ).then(function(response) {
+       if (response.status === 200) {
+         console.log(response)
+         return response
+       } else {
+         console.log(response)
+         throw response;
+       }
+     })
+     .then(function(template) {
+       console.log(template); // The HTML source code
+     })
+     .catch(function(response) {
+       console.log(response.statusText); // Error message
+     });
+</script> -->
+
+<!-- Path: src\assets\test.html -->
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <script>
+            const canvas = document.createElement('canvas');
+            canvas.id = 'canvas';
+            canvas.width = 500;
+            canvas.height = 500;
+            canvas.style.position = 'fixed';
+            canvas.style.border = '1px solid black';
+            document.body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'red';
+            ctx.fillRect(100, 100, 100, 200);
+
+        </script>
+    </body>
+</html>

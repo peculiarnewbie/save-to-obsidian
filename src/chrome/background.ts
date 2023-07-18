@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const blobUrl = `data:${blob.type};base64,${btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''))}`;
         chrome.downloads.download({
           url: blobUrl,
-          filename: "generated.md",
+          filename: "Obsidian/generated.md",
           saveAs: true,
           conflictAction: "uniquify"
         }, () => {

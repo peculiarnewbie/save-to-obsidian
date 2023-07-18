@@ -15,13 +15,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             root.style.right = "0";
             root.style.zIndex = "9999";
             new Component({target: root, props: {root: root}});
+
+            const canvas = document.createElement('canvas');
+            canvas.id = "hoverCanvas";
+            canvas.style.position = "fixed";
+            canvas.style.pointerEvents = "none";
+            canvas.style.zIndex = "9999";
+            canvas.style.top = "0";
+            canvas.style.left = "0";
+        
+            document.body.appendChild(canvas);
         }
         
         firstTime = false;
-        
-        
     }
-    
+
     document.body.appendChild(root);
 
     sendResponse({success: true});
