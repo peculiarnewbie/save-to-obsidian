@@ -4,7 +4,7 @@
 
   export let root: HTMLElement;
 
-  let fields = [{key: "key", data: "click inspect or type here"}]
+  let fields = [{key: "", data: ""}]
   let hoveredElement;
   let data = ""
 
@@ -135,41 +135,82 @@
 
 </script>
 
-<div class="ActualRoot">
-  <h1>Markdown Clipper</h1>
-    <button on:click={closePopup}>Close</button>
-  <div>
-    <p class="rawData">{JSON.stringify(fields)}</p>
-    <button on:click={addField}>Add Field</button>
-    <!-- <button on:click={getParent}>Prev</button>
-    <button on:click={inspect}>Inspect</button> -->
+  <div class="ActualRoot">
+    <div class="Header">
+    <h2 class="ExtensionTitle">Markdown Clipper</h2>
+    <button class="CloseButton" on:click={closePopup}>x</button>
   </div>
-
-  {#each fields as field, i}
+  <div class="MainContent">
+    <div>
+      <p class="rawData">{JSON.stringify(fields)}</p>
+      <button on:click={addField}>Add Field</button>
+      <!-- <button on:click={getParent}>Prev</button>
+        <button on:click={inspect}>Inspect</button> -->
+      </div>
+      
+    {#each fields as field, i}
     <Field index={i} bind:key={field.key} bind:value={field.data} parentInspect={inspect} />
-  {/each}
+    {/each}
 
-  <button on:click={download}>Download</button>
+    <button on:click={download}>Download</button>
+  </div>
 </div>
 
 <style>
 .ActualRoot{
-  background-color: white;
-  padding: 15px;
-  margin: 10px;
+  background-color: #242424;
+  border-radius: 10px;
+  width: fit-content;
+  width: 50vw;
+  height: 70vh;
+  max-width: 450px;
+  max-height: 800px;
+  overflow-y: auto;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #1e1e1e;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  
+}
+.Header{
+  display: flex;
+  justify-content: space-between;
+  background-color: #363636;
+  padding: 0 0 0 15px;
+}
+.ExtensionTitle{
+  margin: 10px 0;
+}
+h2{
+  font-size: 1.5em;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+}
+.CloseButton{
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: white;
+  font-size: 1.5em;
+  font-weight: 300;
+  cursor: pointer;
+  padding: 0 20px;
+}
+.CloseButton:hover{
+  background-color: #fb464c;
+}
+.MainContent{
+  padding: 15px;
 }
 button {
   border-radius: 8px;
@@ -190,7 +231,10 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 .rawData{
-  width: 200px;
+  width: 100%;
   height: auto;
+  max-height: 200px;
+  overflow-y: scroll;
 }
+
 </style>

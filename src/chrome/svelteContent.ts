@@ -10,9 +10,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             
             root = document.createElement("div");
             root.id = "extension-root";
+            root.style.all = "initial";
             root.style.position = "fixed";
-            root.style.top = "0";
-            root.style.right = "0";
+            root.style.top = "10px";
+            root.style.right = "10px";
             root.style.zIndex = "9999";
             new Component({target: root, props: {root: root}});
 
