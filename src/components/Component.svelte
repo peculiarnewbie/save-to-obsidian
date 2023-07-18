@@ -6,7 +6,11 @@
 
   let fields = [{key: "", data: ""}]
   let hoveredElement;
-  let data = ""
+  $: data = `---<br>${
+    fields.map(field => {
+        return `${field.key}: ${field.data}`
+      }).join('<br>')
+  }<br>---<br>`
 
   const closePopup = () => {
     root.remove();
@@ -30,7 +34,13 @@
   }
 
   const addField = () => {
-    fields = [...fields, {key: "key", data: "click inspect or type here"}]
+    fields = [...fields, {key: "", data: ""}]
+  }
+
+  function deleteField(event){
+    const temp = [...fields]
+    temp.splice(event.detail, 1)
+    fields = temp;
   }
 
   const inspect = async () => {
@@ -103,7 +113,8 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-
+    
+    
   }
 
   // const getParent = () => {
@@ -135,40 +146,52 @@
 
 </script>
 
-  <div class="ActualRoot">
-    <div class="Header">
+<div class="ActualRoot">
+  <div class="Header">
     <h2 class="ExtensionTitle">Markdown Clipper</h2>
-    <button class="CloseButton" on:click={closePopup}>x</button>
+    <div class="CloseButton" on:click={closePopup}>x</div>
   </div>
   <div class="MainContent">
     <div>
-      <p class="rawData">{JSON.stringify(fields)}</p>
       <button on:click={addField}>Add Field</button>
       <!-- <button on:click={getParent}>Prev</button>
-        <button on:click={inspect}>Inspect</button> -->
-      </div>
+      <button on:click={inspect}>Inspect</button> -->
+    </div>
       
     {#each fields as field, i}
-    <Field index={i} bind:key={field.key} bind:value={field.data} parentInspect={inspect} />
+    <Field index={i} bind:key={field.key} bind:value={field.data} parentInspect={inspect} on:deleteField={deleteField} />
     {/each}
-
-    <button on:click={download}>Download</button>
+      
+  </div>
+  
+  <div class="result">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items:end">
+      <p style="margin: 0;">result:</p>
+      <button on:click={download}>Download</button>
+    </div>
+    <div class="rawData">
+      <p style="margin: 0;">{@html data}</p>
+    </div>
   </div>
 </div>
 
 <style>
 .ActualRoot{
+  display: flex;
+  flex-direction: column;
   background-color: #242424;
   border-radius: 10px;
   width: fit-content;
   width: 50vw;
   height: 70vh;
   max-width: 450px;
-  max-height: 800px;
-  overflow-y: auto;
+  min-height: 500px;
+  max-height: 1200px;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
+  overflow: hidden;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -197,6 +220,7 @@ h2{
   padding: 0;
 }
 .CloseButton{
+  display: flex;
   background-color: transparent;
   border: none;
   border-radius: 0;
@@ -204,37 +228,62 @@ h2{
   font-size: 1.5em;
   font-weight: 300;
   cursor: pointer;
-  padding: 0 20px;
+  padding: 5px 20px;
 }
 .CloseButton:hover{
   background-color: #fb464c;
 }
 .MainContent{
+  min-height: 100px;
+  flex-grow: 10;
   padding: 15px;
+  overflow-y: auto;
 }
 button {
-  border-radius: 8px;
+  align-items: center;
+  border-radius: 6px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.4em 1.5em;
+  height: 36px;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 300;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #363636;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.1s;
+  border-left: solid 1px #3f3f3f;
+  border-right: solid 1px #3f3f3f;
+  border-top: solid 1px #484848;
+  box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 0.67);
 }
 button:hover {
-  border-color: #646cff;
+  background-color: #3f3f3f;
+  border-left: solid 1px #4e4e4e;
+  border-right: solid 1px #4e4e4e;
+  border-top: solid 1px #5b5b5b;
+  box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 1);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+.result{
+  display: flex;
+  flex-direction: column;
+  height: 176px;
+  width: auto;
+  background-color: #1e1e1e;
+  padding: 10px;
+  /* box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.25); */
+  border-top: #363636 solid 1px;
+}
 .rawData{
-  width: 100%;
-  height: auto;
-  max-height: 200px;
-  overflow-y: scroll;
+  height: 50%;
+  flex-grow: 10;
+  overflow-y: auto;
+  background-color: #242424;
+  padding: 8px;
+  font-size: 12px
 }
 
 </style>
