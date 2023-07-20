@@ -33,11 +33,13 @@
                 break
             }
             else if(currentElement.className != ""){
-                let queriedElements = document.getElementsByClassName(currentElement.className)
-                if(queriedElements.length < 5){
-                    searchResult = searchElements(queriedElements, currentElement)
-                    path.push({type: IdType.CLASS, value: currentElement.className, index: searchResult.index})
-                    break
+                if(validateClass(currentElement.className)){
+                    let queriedElements = document.getElementsByClassName(currentElement.className)
+                    if(queriedElements.length < 5){
+                        searchResult = searchElements(queriedElements, currentElement)
+                        path.push({type: IdType.CLASS, value: currentElement.className, index: searchResult.index})
+                        break
+                    }
                 }
             }
 
@@ -50,6 +52,25 @@
         console.log("treePath: ", treePath)
 
         testPath(treePath, selectedElement)
+
+    }
+
+    const validateClass = (className) => {
+        if(className.includes(" ")){
+            return false;
+        }
+        else if(className.length > 40){
+            return false;
+        }
+        else {
+            let regex = /\d/;
+            if(regex.test(className)){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
 
     }
 
