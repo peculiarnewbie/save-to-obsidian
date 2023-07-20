@@ -72,17 +72,17 @@
         };
 
         const chosen = await WaitForSelection() as HTMLElement;
-        const getParent = (element) => {
-            if(element.parentElement == null){
-                console.log("no parent")
-                return;
-            }
-            else{
-            console.log("parent: ", element.parentElement)
-            getParent(element.parentElement)
-            }
-        }
-        getParent(chosen)
+        // const getParent = (element) => {
+        //     if(element.parentElement == null){
+        //         console.log("no parent")
+        //         return;
+        //     }
+        //     else{
+        //     console.log("parent: ", element.parentElement)
+        //     getParent(element.parentElement)
+        //     }
+        // }
+        // getParent(chosen)
         return chosen
 
         function InspectElement (event) {

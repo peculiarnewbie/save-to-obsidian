@@ -5,25 +5,99 @@
     export let index = 0;
     export let key = "key"
     export let value = "value"
+    export let treePath = []
     export let parentInspect;
+
+    enum IdType {
+        ID,
+        CLASS,
+        INDEX
+    }
     
     const dispatch = createEventDispatcher()
 
     const selectElement = async () => {
         const selectedElement = await parentInspect();
+        generatePath(selectedElement)
+        determineNodeType(selectedElement)
+    }
 
-        const determineNodeType = (selectedElement) => {
-            if(selectedElement.nodeName == "IMG"){
-                console.log("src: ", selectedElement.src)
-                value = selectedElement.src
+    const generatePath = (selectedElement) => {
+        let path = []
+        let currentElement = selectedElement;
+        let searchResult = {found: false, index: 0};
+        
+        while(currentElement != document.body){
+            if(currentElement.id != ""){
+                path.push({type: IdType.ID, value: currentElement.id, index: 0})
+                break
             }
-            else{
-                console.log("innerText: ", selectedElement.innerText)
-                value = selectedElement.innerText;
+            else if(currentElement.className != ""){
+                let queriedElements = document.getElementsByClassName(currentElement.className)
+                if(queriedElements.length < 5){
+                    searchResult = searchElements(queriedElements, currentElement)
+                    path.push({type: IdType.CLASS, value: currentElement.className, index: searchResult.index})
+                    break
+                }
             }
+
+            path.push({type: IdType.INDEX, value: "", index: Array.from(currentElement.parentElement.children).indexOf(currentElement)})
+            currentElement = currentElement.parentElement
+            continue
         }
 
-        determineNodeType(selectedElement)
+        treePath = path.reverse()
+        console.log("treePath: ", treePath)
+
+        testPath(treePath, selectedElement)
+
+    }
+
+    const testPath = (path, selectedElement) => {
+        let currentElement;
+
+        currentElement = getElementFromPath(path[0], document.body)
+        
+        for(let i = 1; i < path.length; i++){
+            console.log("currentElement: ", currentElement)
+            currentElement = getElementFromPath(path[i], currentElement)
+        }
+
+        if(currentElement != selectedElement){
+            console.error("failed to generate path")
+        }
+    }
+
+    const getElementFromPath = (currentPath, currentElement) => {
+        switch(currentPath.type){
+            case IdType.ID:
+                return currentElement.querySelector("#" + currentPath.value)
+            case IdType.CLASS:
+                return currentElement.querySelectorAll("." + currentPath.value)[currentPath.index]
+            case IdType.INDEX:
+                return currentElement.children[currentPath.index]
+        }
+    }
+
+    const searchElements = (elements, element) => {
+        for(let i = 0; i < elements.length; i++){
+            if(elements[i] == element){
+                return {found: true, index: i}
+            }
+        }
+        console.error("failed to find element")
+        return {found: false, index: 0}
+    }
+    
+    const determineNodeType = (selectedElement) => {
+        if(selectedElement.nodeName == "IMG"){
+            console.log("src: ", selectedElement.src)
+            value = selectedElement.src
+        }
+        else{
+            console.log("innerText: ", selectedElement.innerText)
+            value = selectedElement.innerText;
+        }
     }
 
     const deleteField = () => {
