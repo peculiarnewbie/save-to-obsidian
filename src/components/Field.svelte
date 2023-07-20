@@ -12,8 +12,6 @@
     const selectElement = async () => {
         const selectedElement = await parentInspect();
 
-        console.log("from child: ", selectedElement)
-
         const determineNodeType = (selectedElement) => {
             if(selectedElement.nodeName == "IMG"){
                 console.log("src: ", selectedElement.src)
@@ -38,11 +36,23 @@
     <input style="font-weight:700; font-size:16px" type="text" placeholder="enter key" bind:value={key}>
     <div class="FieldComponent">
         
-        <button on:click={selectElement}><img src={select} alt="select" width="15px"></button>
+        <button on:click={selectElement}>
+            {#if import.meta.env.DEV}
+            <img src={select} alt="select" width="15px">
+            {:else}
+            <img src={chrome.runtime.getURL(select)} alt="select" width="15px">
+            {/if}
+        </button>
         <input type="text" placeholder="select data or type here" bind:value={value}>
         
     </div>
-    <button on:click={deleteField}><img src={trash} alt="select" width="15px"></button>
+    <button on:click={deleteField}>
+        {#if import.meta.env.DEV}
+        <img src={trash} alt="select" width="15px">
+        {:else}
+        <img src={chrome.runtime.getURL(trash)} alt="select" width="15px">
+        {/if}
+    </button>
 </div>
   
 <style>
