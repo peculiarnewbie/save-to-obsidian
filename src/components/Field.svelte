@@ -56,10 +56,10 @@
             continue
         }
 
-        treePath = path.reverse()
-        console.log("treePath: ", treePath)
+        field.treePath = path.reverse()
+        console.log("treePath: ", field.treePath)
 
-        getElementFromPath(treePath, selectedElement)
+        getElementFromPath(field.treePath, selectedElement)
 
     }
 

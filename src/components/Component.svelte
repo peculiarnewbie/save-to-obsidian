@@ -17,7 +17,6 @@
     };
 
     const getChromeStorage = async () => {
-      await chrome.storage.local.remove(["forms"])
       await chrome.storage.local.get(null, async (result) => {
         console.log(result)
         allData = result;
@@ -31,6 +30,14 @@
         }
         loading = false;
       })
+    }
+
+    const deleteForm = async(form) => {
+      await chrome.storage.local.remove([`form_${form}`])
+      let newForms = forms.filter((item) => item != form)
+      await chrome.storage.local.set({forms: newForms})
+      forms = newForms;
+      await getChromeStorage()
     }
 
     const promise = getChromeStorage();
@@ -52,7 +59,7 @@
   <div class="MainContent">
     {#if import.meta.env.DEV}
       {#if openForm}
-        <Form root={root} bind:currentForm={currentForm} bind:openForm={openForm} isEditing={isEditing}/>
+        <Form root={root} bind:currentForm={currentForm} isEditing={isEditing} bind:forms={forms} refresh={getChromeStorage}/>
       {:else}
         <button on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
       {/if}
@@ -61,14 +68,14 @@
       <p>loading...</p>
     {:then}
       {#if openForm}
-        <Form root={root} bind:currentForm={currentForm} bind:openForm={openForm} isEditing={isEditing}/>
+        <Form root={root} bind:currentForm={currentForm} isEditing={isEditing} bind:forms={forms} refresh={getChromeStorage}/>
       {:else}
         <button on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
         {#each forms as form, i}
           <div class="Form">
             <h2>{form}</h2>
             <button on:click={() => {currentForm = allData[`form_${form}`]; isEditing=false; openForm = true;}}>Open Form</button>
-            <button on:click={() => {chrome.storage.local.remove(form); getChromeStorage()}}>Delete</button>
+            <button on:click={() => deleteForm(form)}>Delete</button>
           </div>
         {/each}
       {/if}

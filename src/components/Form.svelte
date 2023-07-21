@@ -3,14 +3,16 @@
     export let root: HTMLElement;
     export let currentForm;
     export let isEditing;
-    $: fields = currentForm.fields
-    export let openForm = true;
+    $: fields = currentForm.fields;
+    let prevName;
     let hoveredElement;
     $: data = `---<br>${
         currentForm.fields.map(field => {
             return `${field.key}: ${field.value}`
         }).join('<br>')
     }<br>---<br>`
+    export let forms;
+    export let refresh;
 
     const download = () => {
         data = `---\n` 
@@ -122,9 +124,19 @@
     }
 
     const saveForm = async () => {
-        await chrome.storage.local.set({[`form_${currentForm.name}`]: currentForm})
+        if(!forms.includes(currentForm.name)){
+            await chrome.storage.local.remove([`form_${prevName}`])
+            let temp = forms
+            temp[temp.indexOf(prevName)] = currentForm.name
+            forms = temp
+            await chrome.storage.local.set({forms: forms})
+        }
+        await chrome.storage.local.set({[`form_${currentForm.name}`]: currentForm, forms: forms})
+        await refresh()
         isEditing = false;
     }
+
+    prevName = currentForm.name;
 </script>
 
 
@@ -133,7 +145,7 @@
     {#if isEditing}
         <div style="display: flex; justify-content:space-between; align-items:end">
             <div>
-                <h2>Title:</h2>
+                <h4>Title:</h4>
                 <input type="text" placeholder="enter form name" bind:value={currentForm.name}>
             </div>
             <button on:click={addField}>Add Field</button>
@@ -180,9 +192,10 @@
   /* box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.25); */
   border-top: #363636 solid 1px;
 }
-h2{
+h4{
     margin: 0;
     color: white;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 .rawData{
   height: 50%;
