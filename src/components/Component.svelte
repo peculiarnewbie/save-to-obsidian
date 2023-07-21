@@ -36,7 +36,6 @@
       let newForms = forms.filter((item) => item != form)
       await chrome.storage.local.set({forms: newForms})
       forms = newForms;
-      await getChromeStorage()
     }
 
     const promise = getChromeStorage();
