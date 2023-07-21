@@ -3,7 +3,12 @@
     import Form from "./Form.svelte";
 
     export let root: HTMLElement;
-    let fields = [{key: "", data: ""}]
+    let loading = true;
+    let fields = [{key: "", value: ""}]
+    let forms: string[] = [];
+    let allData = {}
+    let isEditing = false
+    $: currentForm = {name: "", fields: fields}
 
     let openForm = false;
 
@@ -11,46 +16,63 @@
       root.remove();
     };
 
-  // const getParent = () => {
-  //   console.log("element: ", selectedElement)
-  //   console.log("parent: ", selectedElement.parentElement)
-  //   if(selectedElement.parentElement == null){
-  //     console.log("no parent")
-  //     return;
-  //   }
-  //   else{
-  //     selectedElement = selectedElement.parentElement
-  //     return selectedElement
-  //   }
-  // }
+    const getChromeStorage = async () => {
+      await chrome.storage.local.remove(["forms"])
+      await chrome.storage.local.get(null, async (result) => {
+        console.log(result)
+        allData = result;
+        if(!result.forms){
+          forms = ["example"]
+          let form_example = {name: "example", fields: [{key: "title", value: "Example Title"}, {key: "tags", value: "example, tags"}, {key: "description", value: "Example Description"}]}
+          await chrome.storage.local.set({forms: forms, form_example: form_example})
+        }
+        else{
+          forms = result.forms;
+        }
+        loading = false;
+      })
+    }
 
-  // const determineNodeType = () => {
-  //   if(selectedElement.nodeName == "IMG"){
-  //     console.log("src: ", selectedElement.src)
-  //     data = selectedElement.src
-  //     return data
-  //   }
-  //   else{
-  //     console.log("innerText: ", selectedElement.innerText)
-  //     data = selectedElement.innerText;
-  //     return data
-  //     console.log(JSON.stringify(fields))
-  //   }
-  // }
+    const promise = getChromeStorage();
 
 </script>
 
 <div class="ActualRoot">
   <div class="Header">
+    {#if !openForm}
     <h2 class="ExtensionTitle">Markdown Clipper</h2>
+    {:else}
+    <div style="display: flex;">
+      <button on:click={() => {openForm = false}}>Back</button>
+      <h2 class="ExtensionTitle">{currentForm.name}</h2>
+    </div>
+    {/if}
     <div class="CloseButton" on:click={closePopup}>x</div>
   </div>
   <div class="MainContent">
-    {#if openForm}
-      <Form root={root} fields={fields} bind:openForm={openForm}/>
-    {:else}
-      <button on:click={() => {openForm = !openForm}}>Open Form</button>
+    {#if import.meta.env.DEV}
+      {#if openForm}
+        <Form root={root} bind:currentForm={currentForm} bind:openForm={openForm} isEditing={isEditing}/>
+      {:else}
+        <button on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
+      {/if}
     {/if}
+    {#await promise}
+      <p>loading...</p>
+    {:then}
+      {#if openForm}
+        <Form root={root} bind:currentForm={currentForm} bind:openForm={openForm} isEditing={isEditing}/>
+      {:else}
+        <button on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
+        {#each forms as form, i}
+          <div class="Form">
+            <h2>{form}</h2>
+            <button on:click={() => {currentForm = allData[`form_${form}`]; isEditing=false; openForm = true;}}>Open Form</button>
+            <button on:click={() => {chrome.storage.local.remove(form); getChromeStorage()}}>Delete</button>
+          </div>
+        {/each}
+      {/if}
+    {/await}
   </div>
 </div>
 
@@ -73,9 +95,7 @@
 
   overflow: hidden;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1e1e1e;
+  color: white;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -85,6 +105,7 @@
   
 }
 .Header{
+  color: white;
   display: flex;
   justify-content: space-between;
   background-color: #363636;
@@ -94,6 +115,7 @@
   margin: 10px 0;
 }
 h2{
+  color: white;
   font-size: 1.5em;
   font-weight: 700;
   margin: 0;
@@ -130,6 +152,7 @@ button {
   font-weight: 300;
   font-family: inherit;
   background-color: #363636;
+  color: white;
   cursor: pointer;
   transition: border-color 0.1s;
   border-left: solid 1px #3f3f3f;

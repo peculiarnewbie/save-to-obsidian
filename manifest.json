@@ -14,5 +14,5 @@
         "run_at": "document_end"
       }
     ],
-    "permissions": ["activeTab", "downloads", "scripting"]
+    "permissions": ["activeTab", "downloads", "scripting", "storage"]
   }

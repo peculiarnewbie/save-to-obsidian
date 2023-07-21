@@ -3,10 +3,12 @@
     import trash from '../../public/Delete.svg'
     import { createEventDispatcher } from "svelte";
     export let index = 0;
-    export let key = "key"
-    export let value = "value"
-    export let treePath = []
+    export let field;
+    $: key = field.key;
+    $: value = field.value;
+    $: treePath = field.treePath;
     export let parentInspect;
+    export let isEditing = false;
 
     enum IdType {
         ID,
@@ -15,6 +17,12 @@
     }
     
     const dispatch = createEventDispatcher()
+
+    const initField = () => {
+        if(field.treePath){
+            determineNodeType(getElementFromPath(field.treePath))
+        }
+    }
 
     const selectElement = async () => {
         const selectedElement = await parentInspect();
@@ -51,7 +59,7 @@
         treePath = path.reverse()
         console.log("treePath: ", treePath)
 
-        testPath(treePath, selectedElement)
+        getElementFromPath(treePath, selectedElement)
 
     }
 
@@ -74,22 +82,24 @@
 
     }
 
-    const testPath = (path, selectedElement) => {
+    const getElementFromPath = (path, selectedElement?) => {
         let currentElement;
 
-        currentElement = getElementFromPath(path[0], document.body)
+        currentElement = getElementFromCurrentPath(path[0], document.body)
         
         for(let i = 1; i < path.length; i++){
-            console.log("currentElement: ", currentElement)
-            currentElement = getElementFromPath(path[i], currentElement)
+            currentElement = getElementFromCurrentPath(path[i], currentElement)
         }
 
+        if(selectedElement == undefined){
+            return currentElement
+        }
         if(currentElement != selectedElement){
             console.error("failed to generate path")
         }
     }
 
-    const getElementFromPath = (currentPath, currentElement) => {
+    const getElementFromCurrentPath = (currentPath, currentElement) => {
         switch(currentPath.type){
             case IdType.ID:
                 return currentElement.querySelector("#" + currentPath.value)
@@ -113,22 +123,25 @@
     const determineNodeType = (selectedElement) => {
         if(selectedElement.nodeName == "IMG"){
             console.log("src: ", selectedElement.src)
-            value = selectedElement.src
+            field.value = selectedElement.src;
         }
         else{
             console.log("innerText: ", selectedElement.innerText)
-            value = selectedElement.innerText;
+            field.value = selectedElement.innerText;
         }
     }
 
     const deleteField = () => {
         dispatch("deleteField", index)
     }
+
+    initField()
 </script>
   
 <div class="FieldRoot">
     <!-- <p>{index}</p> -->
-    <input style="font-weight:700; font-size:16px" type="text" placeholder="enter key" bind:value={key}>
+    {#if isEditing}
+    <input style="font-weight:700; font-size:16px" type="text" placeholder="enter key" bind:value={field.key}>
     <div class="FieldComponent">
         
         <button on:click={selectElement}>
@@ -138,7 +151,7 @@
             <img src={chrome.runtime.getURL(select)} alt="select" width="15px">
             {/if}
         </button>
-        <input type="text" placeholder="select data or type here" bind:value={value}>
+        <input type="text" placeholder="select data or type here" bind:value={field.value}>
         
     </div>
     <button on:click={deleteField}>
@@ -148,10 +161,17 @@
         <img src={chrome.runtime.getURL(trash)} alt="select" width="15px">
         {/if}
     </button>
+    {:else}
+        <div class="FieldComponent">
+            <p style="font-weight:700; font-size:16px">{key}</p>
+            <p>{value}</p>
+        </div>
+    {/if}
 </div>
   
 <style>
 .FieldRoot{
+    color: white;
     padding: 0 10px 0 0;
     margin: 10px 0;
 }
@@ -159,6 +179,7 @@
     margin: 10px 0px 5px 5px;
 } */
 input{
+    color: white;
     width: 100%;
     min-width: 40px;
     height: 2rem;
@@ -182,6 +203,7 @@ input{
     margin: 5px 0;
 } */
 button{
+    color: white;
     padding: 7px 7px 3px 7px;
     font-weight: 200;
     border: none;

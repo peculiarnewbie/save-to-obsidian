@@ -1,20 +1,21 @@
 <script lang="ts">
     import Field from "./Field.svelte";
     export let root: HTMLElement;
-
-    export let fields = [{key: "", data: ""}]
+    export let currentForm;
+    export let isEditing;
+    $: fields = currentForm.fields
     export let openForm = true;
     let hoveredElement;
     $: data = `---<br>${
-        fields.map(field => {
-            return `${field.key}: ${field.data}`
+        currentForm.fields.map(field => {
+            return `${field.key}: ${field.value}`
         }).join('<br>')
     }<br>---<br>`
 
     const download = () => {
         data = `---\n` 
         fields.forEach((field) => {
-        data += `${field.key}: ${field.data}\n`
+        data += `${field.key}: ${field.value}\n`
         })
         data += `---\n`
         console.log("clicked download")
@@ -29,13 +30,13 @@
     }
 
     const addField = () => {
-        fields = [...fields, {key: "", data: ""}]
+        currentForm.fields = [...fields, {key: "", value: ""}]
     }
 
     function deleteField(event){
         const temp = [...fields]
         temp.splice(event.detail, 1)
-        fields = temp;
+        currentForm.fields = temp;
     }
 
     const inspect = async () => {
@@ -119,26 +120,42 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     }
+
+    const saveForm = async () => {
+        await chrome.storage.local.set({[`form_${currentForm.name}`]: currentForm})
+        isEditing = false;
+    }
 </script>
 
 
 <div class="Form">
-    <div>
-        <button on:click={() =>{openForm = false}}>Back</button>
-        <button on:click={addField}>Add Field</button>
-        <!-- <button on:click={getParent}>Prev</button>
-        <button on:click={inspect}>Inspect</button> -->
-    </div>
+
+    {#if isEditing}
+        <div style="display: flex; justify-content:space-between; align-items:end">
+            <div>
+                <h2>Title:</h2>
+                <input type="text" placeholder="enter form name" bind:value={currentForm.name}>
+            </div>
+            <button on:click={addField}>Add Field</button>
+        </div>
+    {:else}
+        <button on:click={() => {isEditing = true}}>Edit</button>
+    {/if}
         
-    {#each fields as field, i}
-    <Field index={i} bind:key={field.key} bind:value={field.data} parentInspect={inspect} on:deleteField={deleteField} />
+    {#each currentForm.fields as field, i}
+        <Field index={i} bind:field={field} parentInspect={inspect} on:deleteField={deleteField} isEditing={isEditing} />
     {/each}
+
 </div>
   
 <div class="result">
     <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items:end">
     <p style="margin: 0;">result:</p>
-    <button on:click={download}>Download</button>
+    {#if isEditing}
+        <button on:click={saveForm}>Save</button>
+    {:else}
+        <button on:click={download}>Download</button>
+    {/if}
     </div>
     <div class="rawData">
     <p style="margin: 0;">{@html data}</p>
@@ -150,7 +167,7 @@
 .Form{
   min-height: 100px;
   flex-grow: 10;
-  padding: 15px;
+  padding: 5px 15px 15px 15px;
   overflow-y: auto;
 }
 .result{
@@ -163,6 +180,10 @@
   /* box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.25); */
   border-top: #363636 solid 1px;
 }
+h2{
+    margin: 0;
+    color: white;
+}
 .rawData{
   height: 50%;
   flex-grow: 10;
@@ -172,6 +193,7 @@
   font-size: 12px
 }
 button {
+    color: white;
   align-items: center;
   border-radius: 6px;
   border: 1px solid transparent;
