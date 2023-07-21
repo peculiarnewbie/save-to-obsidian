@@ -20,13 +20,12 @@
       await chrome.storage.local.get(null, async (result) => {
         console.log(result)
         allData = result;
-        if(!result.forms){
+        forms = Object.keys(allData).filter((item) => item.includes("form_")).map((item) => item.replace("form_", ""))
+        if(forms.length == 0){
           forms = ["example"]
           let form_example = {name: "example", fields: [{key: "title", value: "Example Title"}, {key: "tags", value: "example, tags"}, {key: "description", value: "Example Description"}]}
           await chrome.storage.local.set({forms: forms, form_example: form_example})
-        }
-        else{
-          forms = result.forms;
+          allData["form_example"] = form_example
         }
         loading = false;
       })
