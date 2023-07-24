@@ -16,53 +16,32 @@
         CLASS,
         INDEX
     }
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if(request.action === "bgElementSelected"){
+            document.getElementById("extension-html").classList.remove("hidden")
+            sendResponse({success:true})
+            field.treePath = request.path
+            getValueFromPath(field.treePath)
+        }
+
+    })
     
     const dispatch = createEventDispatcher()
 
     const initField = () => {
         if(field.treePath){
-            determineNodeType(getElementFromPath(field.treePath))
+            getValueFromPath(field.treePath)
         }
     }
 
-    const selectElement = async () => {
-        const selectedElement = await parentInspect();
-        generatePath(selectedElement)
-        determineNodeType(selectedElement)
+    const selectElement = () => {
+        document.getElementById("extension-html").classList.add("hidden")
+        chrome.runtime.sendMessage({ action: "inspect"}, (response) => {
+
+        })
     }
 
-    const generatePath = (selectedElement) => {
-        let path = []
-        let currentElement = selectedElement;
-        let searchResult = {found: false, index: 0};
-        
-        while(currentElement != document.body){
-            if(currentElement.id != ""){
-                path.push({type: IdType.ID, value: currentElement.id, index: 0})
-                break
-            }
-            else if(currentElement.className != ""){
-                if(validateClass(currentElement.className)){
-                    let queriedElements = document.getElementsByClassName(currentElement.className)
-                    if(queriedElements.length < 5){
-                        searchResult = searchElements(queriedElements, currentElement)
-                        path.push({type: IdType.CLASS, value: currentElement.className, index: searchResult.index})
-                        break
-                    }
-                }
-            }
-
-            path.push({type: IdType.INDEX, value: "", index: Array.from(currentElement.parentElement.children).indexOf(currentElement)})
-            currentElement = currentElement.parentElement
-            continue
-        }
-
-        field.treePath = path.reverse()
-        console.log("treePath: ", field.treePath)
-
-        getElementFromPath(field.treePath, selectedElement)
-
-    }
 
     const validateClass = (className) => {
         if(className.includes(" ")){
@@ -83,32 +62,16 @@
 
     }
 
-    const getElementFromPath = (path, selectedElement?) => {
-        let currentElement;
+    const getValueFromPath = async (path, selectedElement?) => {
 
-        currentElement = getElementFromCurrentPath(path[0], document.body)
-        
-        for(let i = 1; i < path.length; i++){
-            currentElement = getElementFromCurrentPath(path[i], currentElement)
-        }
-
-        if(selectedElement == undefined){
-            return currentElement
-        }
-        if(currentElement != selectedElement){
-            console.error("failed to generate path")
-        }
-    }
-
-    const getElementFromCurrentPath = (currentPath, currentElement) => {
-        switch(currentPath.type){
-            case IdType.ID:
-                return currentElement.querySelector("#" + currentPath.value)
-            case IdType.CLASS:
-                return currentElement.querySelectorAll("." + currentPath.value)[currentPath.index]
-            case IdType.INDEX:
-                return currentElement.children[currentPath.index]
-        }
+        chrome.runtime.sendMessage({ action: "getElement", path: path}, (response) => {
+            if(!response.success){
+                console.error("failed to get element")
+            }
+            else{
+                field.value = response.value;
+            }
+        })
     }
 
     const searchElements = (elements, element) => {
@@ -121,14 +84,14 @@
         return {found: false, index: 0}
     }
     
-    const determineNodeType = (selectedElement) => {
-        if(selectedElement.nodeName == "IMG"){
-            console.log("src: ", selectedElement.src)
-            field.value = selectedElement.src;
+    const determineNodeType = (element) => {
+        if(element.nodeName == "IMG"){
+            console.log("src: ", element.src)
+            field.value = element.src;
         }
         else{
-            console.log("innerText: ", selectedElement.innerText)
-            field.value = selectedElement.innerText;
+            console.log("innerText: ", element.innerText)
+            field.value = element.innerText;
         }
     }
 

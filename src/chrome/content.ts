@@ -22,14 +22,10 @@ if(!document.getElementById("closeButton")){
 
     const downloadButton = document.getElementById("downloadButton");
     downloadButton.addEventListener("click", () => {
-        console.log("clicked download")
         chrome.runtime.sendMessage({ action: "download" }, (response) => {
-            console.log("sent message")
             if (response.success) {
-                console.log("success")
                 document.getElementById("floatingPage").style.display = "none";
             }
-            console.log("done")
         })
         
     });
@@ -37,7 +33,5 @@ if(!document.getElementById("closeButton")){
 else{
     document.getElementById("floatingPage").style.display = "block";
 }
-
-    console.log("called")
     
    

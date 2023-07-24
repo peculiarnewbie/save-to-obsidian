@@ -1,12 +1,10 @@
 
 
 chrome.action.onClicked.addListener((tab) => {
-    console.log("alooo")
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" }, (response) => {
-          // Handle the response from the content script
-          console.log(response);
+        chrome.tabs.sendMessage(tabs[0].id, { action: "popup" }, (response) => {
+          
         });
       });
 
@@ -37,25 +35,46 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       };
       sendResponse({ success: true });
       reader.readAsArrayBuffer(blob);
+      return;
     }
+  else if(request.action === "inspect"){
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: "inspect" }, (response) => {
+        // Handle the response from the content script
+        sendResponse(response);
+      });
+    });
+    return;
+  }
+  else if(request.action === "elementSelected"){
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: "bgElementSelected", path: request.path }, (response) => {
+        sendResponse(response);
+      });
+    });
+    return;
+  }
+  else if(request.action === "getElement"){
+    (async () => {
+      let actualResponse; 
+      
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "bgGetElement", path: request.path }, (response) => {
+          // Handle the response from the content script
+          actualResponse = response;
+        });
+      });
+
+      const result = await new Promise((resolve, reject) => {
+        setInterval(() => {
+          if(actualResponse){
+            resolve(actualResponse);
+          }
+          }, 10);
+      })
+      
+      sendResponse(result);
+    })();
+    return true;
+  }
 })
-
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  
-//   if(message.action === "inspect"){
-//     console.log("waiting for click");
-//     chrome.scripting.executeScript({
-//       target: { tabId: sender.tab.id },
-
-//     });
-//   }
-// });
-
-function displayClickedElement() {
-  console.log("in listening function")
-  document.addEventListener('click', (event) => {
-    const clickedElement = event.target as HTMLElement;
-    // Do something with the clicked element, such as displaying it in the popup
-    chrome.runtime.sendMessage({ action: "clicked", element: clickedElement.innerText });
-  });
-}

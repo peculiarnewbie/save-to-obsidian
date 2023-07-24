@@ -19,7 +19,7 @@
 
     const getChromeStorage = async () => {
       await chrome.storage.local.get(null, async (result) => {
-        console.log(result)
+        console.log("forms: ", result)
         allData = result;
         forms = Object.keys(allData).filter((item) => item.includes("form_")).map((item) => item.replace("form_", ""))
         if(forms.length == 0){

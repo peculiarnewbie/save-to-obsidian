@@ -1,6 +1,5 @@
 <script lang="ts">
     import Field from "./Field.svelte";
-    import "../app.css"
     export let root: HTMLElement;
     export let currentForm;
     export let isEditing;
@@ -21,14 +20,10 @@
         data += `${field.key}: ${field.value}\n`
         })
         data += `---\n`
-        console.log("clicked download")
         chrome.runtime.sendMessage({ action: "download", data: data}, (response) => {
-            console.log("sent message")
             if (response.success) {
-                console.log("success")
                 document.getElementById("floatingPage").style.display = "none";
             }
-            console.log("done")
         })
     }
 
@@ -65,32 +60,20 @@
         window.addEventListener('mouseout', ClearCanvas, true);
 
         const WaitForSelection = () => {
-        return new Promise((resolve, reject) => {
-            const interval = setInterval(() => {
-            if (selectedElement) {
-                clearInterval(interval);
-                resolve(selectedElement);
-            }
-            }, 100);
-        });
+            return new Promise((resolve, reject) => {
+                const interval = setInterval(() => {
+                if (selectedElement) {
+                    clearInterval(interval);
+                    resolve(selectedElement);
+                }
+                }, 100);
+            });
         };
 
         const chosen = await WaitForSelection() as HTMLElement;
-        // const getParent = (element) => {
-        //     if(element.parentElement == null){
-        //         console.log("no parent")
-        //         return;
-        //     }
-        //     else{
-        //     console.log("parent: ", element.parentElement)
-        //     getParent(element.parentElement)
-        //     }
-        // }
-        // getParent(chosen)
         return chosen
 
         function InspectElement (event) {
-        console.log(click_count)
         click_count++;
         event.preventDefault();
         event.stopPropagation();
@@ -109,7 +92,6 @@
         }
 
         function HoverElement (event){
-        console.log("hovered")
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         hoveredElement = event.target;
         ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
@@ -119,8 +101,7 @@
         }
 
         function ClearCanvas (){
-        // console.log("mouseout")
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     }
 

@@ -10,7 +10,7 @@
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["src/chrome/svelteContent.ts", "src/popup/index.ts"],
+        "js": ["src/chrome/svelteContent.ts", "assets/index.ts"],
         "run_at": "document_end"
       }
     ],
