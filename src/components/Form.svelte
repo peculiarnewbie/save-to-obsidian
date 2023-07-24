@@ -1,5 +1,6 @@
 <script lang="ts">
     import Field from "./Field.svelte";
+    import "../app.css"
     export let root: HTMLElement;
     export let currentForm;
     export let isEditing;
@@ -140,18 +141,18 @@
 </script>
 
 
-<div class="Form">
+<div id="Form" class="min-h-28 p-4 pt-1 overflow-y-auto flex-grow-[10]">
 
     {#if isEditing}
         <div style="display: flex; justify-content:space-between; align-items:end">
             <div>
-                <h4>Title:</h4>
+                <p class="ext-h4">Form Title:</p>
                 <input type="text" placeholder="enter form name" bind:value={currentForm.name}>
             </div>
-            <button on:click={addField}>Add Field</button>
+            <button class="btn-primary" on:click={addField}>Add Field</button>
         </div>
     {:else}
-        <button on:click={() => {isEditing = true}}>Edit</button>
+        <button class="btn-primary" on:click={() => {isEditing = true}}>Edit</button>
     {/if}
         
     {#each currentForm.fields as field, i}
@@ -160,78 +161,32 @@
 
 </div>
   
-<div class="result">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items:end">
+<div id="result" class="flex flex-col text-white h-44 bg-[#1e1e1e] p-3 pb-5 border-t border-[#363636] bottom-0">
+    <div class="flex justify-between mb-4 items-center">
     <p style="margin: 0;">result:</p>
     {#if isEditing}
-        <button on:click={saveForm}>Save</button>
+        <button class="btn-primary" on:click={saveForm}>Save</button>
     {:else}
-        <button on:click={download}>Download</button>
+        <button class="btn-primary" on:click={download}>Download</button>
     {/if}
     </div>
-    <div class="rawData">
+    <div id="rawData" class="h-full grow-10 overflow-y-auto bg-[#242424] p-2 text-xs">
     <p style="margin: 0;">{@html data}</p>
     </div>
 </div>
 
 
 <style>
-.Form{
-  min-height: 100px;
-  flex-grow: 10;
-  padding: 5px 15px 15px 15px;
-  overflow-y: auto;
+h2{
+    @apply text-2xl text-white font-bold my-3 pl-3 font-sans;
 }
-.result{
-  display: flex;
-  flex-direction: column;
-  height: 176px;
-  width: auto;
-  background-color: #1e1e1e;
-  padding: 10px;
-  /* box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.25); */
-  border-top: #363636 solid 1px;
+p{
+    @apply text-white font-normal font-sans;
 }
-h4{
-    margin: 0;
-    color: white;
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+button{
+  @apply bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]; 
 }
-.rawData{
-  height: 50%;
-  flex-grow: 10;
-  overflow-y: auto;
-  background-color: #242424;
-  padding: 8px;
-  font-size: 12px
-}
-button {
-    color: white;
-  align-items: center;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  padding: 0.4em 1.5em;
-  height: 36px;
-  font-size: 1em;
-  font-weight: 300;
-  font-family: inherit;
-  background-color: #363636;
-  cursor: pointer;
-  transition: border-color 0.1s;
-  border-left: solid 1px #3f3f3f;
-  border-right: solid 1px #3f3f3f;
-  border-top: solid 1px #484848;
-  box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 0.67);
-}
-button:hover {
-  background-color: #3f3f3f;
-  border-left: solid 1px #4e4e4e;
-  border-right: solid 1px #4e4e4e;
-  border-top: solid 1px #5b5b5b;
-  box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 1);
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button.hover{
+ @apply bg-[#3f3f3f]border-[#4e4e4e] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)]; 
 }
 </style>

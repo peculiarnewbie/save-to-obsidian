@@ -1,6 +1,7 @@
-import "../app.css";
+
 import Counter from '../components/Counter.svelte';
-import Inspector from "../components/Inspector.svelte";
+import Component from "../components/Component.svelte";
+import "../app.css"
 
 // const target = document.getElementById('app');
 
@@ -13,10 +14,6 @@ import Inspector from "../components/Inspector.svelte";
 
 const root = document.createElement("div");
 root.id = "extension-root";
-document.body.appendChild(root);
-
-async function render(){
-  new Inspector({target: root, props: {}})
-}
-
-document.addEventListener('DOMContentLoaded', render);
+new Component({target: root, props: {root: root}});
+const html = document.getElementById("extension-html")
+html.appendChild(root);

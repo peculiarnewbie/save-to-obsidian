@@ -10,8 +10,14 @@
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["src/chrome/svelteContent.ts"],
+        "js": ["src/chrome/svelteContent.ts", "src/popup/index.ts"],
         "run_at": "document_end"
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["assets/index.html"],
+        "matches": ["<all_urls>"]
       }
     ],
     "permissions": ["activeTab", "downloads", "scripting", "storage"]

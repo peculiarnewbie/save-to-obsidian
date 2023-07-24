@@ -1,7 +1,8 @@
 
 <script lang="ts">
     import Form from "./Form.svelte";
-
+    import back from '../../public/Back.svg'
+    import "../app.css"
     export let root: HTMLElement;
     let loading = true;
     let fields = [{key: "", value: ""}]
@@ -42,140 +43,72 @@
 
 </script>
 
-<div class="ActualRoot">
-  <div class="Header">
+<div id="ActualRoot" class="ext flex flex-col rounded-xl h-full w-full bg-[#242424] overflow-hidden font-sans" >
+  <div id="Header" class="ext flex justify-between bg-[#363636]">
     {#if !openForm}
-    <h2 class="ExtensionTitle">Markdown Clipper</h2>
+    <div id="ExtensionTitle" class="ext text-2xl text-white font-bold my-3 pl-3 font-sans">Markdown Clipper</div>
     {:else}
-    <div style="display: flex;">
-      <button on:click={() => {openForm = false}}>Back</button>
-      <h2 class="ExtensionTitle">{currentForm.name}</h2>
+    <div class="flex">
+      <div class="ext flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] align-middle cursor-pointer"
+      on:click={() => {openForm = false}}>
+        {#if import.meta.env.DEV}
+          <img src={back} alt="back" width="20px">
+          {:else}
+          <img src={chrome.runtime.getURL(back)} alt="back" width="20px">
+        {/if}
+    </div>
+      <h2 id="ExtensionTitle">{currentForm.name}</h2>
     </div>
     {/if}
-    <div class="CloseButton" on:click={closePopup}>x</div>
+    <div id="CloseButton" class="ext flex bg-transparent text-2xl text-white py-3 px-5 hover:bg-red-500" on:click={closePopup}>
+      x
+    </div>
   </div>
-  <div class="MainContent">
+  <div id="MainContent" class="ext flex flex-col flex-grow-[10] max-h-[92%]">
     {#if import.meta.env.DEV}
       {#if openForm}
         <Form root={root} bind:currentForm={currentForm} isEditing={isEditing} bind:forms={forms} refresh={getChromeStorage}/>
       {:else}
-        <button on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
+      <div class="ext p-3">
+        <button class="btn-primary"
+          on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>
+          <div class="text-white font-normal font-sans">Add Form</div>
+        </button>
+      </div>
       {/if}
     {/if}
     {#await promise}
-      <p>loading...</p>
+      <div class="text-white font-normal font-sans">loading...</div>
     {:then}
       {#if openForm}
         <Form root={root} bind:currentForm={currentForm} isEditing={isEditing} bind:forms={forms} refresh={getChromeStorage}/>
       {:else}
-        <button on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
-        {#each forms as form, i}
-          <div class="Form">
-            <h2>{form}</h2>
-            <button on:click={() => {currentForm = allData[`form_${form}`]; isEditing=false; openForm = true;}}>Open Form</button>
-            <button on:click={() => deleteForm(form)}>Delete</button>
-          </div>
-        {/each}
+        <div class="p-3">
+          <button class="btn-primary" on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>Add Form</button>
+          {#each forms as form, i}
+            <div id="Form">
+              <div class="text-2xl text-white font-bold my-3 pl-3 font-sans">{form}</div>
+              <button class="btn-primary" on:click={() => {currentForm = allData[`form_${form}`]; isEditing=false; openForm = true;}}>Open Form</button>
+              <button class="btn-primary" on:click={() => deleteForm(form)}>Delete</button>
+            </div>
+          {/each}
+        </div>
       {/if}
     {/await}
   </div>
 </div>
 
 <style>
-.ActualRoot{
-  display: flex;
-  flex-direction: column;
-  background-color: #242424;
-  border-radius: 10px;
-  width: fit-content;
-  width: 50vw;
-  height: 70vh;
-  min-width: 350px;
-  max-width: 450px;
-  min-height: 500px;
-  max-height: 1200px;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  overflow: hidden;
-
-  color: white;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-  
+  h2{
+    @apply text-2xl text-white font-bold my-3 pl-3 font-sans;
 }
-.Header{
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  background-color: #363636;
-  padding: 0 0 0 15px;
+p{
+    @apply text-white font-normal font-sans;
 }
-.ExtensionTitle{
-  margin: 10px 0;
+button{
+  @apply bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]; 
 }
-h2{
-  color: white;
-  font-size: 1.5em;
-  font-weight: 700;
-  margin: 0;
-  padding: 0;
+button.hover{
+ @apply bg-[#3f3f3f]border-[#4e4e4e] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)]; 
 }
-.CloseButton{
-  display: flex;
-  background-color: transparent;
-  border: none;
-  border-radius: 0;
-  color: white;
-  font-size: 1.5em;
-  font-weight: 300;
-  cursor: pointer;
-  padding: 5px 20px;
-}
-.CloseButton:hover{
-  background-color: #fb464c;
-}
-.MainContent{
-  display: flex;
-  flex-direction: column;
-  height:200px; 
-  flex-grow:10; 
-  padding:10px
-}
-button {
-  align-items: center;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  padding: 0.4em 1.5em;
-  height: 36px;
-  font-size: 1em;
-  font-weight: 300;
-  font-family: inherit;
-  background-color: #363636;
-  color: white;
-  cursor: pointer;
-  transition: border-color 0.1s;
-  border-left: solid 1px #3f3f3f;
-  border-right: solid 1px #3f3f3f;
-  border-top: solid 1px #484848;
-  box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 0.67);
-}
-button:hover {
-  background-color: #3f3f3f;
-  border-left: solid 1px #4e4e4e;
-  border-right: solid 1px #4e4e4e;
-  border-top: solid 1px #5b5b5b;
-  box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 1);
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-
 </style>

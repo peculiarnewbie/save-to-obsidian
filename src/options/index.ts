@@ -1,4 +1,4 @@
-import '../app.css';
+
 import Options from '../components/Options.svelte';
 
 chrome.action.onClicked.addListener((tab) => {

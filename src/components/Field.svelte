@@ -1,6 +1,7 @@
 <script lang="ts">
     import select from '../../public/Select.svg'
     import trash from '../../public/Delete.svg'
+    import "../app.css"
     import { createEventDispatcher } from "svelte";
     export let index = 0;
     export let field;
@@ -138,23 +139,27 @@
     initField()
 </script>
   
-<div class="FieldRoot">
+<div id="FieldRoot" class="pt-3">
     <!-- <p>{index}</p> -->
     {#if isEditing}
-    <input style="font-weight:700; font-size:16px" type="text" placeholder="enter key" bind:value={field.key}>
-    <div class="FieldComponent">
+    <input class="font-bold text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]" 
+        type="text" placeholder="enter key" bind:value={field.key}>
+    <div id="FieldComponent" class="flex gap-1 align-middle pt-1">
         
-        <button on:click={selectElement}>
+        <button class="p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636]"
+         on:click={selectElement}>
             {#if import.meta.env.DEV}
             <img src={select} alt="select" width="15px">
             {:else}
             <img src={chrome.runtime.getURL(select)} alt="select" width="15px">
             {/if}
         </button>
-        <input type="text" placeholder="select data or type here" bind:value={field.value}>
+        <input class=" font-normal text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
+            type="text" placeholder="select data or type here" bind:value={field.value}>
         
     </div>
-    <button on:click={deleteField}>
+    <button class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
+    on:click={deleteField}>
         {#if import.meta.env.DEV}
         <img src={trash} alt="select" width="15px">
         {:else}
@@ -162,7 +167,7 @@
         {/if}
     </button>
     {:else}
-        <div class="FieldComponent">
+        <div id="FieldComponent" class="flex gap-1 align-middle pt-1">
             <p style="font-weight:700; font-size:16px">{key}</p>
             <p>{value}</p>
         </div>
@@ -170,48 +175,5 @@
 </div>
   
 <style>
-.FieldRoot{
-    color: white;
-    padding: 0 10px 0 0;
-    margin: 10px 0;
-}
-/* h4{
-    margin: 10px 0px 5px 5px;
-} */
-input{
-    color: white;
-    width: 100%;
-    min-width: 40px;
-    height: 2rem;
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid #3e4446;
-    padding: 0 0 0;
-}
-/* .divider{
-    width: 100%;
-    height: 2px;
-    background-color: #3e4446;
-} */
-.FieldComponent{
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    padding: 5px 0 0 0px;
-}
-/* p{
-    margin: 5px 0;
-} */
-button{
-    color: white;
-    padding: 7px 7px 3px 7px;
-    font-weight: 200;
-    border: none;
-    border-radius: 5px;
-    background-color: transparent;
-}
-button:hover{
-    background-color: #363636;
-    color: white;
-}
+   
 </style>
