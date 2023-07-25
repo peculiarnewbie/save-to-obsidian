@@ -3,24 +3,50 @@
     export let root: HTMLElement;
     export let currentForm;
     export let isEditing;
-    $: fields = currentForm.fields;
+    let fields;
     let prevName;
     let hoveredElement;
+    $: {
+        let temp = [...currentForm.fields]
+        temp.splice(0, 1);
+        fields = temp;
+    }
     $: data = `---<br>${
-        currentForm.fields.map(field => {
+        fields.map(field => {
             return `${field.key}: ${field.value}`
         }).join('<br>')
     }<br>---<br>`
     export let forms;
     export let refresh;
+    let selectionIndex : number;
+
+    if(!import.meta.env.DEV){
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if(request.action === "bgElementSelected"){
+                document.getElementById("extension-html").classList.remove("hidden")
+                sendResponse({success:true})
+                currentForm.fields[selectionIndex].treePath = request.path;
+                currentForm.fields[selectionIndex].value = request.value;
+            }
+            if(request.action === "bgValuesUpdated"){
+                request.values.forEach((value, index) => {
+                    currentForm.fields[index].value = value;
+                })
+            }
+        })
+    }
 
     const download = () => {
+
         data = `---\n` 
         fields.forEach((field) => {
         data += `${field.key}: ${field.value}\n`
         })
         data += `---\n`
-        chrome.runtime.sendMessage({ action: "download", data: data}, (response) => {
+        
+        console.log(data);
+
+        chrome.runtime.sendMessage({ action: "download", data: data, title: currentForm.fields[0].value}, (response) => {
             if (response.success) {
                 chrome.runtime.sendMessage({message: "closePopup"})
             }
@@ -28,81 +54,16 @@
     }
 
     const addField = () => {
-        currentForm.fields = [...fields, {key: "", value: ""}]
+        currentForm.fields = [...currentForm.fields, {key: "", value: ""}]
     }
 
     function deleteField(event){
-        const temp = [...fields]
-        temp.splice(event.detail, 1)
-        currentForm.fields = temp;
+        currentForm.fields = [...fields]
     }
 
-    const inspect = async () => {
-
-        let selectedElement;
-
-        root.style.opacity = "0";
-        root.style.pointerEvents = "none";
-
-        let click_count = 0;
-
-        const canvas = document.getElementById("hoverCanvas") as HTMLCanvasElement;
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.style.width = "100vw";
-        canvas.style.height = "100vh";
-
-        const ctx = canvas.getContext('2d');
-
-        document.addEventListener('click', InspectElement, true);
-        document.addEventListener('mouseover', HoverElement, true);
-        window.addEventListener('mouseout', ClearCanvas, true);
-
-        const WaitForSelection = () => {
-            return new Promise((resolve, reject) => {
-                const interval = setInterval(() => {
-                if (selectedElement) {
-                    clearInterval(interval);
-                    resolve(selectedElement);
-                }
-                }, 100);
-            });
-        };
-
-        const chosen = await WaitForSelection() as HTMLElement;
-        return chosen
-
-        function InspectElement (event) {
-        click_count++;
-        event.preventDefault();
-        event.stopPropagation();
-        const element = event.target;
-        selectedElement = element;
-
-        if(click_count == 1){
-            root.style.opacity = "1";
-            root.style.pointerEvents = "all";
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.removeEventListener('click', InspectElement, true);
-            document.removeEventListener('mouseover', HoverElement, true);
-            window.removeEventListener('mouseout', ClearCanvas, true);
-            return selectedElement
-        }
-        }
-
-        function HoverElement (event){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        hoveredElement = event.target;
-        ctx.fillStyle = 'rgba(0, 0, 255, 0.2)';
-        const hoveredDom = hoveredElement.getBoundingClientRect();
-        // ctx.fillRect(100, 100, 200, 200);
-        ctx.fillRect(hoveredDom.left, hoveredDom.top, hoveredDom.width, hoveredDom.height);
-        }
-
-        function ClearCanvas (){
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+    const inspect = async (index) => {
+        selectionIndex = index;
+        chrome.runtime.sendMessage({ action: "inspect"},)
     }
 
     const saveForm = async () => {
@@ -118,7 +79,30 @@
         isEditing = false;
     }
 
+    const updateFieldValues = () => {
+
+        let paths = currentForm.fields.map((field) => field.treePath)
+
+        console.log("in form: sent getElements", paths)
+        chrome.runtime.sendMessage({ action: "getElements", paths: paths}, (response) => {
+            if(!response.success){
+                console.error("failed to get element")
+            }
+            else{
+                response.values.forEach((value, index) => {
+                    currentForm.fields[index].value = value;
+                })
+            }
+        })
+
+    }
+
     prevName = currentForm.name;
+
+    if(!isEditing){
+        console.log("in form: call updating values")
+        updateFieldValues()
+    }
 </script>
 
 

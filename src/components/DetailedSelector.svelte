@@ -1,6 +1,7 @@
 <script lang="ts">
     export let extensionId;
     export let selectedElement;
+    export let getElementValueFromPath;
     $: currentElement = selectedElement;
     let treePath;
 
@@ -36,6 +37,13 @@
         })
     }
 
+    const FinishSelection = () => {
+        generatePath()
+        let value = getElementValueFromPath(treePath)
+        chrome.runtime.sendMessage({ action: "elementSelected", path: treePath, value:value})
+        selectedElement = null;
+    }
+
     const getParentElement = () => {
         if(currentElement.parentElement){
             selectedElement = currentElement.parentElement;
@@ -44,10 +52,13 @@
         }
     }
 
-    const FinishSelection = () => {
-        generatePath()
-        chrome.runtime.sendMessage({ action: "elementSelected", path: treePath})
-        selectedElement = null;
+    if(!import.meta.env.DEV){
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if(request.action == "bgElementSelected"){
+                selectedElement = request.element
+                sendResponse({success:true})
+            }
+        })
     }
 
     const generatePath = () => {
@@ -100,34 +111,6 @@
 
     }
 
-    const getElementValueFromPath = (path, selectedElement?) => {
-        let element;
-        console.log("in detail: getting element from: ", path);
-        element = getElementFromCurrentPath(path[0], document.body)
-        console.log("in detail: first path: ", element)
-        
-        for(let i = 1; i < path.length; i++){
-            element = getElementFromCurrentPath(path[i], element)
-        }
-
-        if(!selectedElement){
-            return determineElementValue(element)
-        }
-        if(element != selectedElement){
-            console.error("failed to generate path")
-        }
-    }
-
-    const getElementFromCurrentPath = (currentPath, currentElement) => {
-        switch(currentPath.type){
-            case IdType.ID:
-                return currentElement.querySelector("#" + currentPath.value)
-            case IdType.CLASS:
-                return currentElement.querySelectorAll("." + currentPath.value)[currentPath.index]
-            case IdType.INDEX:
-                return currentElement.children[currentPath.index]
-        }
-    }
 
     const searchElements = (elements, element) => {
         for(let i = 0; i < elements.length; i++){
@@ -204,9 +187,9 @@
     `
 
     const imgContainer = `
-        max-width: 200px;
-        height: 200px;
-        max-height: 200px;
+        max-width: 250px;
+        height: 250px;
+        max-height: 250px;
     `
 
     const imgElement = `
@@ -214,11 +197,51 @@
         max-height: 100%;
     `
 
+    const resultBox = `
+        background-color: #1e1e1e;
+        height:fit-content;
+        padding:4px;
+        margin-top:8px;
+        min-height: 50px;
+        max-width: 250px;
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: auto;
+    `
+
     const testSelectImage = () => {
         let imgTest = document.createElement("img")
         imgTest.src = "https://e.snmc.io/i/600/w/291a2a8451de99ede908023514823338/10297048/paramore-this-is-why-Cover-Art.jpg"
         imgTest.alt = "ParamoreTest"
         selectedElement = imgTest;
+    }
+    const testLongItem = () => {
+        let longTest = document.createElement("p")
+        longTest.innerText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
+        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
+        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
+        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl 
+        nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, nisl nisl 
+        aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, nisl eget 
+        ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. 
+        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
+        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
+        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
+        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
+        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
+        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
+        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl 
+        nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, nisl nisl 
+        aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, nisl eget 
+        ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. 
+        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
+        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
+        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
+        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl.`
+        selectedElement = longTest;
     }
 
 </script>
@@ -228,7 +251,7 @@
     <div style={`${parentStyle}`}>
         <div style="all:unset; color: white;">
             Result:
-            <div style="width: 100%; background-color: #1e1e1e; height:fit-content; padding:4px; margin-top:8px">
+            <div id="resultBox" style={resultBox}>
                 {#if elementType == ElementType.TEXT}
                     <p>{elementValue}</p>
                 {:else if elementType == ElementType.IMG}
@@ -248,6 +271,7 @@
 
 {#if import.meta.env.DEV}
     <button id="testButton" style={buttonStyle} on:click={testSelectImage}>Test Image</button>
+    <button id="testButton" style={buttonStyle} on:click={testLongItem}>Test Long</button>
 {/if}
 
 

@@ -7,6 +7,7 @@
     $: key = field.key;
     $: value = field.value;
     $: treePath = field.treePath;
+
     export let parentInspect;
     export let isEditing = false;
 
@@ -15,52 +16,23 @@
         CLASS,
         INDEX
     }
-
-    if(!import.meta.env.DEV){
-        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if(request.action === "bgElementSelected"){
-                document.getElementById("extension-html").classList.remove("hidden")
-                sendResponse({success:true})
-                field.treePath = request.path
-                getValueFromPath(field.treePath)
-            }
-        })
-    }
     
     const dispatch = createEventDispatcher()
 
-    const initField = () => {
-        if(field.treePath){
-            getValueFromPath(field.treePath)
-        }
-    }
+    // const initField = async() => {
+    //     console.log("init field")
+    //     if(field.treePath){
+    //         await getValueFromPath(field.treePath)
+    //     }
+    // }
 
     const selectElement = () => {
         document.getElementById("extension-html").classList.add("hidden")
-        chrome.runtime.sendMessage({ action: "inspect"})
-    }
-
-
-    const validateClass = (className) => {
-        if(className.includes(" ")){
-            return false;
-        }
-        else if(className.length > 40){
-            return false;
-        }
-        else {
-            let regex = /\d/;
-            if(regex.test(className)){
-                return false;
-            }
-            else{
-                return true;
-            }
-        }
-
+        parentInspect(index)
     }
 
     const getValueFromPath = async (path, selectedElement?) => {
+        let fetching = true;
 
         chrome.runtime.sendMessage({ action: "getElement", path: path}, (response) => {
             if(!response.success){
@@ -68,36 +40,22 @@
             }
             else{
                 field.value = response.value;
+                fetching = false
             }
         })
-    }
 
-    const searchElements = (elements, element) => {
-        for(let i = 0; i < elements.length; i++){
-            if(elements[i] == element){
-                return {found: true, index: i}
-            }
+        while(fetching){
+            await new Promise(r => setTimeout(r, 10));
+            
         }
-        console.error("failed to find element")
-        return {found: false, index: 0}
-    }
-    
-    const determineNodeType = (element) => {
-        if(element.nodeName == "IMG"){
-            console.log("src: ", element.src)
-            field.value = element.src;
-        }
-        else{
-            console.log("innerText: ", element.innerText)
-            field.value = element.innerText;
-        }
+        console.log("got value", field.value)
     }
 
     const deleteField = () => {
         dispatch("deleteField", index)
     }
 
-    initField()
+    // initField()
 </script>
   
 <div id="FieldRoot" class="pt-3">
@@ -119,14 +77,16 @@
             type="text" placeholder="select data or type here" bind:value={field.value}>
         
     </div>
-    <button class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
-    on:click={deleteField}>
-        {#if import.meta.env.DEV}
-        <img src={trash} alt="select" width="15px">
-        {:else}
-        <img src={chrome.runtime.getURL(trash)} alt="select" width="15px">
+        {#if index != 0}
+            <button class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
+            on:click={deleteField}>
+                {#if import.meta.env.DEV}
+                <img src={trash} alt="select" width="15px">
+                {:else}
+                <img src={chrome.runtime.getURL(trash)} alt="select" width="15px">
+                {/if}
+            </button>
         {/if}
-    </button>
     {:else}
         <div id="FieldComponent" class="flex gap-1 align-middle pt-1">
             <p style="font-weight:700; font-size:16px">{key}</p>

@@ -8,7 +8,7 @@
     let forms: string[] = [];
     let allData = {}
     let isEditing = false
-    $: currentForm = {name: "", fields: fields}
+    let currentForm = {name: "", fields: fields}
 
     let openForm = false;
 
@@ -70,7 +70,7 @@
       {:else}
       <div class="ext p-3">
         <button class="btn-primary"
-          on:click={() => {currentForm = {name: "New Form", fields: [{key: "", value: ""}]}; isEditing=true; openForm = true}}>
+          on:click={() => {fields = [{key: "file title", value: ""}]; currentForm = {name: "New Form", fields: fields}; isEditing=true; openForm = true}}>
           <div class="text-white font-normal font-sans">Add Form</div>
         </button>
       </div>
