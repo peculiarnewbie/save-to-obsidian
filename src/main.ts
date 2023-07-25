@@ -1,8 +1,9 @@
 
-import Component from "./components/Component.svelte"
+import DetailedSelector from "./components/DetailedSelector.svelte"
 
-const app = new Component({
-  target: document.getElementById('app'),
-})
+console.log("am here")
 
-export default app
+const target = document.getElementById('app');
+const root = document.createElement("div");
+new DetailedSelector({target: root, props: {extensionId: 1, selectedElement: target}});
+target.appendChild(root);

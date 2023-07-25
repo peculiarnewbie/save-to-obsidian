@@ -1,15 +1,25 @@
 <script lang="ts">
     import DetailedSelector from "./DetailedSelector.svelte";
 
-    export let root: HTMLElement;
     export let canvas: HTMLCanvasElement;
+    export let extensionId;
     let selectedElement;
 
     let hoveredElement;
 
-    const inspect = async () => {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if(request.action === "closePopup"){
+            const popup = document.getElementById(`${extensionId}-iframe`)
+            popup.remove()
+            sendResponse({success: true})
+        }
+        else if(request.action === "inspect"){
+            inspect()
+            sendResponse({success: true})
+        }
+    })
 
-        
+    const inspect = async () => {
 
         let click_count = 0;
 
@@ -23,21 +33,6 @@
         document.addEventListener('click', InspectElement, true);
         document.addEventListener('mouseover', HoverElement, true);
         window.addEventListener('mouseout', ClearCanvas, true);
-
-        // const WaitForSelection = () => {
-        // return new Promise((resolve, reject) => {
-        //     const interval = setInterval(() => {
-        //     if (selectedElement) {
-        //         clearInterval(interval);
-        //         resolve(selectedElement);
-        //     }
-        //     }, 100);
-        // });
-        // };
-
-        // const chosen = await WaitForSelection() as HTMLElement;
-
-        // return chosen
 
         function InspectElement (event) {
             click_count++;
@@ -69,10 +64,8 @@
         }
     }
 
-    inspect();
-
 </script>
 
 <div>
-    <DetailedSelector selectedElement={selectedElement} />
+    <DetailedSelector extensionId={extensionId} selectedElement={selectedElement} />
 </div>

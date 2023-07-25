@@ -1,19 +1,11 @@
 
 
 chrome.action.onClicked.addListener((tab) => {
-
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "popup" }, (response) => {
-          
         });
-      });
-
-    
-    // chrome.scripting.executeScript({
-    //   target: { tabId: tab.id },
-    //   files: ["src/chrome/content.ts"]
-    // });
   });
+});
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.action === "download"){  
@@ -40,7 +32,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   else if(request.action === "inspect"){
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, { action: "inspect" }, (response) => {
-        // Handle the response from the content script
         sendResponse(response);
       });
     });
@@ -62,6 +53,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "bgGetElement", path: request.path }, (response) => {
           // Handle the response from the content script
           actualResponse = response;
+          sendResponse(actualResponse);
         });
       });
 
@@ -73,8 +65,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           }, 10);
       })
       
-      sendResponse(result);
+      
     })();
     return true;
+  }
+  else if(request.action === "closePopup"){
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: "closePopup" }, (response) => {
+        sendResponse(response);
+      });
+    });
+    return;
   }
 })

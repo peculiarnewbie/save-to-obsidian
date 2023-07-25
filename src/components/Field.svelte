@@ -1,7 +1,6 @@
 <script lang="ts">
     import select from '../../public/Select.svg'
     import trash from '../../public/Delete.svg'
-    import "../app.css"
     import { createEventDispatcher } from "svelte";
     export let index = 0;
     export let field;
@@ -37,9 +36,7 @@
 
     const selectElement = () => {
         document.getElementById("extension-html").classList.add("hidden")
-        chrome.runtime.sendMessage({ action: "inspect"}, (response) => {
-
-        })
+        chrome.runtime.sendMessage({ action: "inspect"})
     }
 
 

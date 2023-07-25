@@ -1,5 +1,4 @@
 
-import Counter from '../src/components/old/Counter.svelte';
 import Component from "../src/components/Component.svelte";
 import "../src/app.css"
 
@@ -14,7 +13,10 @@ import "../src/app.css"
 
 const root = document.createElement("div");
 root.id = "extension-root";
-new Component({target: root, props: {root: root}});
-const html = document.getElementById("extension-html")
-//@ts-ignore
-html.appendChild(root);
+const html = document.getElementById("extension-html") as HTMLElement
+
+if(html){
+    new Component({target: root, props: {root: html}});
+    //@ts-ignore
+    html.appendChild(root);
+}
