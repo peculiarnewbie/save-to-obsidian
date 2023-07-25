@@ -12,7 +12,9 @@
     $: elementType = determineNodeType(currentElement);
     $: elementValue = determineElementValue(currentElement);
 
-    
+    let selectableElements = []
+    let showChildren = false
+    let showSiblings = false
 
     enum IdType {
         ID,
@@ -155,6 +157,22 @@
         }
     }
 
+    const getElementChildren = (element) => {
+        let children = []
+        for(let i = 0; i < element.children.length; i++){
+            children.push(element.children[i])
+        }
+        return children
+    }
+
+    const getElementSiblings = (element) => {
+        let siblings = []
+        for(let i = 0; i < element.parentElement.children.length; i++){
+            siblings.push(element.parentElement.children[i])
+        }
+        return siblings
+    }
+
     const buttonStyle = `
         background-color: #363636;
         color: white;
@@ -185,6 +203,24 @@
         gap: 12px;
     `
 
+    const imgContainer = `
+        max-width: 200px;
+        height: 200px;
+        max-height: 200px;
+    `
+
+    const imgElement = `
+        max-width: 100%;
+        max-height: 100%;
+    `
+
+    const testSelectImage = () => {
+        let imgTest = document.createElement("img")
+        imgTest.src = "https://e.snmc.io/i/600/w/291a2a8451de99ede908023514823338/10297048/paramore-this-is-why-Cover-Art.jpg"
+        imgTest.alt = "ParamoreTest"
+        selectedElement = imgTest;
+    }
+
 </script>
 
 
@@ -196,7 +232,9 @@
                 {#if elementType == ElementType.TEXT}
                     <p>{elementValue}</p>
                 {:else if elementType == ElementType.IMG}
-                    <img src={elementValue} alt="selected" />
+                <div style={`${imgContainer}`}>
+                    <img style={`all:unset ${imgElement}`} src={elementValue} alt="selected" />
+                </div>
                 {/if}
             </div>
         </div>
@@ -208,9 +246,14 @@
     </div>
 </div>
 
+{#if import.meta.env.DEV}
+    <button id="testButton" style={buttonStyle} on:click={testSelectImage}>Test Image</button>
+{/if}
+
 
 <style>
     .no{
+
         
     }
 </style>
