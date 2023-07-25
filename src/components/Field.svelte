@@ -16,15 +16,16 @@
         INDEX
     }
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        if(request.action === "bgElementSelected"){
-            document.getElementById("extension-html").classList.remove("hidden")
-            sendResponse({success:true})
-            field.treePath = request.path
-            getValueFromPath(field.treePath)
-        }
-
-    })
+    if(!import.meta.env.DEV){
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if(request.action === "bgElementSelected"){
+                document.getElementById("extension-html").classList.remove("hidden")
+                sendResponse({success:true})
+                field.treePath = request.path
+                getValueFromPath(field.treePath)
+            }
+        })
+    }
     
     const dispatch = createEventDispatcher()
 

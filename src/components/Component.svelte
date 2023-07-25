@@ -47,7 +47,7 @@
     {#if !openForm}
     <div id="ExtensionTitle" class="ext text-2xl text-white font-bold my-3 pl-3 font-sans">Markdown Clipper</div>
     {:else}
-    <div class="flex">
+    <div class="flex pl-2">
       <div class="ext flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] align-middle cursor-pointer"
       on:click={() => {openForm = false}}>
         {#if import.meta.env.DEV}
@@ -105,7 +105,7 @@ p{
   @apply text-white font-normal font-sans;
 }
 button{
-  @apply font-sans bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t-[#242424] border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]; 
+  @apply font-sans bg-[#363636] align-middle text-white text-base px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t-[#242424] border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]; 
 }
 button:hover{
   @apply bg-[#3f3f3f] border-[#4e4e4e] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)]; 
