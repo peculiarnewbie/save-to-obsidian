@@ -165,7 +165,7 @@ p{
     @apply text-white font-normal font-sans;
 }
 button{
-    @apply bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t-[#242424] border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]; 
+    @apply font-sans bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t-[#242424] border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]; 
 }
 button:hover{
     @apply bg-[#3f3f3f] border-[#4e4e4e] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)]; 

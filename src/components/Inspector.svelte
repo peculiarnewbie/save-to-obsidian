@@ -66,6 +66,8 @@
 
 </script>
 
+{#if selectedElement}
 <div>
-    <DetailedSelector extensionId={extensionId} selectedElement={selectedElement} />
+    <DetailedSelector extensionId={extensionId} bind:selectedElement={selectedElement} />
 </div>
+{/if}

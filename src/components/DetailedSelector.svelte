@@ -4,6 +4,16 @@
     $: currentElement = selectedElement;
     let treePath;
 
+    enum ElementType{
+        TEXT,
+        IMG
+    }
+
+    $: elementType = determineNodeType(currentElement);
+    $: elementValue = determineElementValue(currentElement);
+
+    
+
     enum IdType {
         ID,
         CLASS,
@@ -99,7 +109,7 @@
         }
 
         if(!selectedElement){
-            return determineNodeType(element)
+            return determineElementValue(element)
         }
         if(element != selectedElement){
             console.error("failed to generate path")
@@ -129,12 +139,19 @@
     
     const determineNodeType = (element) => {
         if(element.nodeName == "IMG"){
-            console.log("src: ", element.src)
-            return element.src;
+            return ElementType.IMG
         }
         else{
-            console.log("innerText: ", element.innerText)
-            return element.innerText;
+            return ElementType.TEXT
+        }
+    }
+
+    const determineElementValue = (element) => {
+        if(element.nodeName == "IMG"){
+            return element.src
+        }
+        else{
+            return element.innerText
         }
     }
 
@@ -148,41 +165,52 @@
         border-radius: 6px;
         padding: 0 20px 0 20px;
         align-items: center;
-        height: 20px;
+        height: 36px;
+        cursor: pointer;
     `
 
     const rootStyle = `
         all:initial; 
         display:flex; 
         background-color: #242424; 
+        width: fit-content;
         border-radius: 6px; 
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     `
 
     const parentStyle = `
-        padding: 8px
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+        gap: 12px;
     `
 
 </script>
 
+
 <div style={`${rootStyle}`}>
     <div style={`${parentStyle}`}>
-        {#if selectedElement}
-        <button style={`all:initial; ${buttonStyle}`} on:click={getParentElement}>Select Parent</button>
-        <button style={`all:initial; ${buttonStyle}`}  on:click={FinishSelection}>Done</button>
-        {/if}
+        <div style="all:unset; color: white;">
+            Result:
+            <div style="width: 100%; background-color: #1e1e1e; height:fit-content; padding:4px; margin-top:8px">
+                {#if elementType == ElementType.TEXT}
+                    <p>{elementValue}</p>
+                {:else if elementType == ElementType.IMG}
+                    <img src={elementValue} alt="selected" />
+                {/if}
+            </div>
+        </div>
+        <div style="all:unset; display: flex; gap:12px">
+            <button style={`all:unset; ${buttonStyle}`} on:click={getParentElement}>Select Parent</button>
+            <button style={`all:unset; ${buttonStyle}`}  on:click={FinishSelection}>Done</button>
+            
+        </div>
     </div>
 </div>
 
+
 <style>
-    /* button{
-        background-color: #363636;
-        color: white;
-        border-top: 1px solid #242424;
-        border-left: 1px solid #3f3f3f;
-        border-right: 1px solid #3f3f3f;
-        box-shadow: 0 2px 5px -2px rgba(0,0,0,0.67);
-        border-radius: 6px;
-        padding: 0 5px 0 5px;
-        align-items: center;
-    } */
+    .no{
+        
+    }
 </style>
