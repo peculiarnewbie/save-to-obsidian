@@ -13,8 +13,8 @@ const root = document.createElement("div");
 // root.style.backgroundColor = "transparent";
 // root.style.zIndex = "9998";
 new DetailedSelector({
-    target: root,
-    props: { extensionId: 1, selectedElement: target },
+	target: root,
+	props: { extensionId: 1, selectedElement: target },
 });
 // new Component({target: root, props: { root: target}});
 target.appendChild(root);

@@ -21,23 +21,19 @@
 	let selectionIndex: number;
 
 	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener(
-			(request, sender, sendResponse) => {
-				if (request.action === "bgElementSelected") {
-					document
-						.getElementById("extension-html")
-						.classList.remove("hidden");
-					sendResponse({ success: true });
-					currentForm.fields[selectionIndex].treePath = request.path;
-					currentForm.fields[selectionIndex].value = request.value;
-				}
-				if (request.action === "bgValuesUpdated") {
-					request.values.forEach((value, index) => {
-						currentForm.fields[index].value = value;
-					});
-				}
+		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+			if (request.action === "bgElementSelected") {
+				document.getElementById("extension-html").classList.remove("hidden");
+				sendResponse({ success: true });
+				currentForm.fields[selectionIndex].treePath = request.path;
+				currentForm.fields[selectionIndex].value = request.value;
 			}
-		);
+			if (request.action === "bgValuesUpdated") {
+				request.values.forEach((value, index) => {
+					currentForm.fields[index].value = value;
+				});
+			}
+		});
 	}
 
 	const download = () => {
@@ -59,7 +55,7 @@
 				if (response.success) {
 					chrome.runtime.sendMessage({ message: "closePopup" });
 				}
-			}
+			},
 		);
 	};
 
@@ -106,7 +102,7 @@
 						currentForm.fields[index].value = value;
 					});
 				}
-			}
+			},
 		);
 	};
 
@@ -120,9 +116,7 @@
 
 <div id="Form" class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
 	{#if isEditing}
-		<div
-			style="display: flex; justify-content:space-between; align-items:end"
-		>
+		<div style="display: flex; justify-content:space-between; align-items:end">
 			<div>
 				<p class="text-xl font-semibold">Form Title:</p>
 				<input

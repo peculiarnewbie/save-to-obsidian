@@ -29,7 +29,7 @@
 	const selectElement = () => {
 		document.getElementById("extension-html").classList.add("hidden");
 		parentInspect(index);
-	};
+ 	};
 
 	const getValueFromPath = async (path, selectedElement?) => {
 		let fetching = true;

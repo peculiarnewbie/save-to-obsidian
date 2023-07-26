@@ -24,18 +24,16 @@
 	}
 
 	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener(
-			(request, sender, sendResponse) => {
-				if (request.action == "bgGetElement") {
-					const value = getElementValueFromPath(request.path);
-					if (value) {
-						sendResponse({ success: true, value: value });
-					} else {
-						sendResponse({ success: false });
-					}
+		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+			if (request.action == "bgGetElement") {
+				const value = getElementValueFromPath(request.path);
+				if (value) {
+					sendResponse({ success: true, value: value });
+				} else {
+					sendResponse({ success: false });
 				}
 			}
-		);
+		});
 	}
 
 	const FinishSelection = () => {
@@ -58,14 +56,12 @@
 	};
 
 	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener(
-			(request, sender, sendResponse) => {
-				if (request.action == "bgElementSelected") {
-					selectedElement = request.element;
-					sendResponse({ success: true });
-				}
+		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+			if (request.action == "bgElementSelected") {
+				selectedElement = request.element;
+				sendResponse({ success: true });
 			}
-		);
+		});
 	}
 
 	const generatePath = () => {
@@ -75,22 +71,21 @@
 
 		while (currentElement != document.body) {
 			if (currentElement.id != "") {
-				path.push({
-					type: IdType.ID,
-					value: currentElement.id,
-					index: 0,
-				});
-				break;
+				if (CheckForDuplicateIds(currentElement.id)) {
+					path.push({
+						type: IdType.ID,
+						value: currentElement.id,
+						index: 0,
+					});
+					break;
+				}
 			} else if (currentElement.className != "") {
 				if (validateClass(currentElement.className)) {
 					let queriedElements = document.getElementsByClassName(
-						currentElement.className
+						currentElement.className,
 					);
 					if (queriedElements.length < 5) {
-						searchResult = searchElements(
-							queriedElements,
-							currentElement
-						);
+						searchResult = searchElements(queriedElements, currentElement);
 						path.push({
 							type: IdType.CLASS,
 							value: currentElement.className,
@@ -104,9 +99,9 @@
 			path.push({
 				type: IdType.INDEX,
 				value: "",
-				index: Array.from(
-					currentElement.parentElement.children
-				).indexOf(currentElement),
+				index: Array.from(currentElement.parentElement.children).indexOf(
+					currentElement,
+				),
 			});
 			currentElement = currentElement.parentElement;
 			continue;
@@ -139,6 +134,15 @@
 		}
 		console.error("failed to find element");
 		return { found: false, index: 0 };
+	};
+
+	const CheckForDuplicateIds = (id) => {
+		let elements = document.querySelectorAll("#" + id);
+		if (elements.length > 1) {
+			return false;
+		} else {
+			return true;
+		}
 	};
 
 	const determineNodeType = (element) => {
@@ -282,13 +286,11 @@
 			</div>
 		</div>
 		<div style="all:unset; display: flex; gap:12px">
-			<button
-				style={`all:unset; ${buttonStyle}`}
-				on:click={getParentElement}>Select Parent</button
+			<button style={`all:unset; ${buttonStyle}`} on:click={getParentElement}
+				>Select Parent</button
 			>
-			<button
-				style={`all:unset; ${buttonStyle}`}
-				on:click={FinishSelection}>Done</button
+			<button style={`all:unset; ${buttonStyle}`} on:click={FinishSelection}
+				>Done</button
 			>
 		</div>
 	</div>

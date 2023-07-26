@@ -71,7 +71,7 @@
 				hoveredDom.left,
 				hoveredDom.top,
 				hoveredDom.width,
-				hoveredDom.height
+				hoveredDom.height,
 			);
 		}
 
@@ -82,15 +82,16 @@
 
 	const getElementValueFromPath = (path) => {
 		const getElementFromCurrentPath = (currentPath, currentElement) => {
+			console.log("in detail: getting element from: ", currentElement);
 			switch (currentPath.type) {
 				case IdType.ID:
-					return currentElement.querySelector(
-						"#" + currentPath.value
-					);
+					return currentElement.querySelectorAll("#" + currentPath.value)[
+						currentPath.index
+					];
 				case IdType.CLASS:
-					return currentElement.querySelectorAll(
-						"." + currentPath.value
-					)[currentPath.index];
+					return currentElement.querySelectorAll("." + currentPath.value)[
+						currentPath.index
+					];
 				case IdType.INDEX:
 					return currentElement.children[currentPath.index];
 			}
