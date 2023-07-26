@@ -1,11 +1,9 @@
-
-import DetailedSelector from "./components/DetailedSelector.svelte"
-
+import DetailedSelector from "./components/DetailedSelector.svelte";
 
 import Component from "./components/Component.svelte";
-import "./app.css"
+import "./app.css";
 
-const target = document.getElementById('app');
+const target = document.getElementById("app");
 const root = document.createElement("div");
 // root.style.position = "fixed";
 // root.style.top = "10px";
@@ -14,6 +12,9 @@ const root = document.createElement("div");
 // root.style.height = "700px";
 // root.style.backgroundColor = "transparent";
 // root.style.zIndex = "9998";
-new DetailedSelector({target: root, props: {extensionId: 1, selectedElement: target}});
+new DetailedSelector({
+    target: root,
+    props: { extensionId: 1, selectedElement: target },
+});
 // new Component({target: root, props: { root: target}});
 target.appendChild(root);

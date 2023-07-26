@@ -1,6 +1,5 @@
-
 import Component from "../src/components/Component.svelte";
-import "../src/app.css"
+import "../src/app.css";
 
 // const target = document.getElementById('app');
 
@@ -13,10 +12,10 @@ import "../src/app.css"
 
 const root = document.createElement("div");
 root.id = "extension-root";
-const html = document.getElementById("extension-html") as HTMLElement
+const html = document.getElementById("extension-html") as HTMLElement;
 
-if(html){
-    new Component({target: root, props: {root: html}});
+if (html) {
+    new Component({ target: root, props: { root: html } });
     //@ts-ignore
     html.appendChild(root);
 }

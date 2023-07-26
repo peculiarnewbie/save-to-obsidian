@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* @layer components {
     .btn-primary{
         @apply bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]
@@ -15,6 +14,3 @@
         @apply text-lg font-bold text-white m-0
     }
 } */
-
-
-
