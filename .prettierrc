@@ -1,8 +1,4 @@
 {
-    "plugins": [
-        "prettier-plugin-svelte",
-        "prettier-plugin-tailwindcss"
-      ],
-    "tabWidth": 4,
-    "useTabs": false
+    "useTabs": true,
+    "tabWidth": 4
 }
