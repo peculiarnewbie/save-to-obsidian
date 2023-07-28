@@ -1,6 +1,6 @@
-import DetailedSelector from "./components/DetailedSelector.svelte";
+import DetailedSelector from "./components/Content Script/DetailedSelector.svelte";
 
-import Component from "./components/Component.svelte";
+import Component from "./components/Main Iframe/Component.svelte";
 import "./app.css";
 
 const target = document.getElementById("app");

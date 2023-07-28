@@ -1,4 +1,6 @@
 <script lang="ts">
+	import TestButtons from "../Test/TestButtons.svelte";
+
 	export let extensionId;
 	export let selectedElement;
 	export let getElementValueFromPath;
@@ -39,6 +41,7 @@
 	const FinishSelection = () => {
 		generatePath();
 		let value = getElementValueFromPath(treePath);
+		document.getElementById(`${extensionId}-iframe`).style.display = "initial";
 		chrome.runtime.sendMessage({
 			action: "elementSelected",
 			path: treePath,
@@ -229,42 +232,6 @@
         overflow-y: auto;
         overflow-x: auto;
     `;
-
-	const testSelectImage = () => {
-		let imgTest = document.createElement("img");
-		imgTest.src =
-			"https://e.snmc.io/i/600/w/291a2a8451de99ede908023514823338/10297048/paramore-this-is-why-Cover-Art.jpg";
-		imgTest.alt = "ParamoreTest";
-		selectedElement = imgTest;
-	};
-	const testLongItem = () => {
-		let longTest = document.createElement("p");
-		longTest.innerText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
-        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
-        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
-        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl 
-        nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, nisl nisl 
-        aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, nisl eget 
-        ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. 
-        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
-        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
-        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
-        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
-        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
-        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
-        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl 
-        nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, nisl nisl 
-        aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, nisl eget 
-        ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. 
-        Donec euismod, nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae 
-        aliquam nisl nisl vitae nisl. Donec euismod, nisl eget ultricies ultrices, 
-        nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl. Donec euismod, 
-        nisl eget ultricies ultrices, nisl nisl aliquam nisl, vitae aliquam nisl nisl vitae nisl.`;
-		selectedElement = longTest;
-	};
 </script>
 
 <div style={`${rootStyle}`}>
@@ -297,12 +264,7 @@
 </div>
 
 {#if import.meta.env.DEV}
-	<button id="testButton" style={buttonStyle} on:click={testSelectImage}
-		>Test Image</button
-	>
-	<button id="testButton" style={buttonStyle} on:click={testLongItem}
-		>Test Long</button
-	>
+	<TestButtons bind:selectedElement />
 {/if}
 
 <style>

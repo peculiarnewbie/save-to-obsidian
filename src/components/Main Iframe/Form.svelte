@@ -1,4 +1,5 @@
 <script lang="ts">
+	import sanitizeString from "../../utils/SanitizeString";
 	import Field from "./Field.svelte";
 	export let root: HTMLElement;
 	export let currentForm;
@@ -19,6 +20,10 @@
 	export let forms;
 	export let refresh;
 	let selectionIndex: number;
+	let directory = "Obsidian/";
+
+	$: fullTitle =
+		directory + sanitizeString(currentForm.fields[0].value) + ".md";
 
 	if (!import.meta.env.DEV) {
 		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -43,13 +48,15 @@
 		});
 		data += `---\n`;
 
-		console.log(data);
+		console.log("data: ", data);
+
+		console.log("generated title: ", fullTitle);
 
 		chrome.runtime.sendMessage(
 			{
 				action: "download",
 				data: data,
-				title: currentForm.fields[0].value,
+				title: fullTitle,
 			},
 			(response) => {
 				if (response.success) {
@@ -125,6 +132,14 @@
 					bind:value={currentForm.name}
 				/>
 			</div>
+			<div>
+				<p class="text-xl font-semibold">Directory:</p>
+				<input
+					type="text"
+					placeholder="enter directory"
+					bind:value={directory}
+				/>
+			</div>
 			<button class="btn-primary" on:click={addField}>Add Field</button>
 		</div>
 	{:else}
@@ -149,21 +164,27 @@
 
 <div
 	id="result"
-	class="flex flex-col text-white h-44 bg-[#1e1e1e] p-3 pb-5 border-t border-[#363636] bottom-0"
+	class="flex flex-col text-white h-48 bg-[#1e1e1e] p-3 pb-5 border-t border-[#363636] bottom-0"
 >
-	<div class="flex justify-between mb-4 items-center">
+	<div class="flex justify-between items-center mb-2">
 		<p style="margin: 0;">result:</p>
-		{#if isEditing}
-			<button class="btn-primary" on:click={saveForm}>Save</button>
-		{:else}
-			<button class="btn-primary" on:click={download}>Download</button>
-		{/if}
 	</div>
 	<div
 		id="rawData"
 		class="h-full grow-10 overflow-y-auto bg-[#242424] p-2 text-xs"
 	>
 		<p style="margin: 0;">{@html data}</p>
+	</div>
+	<div class="flex justify-between mt-2 align-middle">
+		<div class="flex flex-col h-full">
+			<p>full path:</p>
+			<p>{fullTitle}</p>
+		</div>
+		{#if isEditing}
+			<button class="btn-primary" on:click={saveForm}>Save</button>
+		{:else}
+			<button class="btn-primary" on:click={download}>Download</button>
+		{/if}
 	</div>
 </div>
 

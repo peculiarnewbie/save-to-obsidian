@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Form from "./Form.svelte";
-	import back from "../../public/Back.svg";
+	import back from "../../../public/Back.svg";
 	export let root: HTMLElement;
 	let loading = true;
 	let fields = [{ key: "", value: "" }];
@@ -75,11 +75,7 @@
 					{#if import.meta.env.DEV}
 						<img src={back} alt="back" width="20px" />
 					{:else}
-						<img
-							src={chrome.runtime.getURL(back)}
-							alt="back"
-							width="20px"
-						/>
+						<img src={chrome.runtime.getURL(back)} alt="back" width="20px" />
 					{/if}
 				</div>
 				<h2 id="ExtensionTitle">{currentForm.name}</h2>
@@ -114,9 +110,7 @@
 							openForm = true;
 						}}
 					>
-						<div class="text-white font-normal font-sans">
-							Add Form
-						</div>
+						<div class="text-white font-normal font-sans">Add Form</div>
 					</button>
 				</div>
 			{/if}
@@ -147,9 +141,7 @@
 					>
 					{#each forms as form, i}
 						<div id="Form">
-							<div
-								class="text-2xl text-white font-bold my-3 pl-3 font-sans"
-							>
+							<div class="text-2xl text-white font-bold my-3 pl-3 font-sans">
 								{form}
 							</div>
 							<button
@@ -160,9 +152,8 @@
 									openForm = true;
 								}}>Open Form</button
 							>
-							<button
-								class="btn-primary"
-								on:click={() => deleteForm(form)}>Delete</button
+							<button class="btn-primary" on:click={() => deleteForm(form)}
+								>Delete</button
 							>
 						</div>
 					{/each}

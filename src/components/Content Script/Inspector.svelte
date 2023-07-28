@@ -34,6 +34,8 @@
 	const inspect = async () => {
 		let click_count = 0;
 
+		document.getElementById(`${extensionId}-iframe`).style.display = "none";
+
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 		canvas.style.width = "100vw";

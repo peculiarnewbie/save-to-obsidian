@@ -1,6 +1,6 @@
 <script lang="ts">
-	import select from "../../public/Select.svg";
-	import trash from "../../public/Delete.svg";
+	import select from "../../../public/Select.svg";
+	import trash from "../../../public/Delete.svg";
 	import { createEventDispatcher } from "svelte";
 	export let index = 0;
 	export let field;
@@ -27,9 +27,8 @@
 	// }
 
 	const selectElement = () => {
-		document.getElementById("extension-html").classList.add("hidden");
 		parentInspect(index);
- 	};
+	};
 
 	const getValueFromPath = async (path, selectedElement?) => {
 		let fetching = true;
@@ -43,7 +42,7 @@
 					field.value = response.value;
 					fetching = false;
 				}
-			}
+			},
 		);
 
 		while (fetching) {
@@ -76,11 +75,7 @@
 				{#if import.meta.env.DEV}
 					<img src={select} alt="select" width="15px" />
 				{:else}
-					<img
-						src={chrome.runtime.getURL(select)}
-						alt="select"
-						width="15px"
-					/>
+					<img src={chrome.runtime.getURL(select)} alt="select" width="15px" />
 				{/if}
 			</button>
 			<input
@@ -98,11 +93,7 @@
 				{#if import.meta.env.DEV}
 					<img src={trash} alt="select" width="15px" />
 				{:else}
-					<img
-						src={chrome.runtime.getURL(trash)}
-						alt="select"
-						width="15px"
-					/>
+					<img src={chrome.runtime.getURL(trash)} alt="select" width="15px" />
 				{/if}
 			</button>
 		{/if}
