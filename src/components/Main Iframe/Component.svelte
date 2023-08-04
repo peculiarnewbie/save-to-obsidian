@@ -17,7 +17,6 @@
 
 	const getChromeStorage = async () => {
 		await chrome.storage.local.get(null, async (result) => {
-			console.log("forms: ", result);
 			allData = result;
 			forms = Object.keys(allData)
 				.filter((item) => item.includes("form_"))
@@ -42,6 +41,13 @@
 		});
 	};
 
+	const addForm = () => {
+		fields = [{ key: "file title", value: "" }];
+		currentForm = { name: "New Form", fields: fields };
+		isEditing = true;
+		openForm = true;
+	}
+
 	const deleteForm = async (form) => {
 		await chrome.storage.local.remove([`form_${form}`]);
 		let newForms = forms.filter((item) => item != form);
@@ -50,6 +56,7 @@
 	};
 
 	const promise = getChromeStorage();
+
 </script>
 
 <div
@@ -103,12 +110,7 @@
 				<div class="ext p-3">
 					<button
 						class="btn-primary"
-						on:click={() => {
-							fields = [{ key: "file title", value: "" }];
-							currentForm = { name: "New Form", fields: fields };
-							isEditing = true;
-							openForm = true;
-						}}
+						on:click={() => addForm()}
 					>
 						<div class="text-white font-normal font-sans">Add Form</div>
 					</button>
@@ -130,14 +132,7 @@
 				<div class="p-3">
 					<button
 						class="btn-primary"
-						on:click={() => {
-							currentForm = {
-								name: "New Form",
-								fields: [{ key: "", value: "" }],
-							};
-							isEditing = true;
-							openForm = true;
-						}}>Add Form</button
+						on:click={() => addForm()}>Add Form</button
 					>
 					{#each forms as form, i}
 						<div id="Form">
