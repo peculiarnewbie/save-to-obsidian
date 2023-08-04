@@ -12,8 +12,6 @@ if (!document.getElementById("closeButton")) {
         "<button id='closeButton'>Close</button> <button id='downloadButton'>Download</button> <p>sheeesh</p>";
 
     document.body.appendChild(floatingPage);
-
-    console.log("create floating page");
     const closeButton = document.getElementById("closeButton");
     closeButton.addEventListener("click", () => {
         document.getElementById("floatingPage").style.display = "none";

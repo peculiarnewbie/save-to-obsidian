@@ -85,8 +85,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	} else if (request.action === "getElements") {
 		(async () => {
 			let actualResponse;
-
-			console.log("bg: received getElements request", request.paths);
 			chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 				chrome.tabs.sendMessage(
 					tabs[0].id,

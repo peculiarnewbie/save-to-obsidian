@@ -111,7 +111,6 @@
 		}
 
 		treePath = path.reverse();
-		console.log("treePath: ", treePath);
 	};
 
 	const validateClass = (className) => {
