@@ -22,7 +22,6 @@
 			inspect();
 			sendResponse({ success: true });
 		} else if (request.action === "bgValuesUpdate") {
-			console.log("in inspector: got bgValuesUpdate", request.paths);
 			let values = [];
 			request.paths.forEach((path, index) => {
 				values.push(getElementValueFromPath(path));
@@ -55,7 +54,6 @@
 			selectedElement = element;
 
 			if (click_count == 1) {
-				console.log(selectedElement);
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				document.removeEventListener("click", InspectElement, true);
 				document.removeEventListener("mouseover", HoverElement, true);
@@ -84,7 +82,6 @@
 
 	const getElementValueFromPath = (path) => {
 		const getElementFromCurrentPath = (currentPath, currentElement) => {
-			console.log("in detail: getting element from: ", currentElement);
 			switch (currentPath.type) {
 				case IdType.ID:
 					return currentElement.querySelectorAll("#" + currentPath.value)[
@@ -99,10 +96,12 @@
 			}
 		};
 
+		if (!path) {
+			return "";
+		}
+
 		let element;
-		console.log("in detail: getting element from: ", path);
 		element = getElementFromCurrentPath(path[0], document.body);
-		console.log("in detail: first path: ", element);
 
 		for (let i = 1; i < path.length; i++) {
 			element = getElementFromCurrentPath(path[i], element);

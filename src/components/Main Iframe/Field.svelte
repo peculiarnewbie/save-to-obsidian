@@ -20,7 +20,6 @@
 	const dispatch = createEventDispatcher();
 
 	// const initField = async() => {
-	//     console.log("init field")
 	//     if(field.treePath){
 	//         await getValueFromPath(field.treePath)
 	//     }
@@ -48,11 +47,10 @@
 		while (fetching) {
 			await new Promise((r) => setTimeout(r, 10));
 		}
-		console.log("got value", field.value);
 	};
 
 	const deleteField = () => {
-		dispatch("deleteField", index);
+		dispatch("deleteField", {index: index});
 	};
 
 	// initField()

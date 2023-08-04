@@ -48,9 +48,6 @@
 		});
 		data += `---\n`;
 
-		console.log("data: ", data);
-
-		console.log("generated title: ", fullTitle);
 
 		chrome.runtime.sendMessage(
 			{
@@ -71,7 +68,9 @@
 	};
 
 	function deleteField(event) {
-		currentForm.fields = [...fields];
+		let temps = [...currentForm.fields];
+		temps.splice(event.detail.index, 1);
+		currentForm.fields = temps;
 	}
 
 	const inspect = async (index) => {
@@ -98,7 +97,6 @@
 	const updateFieldValues = () => {
 		let paths = currentForm.fields.map((field) => field.treePath);
 
-		console.log("in form: sent getElements", paths);
 		chrome.runtime.sendMessage(
 			{ action: "getElements", paths: paths },
 			(response) => {
@@ -106,6 +104,9 @@
 					console.error("failed to get element");
 				} else {
 					response.values.forEach((value, index) => {
+						if(!value){
+							return;
+						}
 						currentForm.fields[index].value = value;
 					});
 				}
@@ -116,7 +117,6 @@
 	prevName = currentForm.name;
 
 	if (!isEditing) {
-		console.log("in form: call updating values");
 		updateFieldValues();
 	}
 </script>
