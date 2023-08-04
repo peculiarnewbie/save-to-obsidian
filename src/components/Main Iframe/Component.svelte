@@ -7,7 +7,9 @@
 	let forms: string[] = [];
 	let allData = {};
 	let isEditing = false;
-	let currentForm = { name: "", fields: fields };
+	let currentForm = { name: "", directory: "", fields: fields };
+
+	let defaultDir = "Obsidian/"
 
 	let openForm = false;
 
@@ -25,6 +27,7 @@
 				forms = ["example"];
 				let form_example = {
 					name: "example",
+					direactory: "example/",
 					fields: [
 						{ key: "title", value: "Example Title" },
 						{ key: "tags", value: "example, tags" },
@@ -43,7 +46,7 @@
 
 	const addForm = () => {
 		fields = [{ key: "file title", value: "" }];
-		currentForm = { name: "New Form", fields: fields };
+		currentForm = { name: "New Form", directory:defaultDir, fields: fields };
 		isEditing = true;
 		openForm = true;
 	}
@@ -73,8 +76,8 @@
 			</div>
 		{:else}
 			<div class="flex pl-2">
-				<div
-					class="ext flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] align-middle cursor-pointer"
+				<button
+					class="flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] items-center cursor-pointer"
 					on:click={() => {
 						openForm = false;
 					}}
@@ -84,17 +87,17 @@
 					{:else}
 						<img src={chrome.runtime.getURL(back)} alt="back" width="20px" />
 					{/if}
-				</div>
+				</button>
 				<h2 id="ExtensionTitle">{currentForm.name}</h2>
 			</div>
 		{/if}
-		<div
+		<button
 			id="CloseButton"
 			class="ext flex bg-transparent text-2xl text-white py-3 px-5 hover:bg-red-500"
 			on:click={closePopup}
 		>
 			x
-		</div>
+		</button>
 	</div>
 	<div id="MainContent" class="ext flex flex-col flex-grow-[10] max-h-[92%]">
 		{#if import.meta.env.DEV}
@@ -165,10 +168,10 @@
 	p {
 		@apply font-sans font-normal text-white;
 	}
-	button {
+	.btn-primary {
 		@apply h-9 rounded-md border-l border-r border-[#3f3f3f] border-t-[#242424] bg-[#363636] px-5 align-middle font-sans text-base text-white shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)] transition-all duration-100;
 	}
-	button:hover {
+	.btn-primary:hover {
 		@apply border-[#4e4e4e] bg-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)];
 	}
 </style>

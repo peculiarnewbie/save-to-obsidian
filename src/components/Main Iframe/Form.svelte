@@ -20,7 +20,12 @@
 	export let forms;
 	export let refresh;
 	let selectionIndex: number;
-	let directory = "Obsidian/";
+	
+	$: directory = currentForm.directory;
+
+	if(directory == ""){
+		currentForm.directory = "Obsidian/";
+	}
 
 	$: fullTitle =
 		directory + sanitizeString(currentForm.fields[0].value) + ".md";
@@ -137,7 +142,7 @@
 				<input
 					type="text"
 					placeholder="enter directory"
-					bind:value={directory}
+					bind:value={currentForm.directory}
 				/>
 			</div>
 			<button class="btn-primary" on:click={addField}>Add Field</button>
