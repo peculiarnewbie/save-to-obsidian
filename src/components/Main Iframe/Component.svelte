@@ -1,9 +1,10 @@
 <script lang="ts">
 	import Form from "./Form.svelte";
 	import back from "../../../public/Back.svg";
+	import { InputEnum } from "../../utils/FieldInputType";
 	export let root: HTMLElement;
 	let loading = true;
-	let fields = [{ key: "", value: "" }];
+	let fields = [{ key: "", value: "", type: "" }];
 	let forms: string[] = [];
 	let allData = {};
 	let isEditing = false;
@@ -27,7 +28,7 @@
 				forms = ["example"];
 				let form_example = {
 					name: "example",
-					direactory: "example/",
+					directory: "example/",
 					fields: [
 						{ key: "title", value: "Example Title" },
 						{ key: "tags", value: "example, tags" },
@@ -45,7 +46,7 @@
 	};
 
 	const addForm = () => {
-		fields = [{ key: "file title", value: "" }];
+		fields = [{ key: "file title", value: "", type: InputEnum.Filename }];
 		currentForm = { name: "New Form", directory:defaultDir, fields: fields };
 		isEditing = true;
 		openForm = true;
@@ -119,45 +120,46 @@
 					</button>
 				</div>
 			{/if}
-		{/if}
-		{#await promise}
-			<div class="text-white font-normal font-sans">loading...</div>
-		{:then}
-			{#if openForm}
-				<Form
-					{root}
-					bind:currentForm
-					{isEditing}
-					bind:forms
-					refresh={getChromeStorage}
-				/>
-			{:else}
-				<div class="p-3">
-					<button
-						class="btn-primary"
-						on:click={() => addForm()}>Add Form</button
-					>
-					{#each forms as form, i}
-						<div id="Form">
-							<div class="text-2xl text-white font-bold my-3 pl-3 font-sans">
-								{form}
+		{:else}
+			{#await promise}
+				<div class="text-white font-normal font-sans">loading...</div>
+			{:then}
+				{#if openForm}
+					<Form
+						{root}
+						bind:currentForm
+						{isEditing}
+						bind:forms
+						refresh={getChromeStorage}
+					/>
+				{:else}
+					<div class="p-3">
+						<button
+							class="btn-primary"
+							on:click={() => addForm()}>Add Form</button
+						>
+						{#each forms as form, i}
+							<div id="Form">
+								<div class="text-2xl text-white font-bold my-3 pl-3 font-sans">
+									{form}
+								</div>
+								<button
+									class="btn-primary"
+									on:click={() => {
+										currentForm = allData[`form_${form}`];
+										isEditing = false;
+										openForm = true;
+									}}>Open Form</button
+								>
+								<button class="btn-primary" on:click={() => deleteForm(form)}
+									>Delete</button
+								>
 							</div>
-							<button
-								class="btn-primary"
-								on:click={() => {
-									currentForm = allData[`form_${form}`];
-									isEditing = false;
-									openForm = true;
-								}}>Open Form</button
-							>
-							<button class="btn-primary" on:click={() => deleteForm(form)}
-								>Delete</button
-							>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		{/await}
+						{/each}
+					</div>
+				{/if}
+			{/await}
+		{/if}
 	</div>
 </div>
 
