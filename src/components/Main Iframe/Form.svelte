@@ -22,13 +22,21 @@
 	let selectionIndex: number;
 	
 	$: directory = currentForm.directory;
+	let validDir = true;
 
 	if(directory == ""){
 		currentForm.directory = "Obsidian/";
 	}
 
 	$: fullTitle =
-		directory + sanitizeString(currentForm.fields[0].value) + ".md";
+		function(){
+			let lastChar = directory.charAt(directory.length - 1);
+			if(lastChar == '/' || lastChar == '\\' || directory == ""){
+				return directory;
+			} else {
+				return directory + '/';
+			}}() 
+		+ currentForm.fields[0].value + ".md";
 
 	if (!import.meta.env.DEV) {
 		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -124,6 +132,22 @@
 	if (!isEditing) {
 		updateFieldValues();
 	}
+
+	const checkDirValidity = (event: Event) => {
+		validDir = true;
+		const target = event.target as HTMLInputElement;
+		
+		if(target.value == "") {
+			return
+		}
+		else{
+			var rg1 = /^(?:[a-z]:)?[\/\\]{0,2}(?:[.\/\\ ](?![.\/\\\n])|[^<>:"|?*.\/\\ \n])+$/i;
+			if(!rg1.test(target.value)){
+				target.value = directory;
+				validDir = false;
+			}
+		}
+	}
 </script>
 
 <div id="Form" class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
@@ -139,11 +163,21 @@
 			</div>
 			<div>
 				<p class="text-xl font-semibold">Directory:</p>
-				<input
-					type="text"
-					placeholder="enter directory"
-					bind:value={currentForm.directory}
-				/>
+				<div class="relative">
+					<input class={`${validDir ? "" : "outline-red-500"}`}
+						type="text"
+						placeholder="enter directory"
+						on:input={checkDirValidity}
+						on:blur={checkDirValidity}
+						bind:value={currentForm.directory}
+					/>
+					{#if !validDir}
+						<div class="absolute">
+							<p class=" text-red-500">invalid path</p>
+						</div>
+					{/if}
+
+				</div>
 			</div>
 			<button class="btn-primary" on:click={addField}>Add Field</button>
 		</div>

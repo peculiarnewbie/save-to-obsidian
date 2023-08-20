@@ -2,6 +2,8 @@
 	import select from "../../../public/Select.svg";
 	import trash from "../../../public/Delete.svg";
 	import { createEventDispatcher } from "svelte";
+	import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
+	import FieldInput from "./FieldInput.svelte";
 	export let index = 0;
 	export let field;
 	$: key = field.key;
@@ -11,42 +13,10 @@
 	export let parentInspect;
 	export let isEditing = false;
 
-	enum IdType {
-		ID,
-		CLASS,
-		INDEX,
-	}
-
 	const dispatch = createEventDispatcher();
-
-	// const initField = async() => {
-	//     if(field.treePath){
-	//         await getValueFromPath(field.treePath)
-	//     }
-	// }
 
 	const selectElement = () => {
 		parentInspect(index);
-	};
-
-	const getValueFromPath = async (path, selectedElement?) => {
-		let fetching = true;
-
-		chrome.runtime.sendMessage(
-			{ action: "getElement", path: path },
-			(response) => {
-				if (!response.success) {
-					console.error("failed to get element");
-				} else {
-					field.value = response.value;
-					fetching = false;
-				}
-			},
-		);
-
-		while (fetching) {
-			await new Promise((r) => setTimeout(r, 10));
-		}
 	};
 
 	const deleteField = () => {
@@ -62,7 +32,7 @@
 		<input
 			class="font-bold text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
 			type="text"
-			placeholder="enter key"
+			placeholder="key title"
 			bind:value={field.key}
 		/>
 		<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
@@ -76,12 +46,17 @@
 					<img src={chrome.runtime.getURL(select)} alt="select" width="15px" />
 				{/if}
 			</button>
-			<input
-				class=" font-normal text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
-				type="text"
-				placeholder="select data or type here"
-				bind:value={field.value}
-			/>
+			{#if index == 0}
+				<FieldInput
+					field={field}
+					type={InputEnum.Filename}
+				/>
+			{:else}
+				<FieldInput
+					field={field}
+					type={InputEnum.Text}
+				/>
+			{/if}
 		</div>
 		{#if index != 0}
 			<button
@@ -98,7 +73,17 @@
 	{:else}
 		<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
 			<p style="font-weight:700; font-size:16px">{key}</p>
-			<p>{value}</p>
+			{#if index == 0}
+				<FieldInput
+					field={field}
+					type={InputEnum.Filename}
+				/>
+			{:else}
+				<FieldInput
+					field={field}
+					type={InputEnum.Text}
+				/>
+			{/if}
 		</div>
 	{/if}
 </div>
