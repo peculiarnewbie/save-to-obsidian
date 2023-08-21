@@ -2,13 +2,12 @@
     import sanitizeString from "../../utils/SanitizeString";
     import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
     export let field;
-    export let type:FieldInputKeys = InputEnum.Text;
     
     let errorMessage = "";
     let validInput = true;
 
     $: {
-		if(type == InputEnum.Filename){
+		if(field.type == InputEnum.Filename){
 			field.value = sanitizeString(field.value);
 		}
 	}
@@ -48,7 +47,7 @@
 
 </script>
 
-{#if type == InputEnum.Filename}
+{#if field.type == InputEnum.Filename}
 <input
     class=" font-normal text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
     type="text"

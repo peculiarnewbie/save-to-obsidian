@@ -13,6 +13,9 @@
 	export let parentInspect;
 	export let isEditing = false;
 
+	let changingType = false;
+	let typeButton;
+
 	const dispatch = createEventDispatcher();
 
 	const selectElement = () => {
@@ -22,6 +25,29 @@
 	const deleteField = () => {
 		dispatch("deleteField", {index: index});
 	};
+
+	const startChangeFieldType = (e) => {
+		typeButton = e.target as HTMLElement;
+		changingType = !changingType;
+	};
+
+	document.addEventListener("click", (e) => {
+		const element = e.target as HTMLElement;
+		if(changingType && element != typeButton){
+			changingType = false;
+		}
+	});
+
+	const changeFieldType = (type: FieldInputKeys) => {
+		field.type = type;
+		changingType = !changingType;
+	};
+
+	if(index == 0){
+		field.type = InputEnum.Filename;
+	} else {
+		field.type = InputEnum.Text;
+	}
 
 	// initField()
 </script>
@@ -46,17 +72,9 @@
 					<img src={chrome.runtime.getURL(select)} alt="select" width="15px" />
 				{/if}
 			</button>
-			{#if index == 0}
-				<FieldInput
-					field={field}
-					type={InputEnum.Filename}
-				/>
-			{:else}
-				<FieldInput
-					field={field}
-					type={InputEnum.Text}
-				/>
-			{/if}
+			<FieldInput
+				bind:field={field}
+			/>
 		</div>
 		{#if index != 0}
 			<button
@@ -69,21 +87,32 @@
 					<img src={chrome.runtime.getURL(trash)} alt="select" width="15px" />
 				{/if}
 			</button>
+			<button
+				id="typebutton"
+				class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
+				on:click={startChangeFieldType}
+			>
+				{#if import.meta.env.DEV}
+					<img src={trash} class="pointer-events-none" alt="select" width="15px" />
+				{:else}
+					<img src={chrome.runtime.getURL(trash)} class="pointer-events-none" alt="select" width="15px" />
+				{/if}
+			</button>
+			{#if changingType}
+				<div on:blur={() => changingType = false}
+					class=" absolute flex flex-col font-bold text-base text-white w-44 min-w-[40px] bg-[#363636] outline-none  "
+				>
+					<button class="hover:bg-black" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
+					<button class="hover:bg-black" on:click={() => changeFieldType(InputEnum.Filename)}>Filename</button>
+				</div>
+			{/if}
 		{/if}
 	{:else}
 		<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
 			<p style="font-weight:700; font-size:16px">{key}</p>
-			{#if index == 0}
-				<FieldInput
-					field={field}
-					type={InputEnum.Filename}
-				/>
-			{:else}
-				<FieldInput
-					field={field}
-					type={InputEnum.Text}
-				/>
-			{/if}
+			<FieldInput
+				bind:field={field}
+			/>
 		</div>
 	{/if}
 </div>
