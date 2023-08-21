@@ -13,5 +13,14 @@ export default defineConfig(({ command, mode }) => {
         define: {
             "import.meta.env": JSON.stringify(env),
         },
+        build: {
+        rollupOptions: {
+                output: {
+                entryFileNames: `assets/[name].js`,
+                chunkFileNames: `assets/[name].js`,
+                assetFileNames: `assets/[name].[ext]`
+                }
+            }
+        }
     };
 });
