@@ -77,7 +77,7 @@
 	};
 
 	const addField = () => {
-		currentForm.fields = [...currentForm.fields, { key: "", value: "" }];
+		currentForm.fields = [...currentForm.fields, { key: "", value: "", type: "text" }];
 	};
 
 	function deleteField(event) {

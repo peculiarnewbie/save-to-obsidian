@@ -46,7 +46,7 @@
 	};
 
 	const addForm = () => {
-		fields = [{ key: "file title", value: "", type: InputEnum.Filename }];
+		fields = [{ key: "file title", value: "Untitled", type: InputEnum.Filename }];
 		currentForm = { name: "New Form", directory:defaultDir, fields: fields };
 		isEditing = true;
 		openForm = true;

@@ -1,6 +1,7 @@
 <script lang="ts">
     import sanitizeString from "../../utils/SanitizeString";
     import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
+	import DatePicker from "../DatePicker.svelte";
     export let field;
     
     let errorMessage = "";
@@ -56,13 +57,15 @@
     on:blur={checkNameValidity}
     bind:value={field.value}
 />
-{:else}
+{:else if field.type == InputEnum.Text}
 <input
     class=" font-normal text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
     type="text"
     placeholder="select data or type here"
     bind:value={field.value}
 />
+{:else if field.type == InputEnum.Date}
+	<DatePicker/>
 {/if}
 
 {#if !validInput}

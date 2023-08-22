@@ -4,11 +4,9 @@
 	import { createEventDispatcher } from "svelte";
 	import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
 	import FieldInput from "./FieldInput.svelte";
+	import CustomImage from "../CustomImage.svelte";
 	export let index = 0;
 	export let field;
-	$: key = field.key;
-	$: value = field.value;
-	$: treePath = field.treePath;
 
 	export let parentInspect;
 	export let isEditing = false;
@@ -45,8 +43,6 @@
 
 	if(index == 0){
 		field.type = InputEnum.Filename;
-	} else {
-		field.type = InputEnum.Text;
 	}
 
 	// initField()
@@ -66,11 +62,7 @@
 				class="p-2 rounded-md bg-transparent hover:bg-[#363636] pb-1"
 				on:click={selectElement}
 			>
-				{#if import.meta.env.DEV}
-					<img src={select} alt="select" width="15px" />
-				{:else}
-					<img src={chrome.runtime.getURL(select)} alt="select" width="15px" />
-				{/if}
+				<CustomImage src={select} alt="select" width="15px" />
 			</button>
 			<FieldInput
 				bind:field={field}
@@ -81,35 +73,27 @@
 				class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
 				on:click={deleteField}
 			>
-				{#if import.meta.env.DEV}
-					<img src={trash} alt="select" width="15px" />
-				{:else}
-					<img src={chrome.runtime.getURL(trash)} alt="select" width="15px" />
-				{/if}
+				<CustomImage src={trash} alt="trash" width="15px" />
 			</button>
 			<button
 				id="typebutton"
 				class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
 				on:click={startChangeFieldType}
 			>
-				{#if import.meta.env.DEV}
-					<img src={trash} class="pointer-events-none" alt="select" width="15px" />
-				{:else}
-					<img src={chrome.runtime.getURL(trash)} class="pointer-events-none" alt="select" width="15px" />
-				{/if}
+				<CustomImage src={trash} alt="trash" width="15px" />
 			</button>
 			{#if changingType}
-				<div on:blur={() => changingType = false}
-					class=" absolute flex flex-col font-bold text-base text-white w-44 min-w-[40px] bg-[#363636] outline-none  "
-				>
-					<button class="hover:bg-black" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
-					<button class="hover:bg-black" on:click={() => changeFieldType(InputEnum.Filename)}>Filename</button>
+				<div class="absolute left-12 flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
+					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
+					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.List)}>List</button>
+					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.MultiList)}>MultiList</button>
+					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.Date)}>Date</button>
 				</div>
 			{/if}
 		{/if}
 	{:else}
 		<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
-			<p style="font-weight:700; font-size:16px">{key}</p>
+			<p style="font-weight:700; font-size:16px">{field.key}</p>
 			<FieldInput
 				bind:field={field}
 			/>
