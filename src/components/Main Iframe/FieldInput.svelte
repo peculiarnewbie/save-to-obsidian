@@ -65,7 +65,7 @@
     bind:value={field.value}
 />
 {:else if field.type == InputEnum.Date}
-	<DatePicker/>
+	<DatePicker bind:field={field}/>
 {/if}
 
 {#if !validInput}

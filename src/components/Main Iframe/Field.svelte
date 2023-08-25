@@ -84,10 +84,10 @@
 			</button>
 			{#if changingType}
 				<div class="absolute left-12 flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
-					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
-					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.List)}>List</button>
-					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.MultiList)}>MultiList</button>
-					<button class="p-1 rounded-md hover:bg-[#1e1e1e] text-left" on:click={() => changeFieldType(InputEnum.Date)}>Date</button>
+					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
+					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.List)}>List</button>
+					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.MultiList)}>MultiList</button>
+					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Date)}>Date</button>
 				</div>
 			{/if}
 		{/if}
