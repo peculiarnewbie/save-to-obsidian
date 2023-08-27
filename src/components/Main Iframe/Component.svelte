@@ -21,6 +21,7 @@
 	const getChromeStorage = async () => {
 		await chrome.storage.local.get(null, async (result) => {
 			allData = result;
+			console.log(result);
 			forms = Object.keys(allData)
 				.filter((item) => item.includes("form_"))
 				.map((item) => item.replace("form_", ""));
@@ -127,7 +128,7 @@
 				{#if openForm}
 					<Form
 						{root}
-						bind:currentForm
+						{currentForm}
 						{isEditing}
 						bind:forms
 						refresh={getChromeStorage}
@@ -146,7 +147,7 @@
 								<button
 									class="btn-primary"
 									on:click={() => {
-										currentForm = allData[`form_${form}`];
+										currentForm = JSON.parse(JSON.stringify(allData[`form_${form}`]));
 										isEditing = false;
 										openForm = true;
 									}}>Open Form</button
