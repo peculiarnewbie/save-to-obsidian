@@ -1,6 +1,6 @@
 <script lang="ts">
-	import sanitizeString from "../../utils/SanitizeString";
 	import Field from "./Field.svelte";
+
 	export let root: HTMLElement;
 	export let currentForm;
 	export let isEditing;
@@ -20,6 +20,7 @@
 	export let forms;
 	export let refresh;
 	let selectionIndex: number;
+	let formScroll = 0;
 	
 	$: directory = currentForm.directory;
 	let validDir = true;
@@ -148,9 +149,13 @@
 			}
 		}
 	}
+
+	const handleScroll = (e) => {
+		formScroll = (e.target as HTMLElement).scrollTop;
+	}
 </script>
 
-<div id="Form" class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
+<div on:scroll={handleScroll} id="Form" class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
 	{#if isEditing}
 		<div style="display: flex; justify-content:space-between; align-items:end">
 			<div>
@@ -197,6 +202,7 @@
 			parentInspect={inspect}
 			on:deleteField={deleteField}
 			{isEditing}
+			formScroll={formScroll}
 		/>
 	{/each}
 </div>

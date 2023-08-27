@@ -11,6 +11,8 @@
 	export let parentInspect;
 	export let isEditing = false;
 
+	export let formScroll = 0;
+
 	let changingType = false;
 	let typeButton;
 
@@ -66,6 +68,7 @@
 			</button>
 			<FieldInput
 				bind:field={field}
+				{formScroll}
 			/>
 		</div>
 		{#if index != 0}
@@ -83,7 +86,7 @@
 				<CustomImage src={trash} alt="trash" width="15px" />
 			</button>
 			{#if changingType}
-				<div class="absolute left-12 flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
+				<div class="absolute left-12 flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md" style={`transform: translate(0px, ${4-formScroll}px); overscroll-behavior-block: auto;`}>
 					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
 					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.List)}>List</button>
 					<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.MultiList)}>MultiList</button>
@@ -96,6 +99,7 @@
 			<p style="font-weight:700; font-size:16px">{field.key}</p>
 			<FieldInput
 				bind:field={field}
+				{formScroll}
 			/>
 		</div>
 	{/if}

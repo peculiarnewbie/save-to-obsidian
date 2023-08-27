@@ -5,7 +5,8 @@
     import CustomImage from "./CustomImage.svelte";
 
     export let field;
-    let today = dayjs().format("YYYY-MM-DD");
+    export let formScroll = 0;
+
     let currentDate = today;
     let currentMonth = dayjs().month();
     let currentYear = dayjs().year();
@@ -16,6 +17,8 @@
     let rows = initRows();
     let startDay = 0;
     let endDay = 0;
+
+    
 
     const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
@@ -122,6 +125,7 @@
 
     field.value = currentDate;
 
+
 </script>
 
 <button 
@@ -133,18 +137,18 @@
 </button>
 
 {#if isEditing}
-    <div bind:this={dateElement} class="absolute left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md translate-y-8">
+    <div bind:this={dateElement} class="absolute left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md" style={`will-change:transform; transform: translate3d(0px, ${32 - formScroll}px, 0px);`}>
         <div class="flex justify-between px-1">
             <div class="flex text-2xl">
                 <p class="font-bold pr-1">{dayjs(currentDate).format("MMM")}</p>
                 <p class="text-violet-500 font-semibold">{currentYear}</p>
             </div>
             <div class="flex justify-end">
-                <button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(-1)}>
+                <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(-1)}>
                     <CustomImage src={dateBack} alt="dateBack" width="7px"/>
                 </button>
-                <button class="p-1 px-2 rounded-md hover:bg-[#4e4e4e] text-xs font-semibold" on:click={() => changeMonth(0)}>TODAY</button>
-                <button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(1)}>
+                <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-xs font-semibold" on:click={() => changeMonth(0)}>TODAY</button>
+                <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(1)}>
                     <CustomImage src={dateForward} alt="dateForward" width="7px"/>
                 </button>
             </div>
