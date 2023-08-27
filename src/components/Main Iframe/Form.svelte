@@ -25,6 +25,7 @@
 	
 	$: directory = currentForm.directory;
 	let validDir = true;
+	let formElement: HTMLElement;
 
 	if(directory == ""){
 		currentForm.directory = "Obsidian/";
@@ -156,16 +157,15 @@
 	}
 
 	onMount(() => {
-		const form = document.getElementById("Form") as HTMLElement;
-		form.addEventListener("wheel", function(e){
-			form.scrollTop += e.deltaY;
+		formElement.addEventListener("wheel", function(e){
+			formElement.scrollTop += e.deltaY;
 		})
 
 	})
 
 </script>
 
-<div on:scroll={handleScroll} id="Form" class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
+<div on:scroll={handleScroll} id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
 	{#if isEditing}
 		<div style="display: flex; justify-content:space-between; align-items:end">
 			<div>
