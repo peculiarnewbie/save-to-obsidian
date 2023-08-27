@@ -3,7 +3,6 @@
     import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
 	import DatePicker from "../DatePicker.svelte";
     export let field;
-	export let formScroll = 0;
     
     let errorMessage = "";
     let validInput = true;
@@ -66,7 +65,7 @@
     bind:value={field.value}
 />
 {:else if field.type == InputEnum.Date}
-	<DatePicker bind:field={field} {formScroll}/>
+	<DatePicker bind:field={field}/>
 {/if}
 
 {#if !validInput}

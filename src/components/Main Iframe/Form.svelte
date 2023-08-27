@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import Field from "./Field.svelte";
+	import {formScroll} from "../../utils/stores"
 
 	export let root: HTMLElement;
 	export let currentForm;
@@ -20,7 +22,6 @@
 	export let forms;
 	export let refresh;
 	let selectionIndex: number;
-	let formScroll = 0;
 	
 	$: directory = currentForm.directory;
 	let validDir = true;
@@ -151,8 +152,17 @@
 	}
 
 	const handleScroll = (e) => {
-		formScroll = (e.target as HTMLElement).scrollTop;
+		formScroll.set((e.target as HTMLElement).scrollTop);
 	}
+
+	onMount(() => {
+		const form = document.getElementById("Form") as HTMLElement;
+		form.addEventListener("wheel", function(e){
+			form.scrollTop += e.deltaY;
+		})
+
+	})
+
 </script>
 
 <div on:scroll={handleScroll} id="Form" class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
@@ -202,7 +212,6 @@
 			parentInspect={inspect}
 			on:deleteField={deleteField}
 			{isEditing}
-			formScroll={formScroll}
 		/>
 	{/each}
 </div>

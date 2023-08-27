@@ -3,14 +3,9 @@
     import dateBack from "../../public/dateBack.svg";
     import dateForward from "../../public/dateForward.svg"
     import CustomImage from "./CustomImage.svelte";
-	import { onMount } from "svelte";
+	import StickyModals from "./StickyModals.svelte";
 
     export let field;
-    export let formScroll = 0;
-    function getcurrentScroll(){return formScroll}
-    let xTransform = 0;
-    let initScroll = 0;
-    let initTop = 0;
 
     let today = dayjs("2023/08/25").format("YYYY-MM-DD");
     console.log(today, typeof today)
@@ -19,7 +14,6 @@
     let currentYear = dayjs().year();
 
     let isEditing = false
-    function getIsEditing(){return isEditing}
 
     let dateElement: HTMLElement;
     let dateButton: HTMLElement;
@@ -27,48 +21,7 @@
     let startDay = 0;
     let endDay = 0;
 
-    $: {
-        if(getIsEditing()){
-            const temp = formScroll;
-            outputPos()
-
-        } 
-    }
-
-    $:{
-        if(isEditing){
-            const rect = dateElement.getBoundingClientRect()
-            initTop = rect.top;
-            initScroll = xTransform = getcurrentScroll()
-            outputPos()
-        }
-    }
-
     const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-
-    const constValues = {
-        topLimit: 40,
-        bottomLimit: 660, 
-        divHeight: 272,
-    }
-
-    function outputPos(){
-        const bottomPos = initTop + constValues.divHeight + (initScroll - formScroll)
-        if(formScroll - initScroll > initTop - constValues.topLimit){
-            xTransform = initTop + initScroll - constValues.topLimit
-        }
-        else if(bottomPos > constValues.bottomLimit){
-            if(bottomPos < constValues.bottomLimit + constValues.divHeight + 35){
-                xTransform = formScroll + constValues.divHeight + 35
-            }
-            else{
-                xTransform = formScroll + bottomPos - constValues.bottomLimit
-            }
-        }
-        else{
-            xTransform = formScroll;
-        }
-    }
 
     const startEditing = (e) => {
         document.addEventListener("click", handleStartEditing);
@@ -184,9 +137,10 @@
     {field.value}
 </button>
 
-<div bind:this={dateElement}>
+<!-- <div bind:this={dateElement}> -->
     {#if isEditing}
-        <div class="absolute left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md" style={`will-change:transform; transform: translate3d(0px, ${32 - xTransform}px, 0px);`}>
+    <StickyModals>
+        <div class="left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md">
             <div class="flex justify-between px-1">
                 <div class="flex text-2xl">
                     <p class="font-bold pr-1">{dayjs(currentDate).format("MMM")}</p>
@@ -228,5 +182,6 @@
                 </tr>
             {/each}
         </div>
+    </StickyModals>
     {/if}
-</div>
+<!-- </div> -->
