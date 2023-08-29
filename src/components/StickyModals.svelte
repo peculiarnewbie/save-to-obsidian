@@ -1,17 +1,19 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
-    import { formScroll } from "../utils/stores";
+    import { formScroll, formTopLimit } from "../utils/stores";
 
-    export let topLimit = 40;
-    export let bottomLimit = 660;
-    export let divHeight = 272;
-
-    let formScrollValue = 0;
+    export let needToFlip = true;
+    export let topLimit = 70;
+    export let bottomLimit = 700;
+    export let yOffset = 0;
+    export let xOffset = 0;
     
+    let divHeight = 0;
+    let formScrollValue = 0;
     let thisElement: HTMLElement;
 
     function getcurrentScroll(){return formScrollValue}
-    let xTransform = 0;
+    let yTransform = 0;
     let initScroll = 0;
     let initTop = 0;
 
@@ -26,27 +28,31 @@
 
     onMount(() => {
         const rect = thisElement.getBoundingClientRect()
+        divHeight = rect.height;
         initTop = rect.top - formScrollValue;
-        initScroll = xTransform = getcurrentScroll()
+        initScroll = yTransform = getcurrentScroll()
         mounted = true;
     })
 
     function outputPos(){
         const bottomPos = initTop + divHeight + (initScroll - formScrollValue)
-        console.log("formScrollValue: ", formScrollValue, "initScroll: ", initScroll, "initTop: ", initTop, "bottomPos: ", bottomPos)
+        // console.log("formScrollValue: ", formScrollValue, "initScroll: ", initScroll, "initTop: ", initTop, "bottomPos: ", bottomPos)
+        // console.log("topLimit: ", topLimit, "botLimit: ", bottomLimit)
         if(formScrollValue - initScroll > initTop - topLimit){
-            xTransform = initTop + initScroll - topLimit
+            // console.log("exceed top");
+            yTransform = initTop + initScroll - topLimit;
         }
         else if(bottomPos > bottomLimit){
-            if(bottomPos < bottomLimit + divHeight + 35){
-                xTransform = formScrollValue + divHeight + 35
+            // console.log("exceed bot");
+            if(bottomPos < bottomLimit + divHeight + yOffset && needToFlip){
+                yTransform = formScrollValue + divHeight + yOffset;
             }
             else{
-                xTransform = formScrollValue + bottomPos - bottomLimit
+                yTransform = formScrollValue + bottomPos - bottomLimit;
             }
         }
         else{
-            xTransform = formScrollValue;
+            yTransform = formScrollValue;
         }
     }
 
@@ -58,6 +64,6 @@
 </script>
 
 
-<div class="absolute" bind:this={thisElement} style={`will-change:transform; transform: translate3d(0px, ${32 - xTransform}px, 0px);`}>
+<div class="absolute overscroll-none p-2" bind:this={thisElement} style={`will-change:transform; transform: translate3d(${xOffset}px, ${yOffset-yTransform}px, 0px);`}>
     <slot/>
 </div>

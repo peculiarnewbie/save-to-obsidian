@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import Field from "./Field.svelte";
-	import {formScroll} from "../../utils/stores"
+	import {formBottomLimit, formScroll, formTopLimit} from "../../utils/stores"
 
 	export let root: HTMLElement;
 	export let currentForm;
@@ -26,6 +26,7 @@
 	$: directory = currentForm.directory;
 	let validDir = true;
 	let formElement: HTMLElement;
+	let resultElement: HTMLElement;
 
 	if(directory == ""){
 		currentForm.directory = "Obsidian/";
@@ -161,6 +162,9 @@
 			formElement.scrollTop += e.deltaY;
 		})
 
+		formTopLimit.set(formElement.getBoundingClientRect().top);
+		formBottomLimit.set(resultElement.getBoundingClientRect().bottom);
+
 	})
 
 </script>
@@ -219,6 +223,7 @@
 <div
 	id="result"
 	class="flex flex-col text-white h-48 bg-[#1e1e1e] p-3 pb-5 border-t border-[#363636] bottom-0"
+	bind:this={resultElement}
 >
 	<div class="flex justify-between items-center mb-2">
 		<p style="margin: 0;">result:</p>

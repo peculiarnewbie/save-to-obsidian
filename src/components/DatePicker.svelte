@@ -5,6 +5,9 @@
     import CustomImage from "./CustomImage.svelte";
 	import StickyModals from "./StickyModals.svelte";
 
+    import { formTopLimit, formBottomLimit } from "../utils/stores";
+    import { get } from "svelte/store";
+
     export let field;
 
     let today = dayjs("2023/08/25").format("YYYY-MM-DD");
@@ -20,6 +23,9 @@
     let rows = initRows();
     let startDay = 0;
     let endDay = 0;
+
+    let topLimit = 0;
+    let bottomLimit = 0;
 
     const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
@@ -126,6 +132,10 @@
 
     field.value = currentDate;
 
+    //For the floating sticky modals
+
+    topLimit = get(formTopLimit)
+    bottomLimit = get(formBottomLimit);
 
 </script>
 
@@ -137,51 +147,49 @@
     {field.value}
 </button>
 
-<!-- <div bind:this={dateElement}> -->
-    {#if isEditing}
-    <StickyModals>
-        <div class="left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md">
-            <div class="flex justify-between px-1">
-                <div class="flex text-2xl">
-                    <p class="font-bold pr-1">{dayjs(currentDate).format("MMM")}</p>
-                    <p class="text-violet-500 font-semibold">{currentYear}</p>
-                </div>
-                <div class="flex justify-end">
-                    <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(-1)}>
-                        <CustomImage src={dateBack} alt="dateBack" width="7px"/>
-                    </button>
-                    <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-xs font-semibold" on:click={() => changeMonth(0)}>TODAY</button>
-                    <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(1)}>
-                        <CustomImage src={dateForward} alt="dateForward" width="7px"/>
-                    </button>
-                </div>
+{#if isEditing}
+<StickyModals {topLimit} {bottomLimit} yOffset={24} xOffset={28}>
+    <div bind:this={dateElement} class="left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md">
+        <div class="flex justify-between px-1">
+            <div class="flex text-2xl">
+                <p class="font-bold pr-1">{dayjs(currentDate).format("MMM")}</p>
+                <p class="text-violet-500 font-semibold">{currentYear}</p>
             </div>
-            <div class="flex text-[10px] font-semibold justify-around pt-2">
-                {#each dayNames as day}
-                    <p class="w-8 text-center">{day}</p>
-                {/each}
+            <div class="flex justify-end">
+                <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(-1)}>
+                    <CustomImage src={dateBack} alt="dateBack" width="7px"/>
+                </button>
+                <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-xs font-semibold" on:click={() => changeMonth(0)}>TODAY</button>
+                <button class="py-1 px-2 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeMonth(1)}>
+                    <CustomImage src={dateForward} alt="dateForward" width="7px"/>
+                </button>
             </div>
-            {#each rows as col, rIndex}
-                <tr class="flex h-8 text-sm">
-                    {#each col as i, cIndex}
-                        <td>
-                            <!-- date outside of current month -->
-                            {#if (cIndex < startDay && rIndex == 0) || (rIndex*7 + cIndex) >= endDay} 
-                                <button class="bg-[#363636] rounded-md hover:bg-[#3f3f3f] w-8 h-8 text-neutral-600" on:click={() => {selectDate(i, true)}}>{i}</button>
-                            <!-- current selected date -->
-                            {:else if (rIndex*7 + cIndex) == dayjs(field.value).date() + startDay - 1 && dayjs(field.value).month() == currentMonth && dayjs(field.value).year() == currentYear}
-                                <button class="bg-violet-600 rounded-md hover:bg-[#4e4e4e] w-8 h-8 text-white" on:click={() => {selectDate(i)}}>{i}</button>
-                            <!-- current date -->
-                            {:else if (rIndex*7 + cIndex) == dayjs(today).date() + startDay - 1 && dayjs(today).month() == currentMonth && dayjs(today).year() == currentYear}
-                                <button class="bg-[#363636] rounded-md hover:bg-[#4e4e4e] w-8 h-8 text-violet-500" on:click={() => {selectDate(i)}}>{i}</button>
-                            {:else}
-                                <button class={`bg-[#363636] rounded-md hover:bg-[#4e4e4e] w-8 h-8`} on:click={() => {selectDate(i)}}>{i}</button>
-                            {/if}
-                        </td>
-                    {/each}
-                </tr>
+        </div>
+        <div class="flex text-[10px] font-semibold justify-around pt-2">
+            {#each dayNames as day}
+                <p class="w-8 text-center">{day}</p>
             {/each}
         </div>
-    </StickyModals>
-    {/if}
-<!-- </div> -->
+        {#each rows as col, rIndex}
+            <tr class="flex h-8 text-sm">
+                {#each col as i, cIndex}
+                    <td>
+                        <!-- date outside of current month -->
+                        {#if (cIndex < startDay && rIndex == 0) || (rIndex*7 + cIndex) >= endDay} 
+                            <button class="bg-[#363636] rounded-md hover:bg-[#3f3f3f] w-8 h-8 text-neutral-600" on:click={() => {selectDate(i, true)}}>{i}</button>
+                        <!-- current selected date -->
+                        {:else if (rIndex*7 + cIndex) == dayjs(field.value).date() + startDay - 1 && dayjs(field.value).month() == currentMonth && dayjs(field.value).year() == currentYear}
+                            <button class="bg-violet-600 rounded-md hover:bg-[#4e4e4e] w-8 h-8 text-white" on:click={() => {selectDate(i)}}>{i}</button>
+                        <!-- current date -->
+                        {:else if (rIndex*7 + cIndex) == dayjs(today).date() + startDay - 1 && dayjs(today).month() == currentMonth && dayjs(today).year() == currentYear}
+                            <button class="bg-[#363636] rounded-md hover:bg-[#4e4e4e] w-8 h-8 text-violet-500" on:click={() => {selectDate(i)}}>{i}</button>
+                        {:else}
+                            <button class={`bg-[#363636] rounded-md hover:bg-[#4e4e4e] w-8 h-8`} on:click={() => {selectDate(i)}}>{i}</button>
+                        {/if}
+                    </td>
+                {/each}
+            </tr>
+        {/each}
+    </div>
+</StickyModals>
+{/if}
