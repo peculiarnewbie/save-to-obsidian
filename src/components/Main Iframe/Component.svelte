@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Form from "./Form.svelte";
 	import back from "../../../public/Back.svg";
+	import "../../app.css"
 	import { InputEnum } from "../../utils/FieldInputType";
-	export let root: HTMLElement;
+
+	let root: HTMLElement;
 	let loading = true;
 	let fields = [{ key: "", value: "", type: "" }];
 	let forms: string[] = [];
@@ -15,7 +17,8 @@
 	let openForm = false;
 
 	const closePopup = () => {
-		chrome.runtime.sendMessage({ action: "closePopup" });
+		console.log("pressed x")
+		chrome.runtime.sendMessage({ action: "closeExtension" });
 	};
 
 	const getChromeStorage = async () => {
@@ -90,12 +93,12 @@
 						<img src={chrome.runtime.getURL(back)} alt="back" width="20px" />
 					{/if}
 				</button>
-				<h2 id="ExtensionTitle">{currentForm.name}</h2>
+				<h2 class="my-3 pl-3 font-sans text-2xl font-bold text-white" id="ExtensionTitle">{currentForm.name}</h2>
 			</div>
 		{/if}
 		<button
 			id="CloseButton"
-			class="ext flex bg-transparent text-2xl text-white py-3 px-5 hover:bg-red-500"
+			class="flex bg-transparent text-2xl text-white py-3 px-5 hover:bg-red-500"
 			on:click={closePopup}
 		>
 			x
@@ -114,7 +117,7 @@
 			{:else}
 				<div class="ext p-3">
 					<button
-						class="btn-primary"
+						class="btn"
 						on:click={() => addForm()}
 					>
 						<div class="text-white font-normal font-sans">Add Form</div>
@@ -136,7 +139,7 @@
 				{:else}
 					<div class="p-3">
 						<button
-							class="btn-primary"
+							class="btn"
 							on:click={() => addForm()}>Add Form</button
 						>
 						{#each forms as form, i}
@@ -145,14 +148,14 @@
 									{form}
 								</div>
 								<button
-									class="btn-primary"
+									class="btn"
 									on:click={() => {
 										currentForm = JSON.parse(JSON.stringify(allData[`form_${form}`]));
 										isEditing = false;
 										openForm = true;
 									}}>Open Form</button
 								>
-								<button class="btn-primary" on:click={() => deleteForm(form)}
+								<button class="btn" on:click={() => deleteForm(form)}
 									>Delete</button
 								>
 							</div>
@@ -165,16 +168,4 @@
 </div>
 
 <style>
-	h2 {
-		@apply my-3 pl-3 font-sans text-2xl font-bold text-white;
-	}
-	p {
-		@apply font-sans font-normal text-white;
-	}
-	.btn-primary {
-		@apply h-9 rounded-md border-l border-r border-[#3f3f3f] border-t-[#242424] bg-[#363636] px-5 align-middle font-sans text-base text-white shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)] transition-all duration-100;
-	}
-	.btn-primary:hover {
-		@apply border-[#4e4e4e] bg-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)];
-	}
 </style>

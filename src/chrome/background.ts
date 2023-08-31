@@ -106,11 +106,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			});
 		})();
 		return true;
-	} else if (request.action === "closePopup") {
+	} else if (request.action === "closeExtension") {
+		console.log("background x")
 		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 			chrome.tabs.sendMessage(
 				tabs[0].id,
-				{ action: "closePopup" },
+				{ action: "closeExtension" },
 				(response) => {
 					sendResponse(response);
 				},

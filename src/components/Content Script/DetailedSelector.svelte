@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+	import { get } from "svelte/store";
 	import TestButtons from "../Test/TestButtons.svelte";
+	import { currentSelectedElement, storeMessaging, Actions } from "../../utils/stores";
 
 	export let extensionId;
 	export let selectedElement;
 	export let getElementValueFromPath;
+	export let Highlighter;
 	$: currentElement = selectedElement;
 	let treePath;
 
@@ -19,53 +23,44 @@
 	let showChildren = false;
 	let showSiblings = false;
 
+	let siblingCount = 0;
+	let childrenCount = 0;
+
 	enum IdType {
 		ID,
 		CLASS,
 		INDEX,
 	}
 
-	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			if (request.action == "bgGetElement") {
-				const value = getElementValueFromPath(request.path);
-				if (value) {
-					sendResponse({ success: true, value: value });
-				} else {
-					sendResponse({ success: false });
-				}
-			}
-		});
-	}
-
 	const FinishSelection = () => {
 		generatePath();
 		let value = getElementValueFromPath(treePath);
 		document.getElementById(`${extensionId}-iframe`).style.display = "initial";
-		chrome.runtime.sendMessage({
-			action: "elementSelected",
-			path: treePath,
-			value: value,
-		});
+
+		storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
 		selectedElement = null;
 	};
 
+	const moveSelection = (element) => {
+		selectedElement = element
+		console.log(element, element.childElementCount, element.parentElement.childElementCount)
+		childrenCount = selectedElement.childElementCount;
+		siblingCount = selectedElement.parentElement?.childElementCount - 1;
+
+		currentSelectedElement.set(selectedElement);
+
+		if (!import.meta.env.DEV) {
+			Highlighter.highlightElement(element);
+		}
+	}
+
 	const getParentElement = () => {
 		if (currentElement.parentElement) {
-			selectedElement = currentElement.parentElement;
+			moveSelection(currentElement.parentElement);
 		} else {
 			return currentElement;
 		}
 	};
-
-	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			if (request.action == "bgElementSelected") {
-				selectedElement = request.element;
-				sendResponse({ success: true });
-			}
-		});
-	}
 
 	const generatePath = () => {
 		let path = [];
@@ -179,6 +174,12 @@
 		return siblings;
 	};
 
+	onMount(() => {
+		moveSelection(selectedElement);
+	})
+
+	
+
 	const buttonStyle = `
         background-color: #363636;
         color: white;
@@ -203,6 +204,7 @@
     `;
 
 	const parentStyle = `
+		all:unset;
         display: flex;
         flex-direction: column;
         padding: 8px;
@@ -231,11 +233,12 @@
         overflow-y: auto;
         overflow-x: auto;
     `;
+
 </script>
 
 <div style={`${rootStyle}`}>
 	<div style={`${parentStyle}`}>
-		<div style="all:unset; color: white;">
+		<div style="color: white;">
 			Result:
 			<div id="resultBox" style={resultBox}>
 				{#if elementType == ElementType.TEXT}
@@ -251,11 +254,15 @@
 				{/if}
 			</div>
 		</div>
-		<div style="all:unset; display: flex; gap:12px">
-			<button style={`all:unset; ${buttonStyle}`} on:click={getParentElement}
+		<div style="display: flex; gap:12px">
+			<div>
+				<p>siblings: {siblingCount}</p>
+				<p>direct childrens: {childrenCount}</p>
+			</div>
+			<button style={`${buttonStyle}`} on:click={getParentElement}
 				>Select Parent</button
 			>
-			<button style={`all:unset; ${buttonStyle}`} on:click={FinishSelection}
+			<button style={`${buttonStyle}`} on:click={FinishSelection}
 				>Done</button
 			>
 		</div>

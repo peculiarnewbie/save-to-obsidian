@@ -10,13 +10,13 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["src/chrome/svelteContent.ts", "assets/index.ts"],
+			"js": ["src/chrome/svelteContent.ts"],
 			"run_at": "document_end"
 		}
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["assets/index.html"],
+			"resources": ["assets/svelteContent.css"],
 			"matches": ["<all_urls>"]
 		}
 	],

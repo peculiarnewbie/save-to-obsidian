@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import Field from "./Field.svelte";
-	import {formBottomLimit, formScroll, formTopLimit} from "../../utils/stores"
+	import {formBottomLimit, formScroll, formTopLimit, storeMessaging, Actions} from "../../utils/stores"
 
 	export let root: HTMLElement;
 	export let currentForm;
@@ -42,21 +42,23 @@
 			}}() 
 		+ currentForm.fields[0].value + ".md";
 
-	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			if (request.action === "bgElementSelected") {
-				document.getElementById("extension-html").classList.remove("hidden");
-				sendResponse({ success: true });
-				currentForm.fields[selectionIndex].treePath = request.path;
-				currentForm.fields[selectionIndex].value = request.value;
-			}
-			if (request.action === "bgValuesUpdated") {
-				request.values.forEach((value, index) => {
+	storeMessaging.subscribe((message) => {
+		const action = message.action;
+		const data = message.data;
+		switch(action){
+			case Actions.ElementSelected:
+				currentForm.fields[selectionIndex].treePath = data.path;
+				currentForm.fields[selectionIndex].value = data.value;
+				break;
+			case Actions.ValueUpdated:
+				data.values.forEach((value, index) => {
 					currentForm.fields[index].value = value;
-				});
-			}
-		});
-	}
+				})
+				break;
+			default:
+				break;
+		}
+	})
 
 	const download = () => {
 		data = `---\n`;
@@ -74,7 +76,7 @@
 			},
 			(response) => {
 				if (response.success) {
-					chrome.runtime.sendMessage({ message: "closePopup" });
+					chrome.runtime.sendMessage({ message: "closeExtension" });
 				}
 			},
 		);
@@ -92,7 +94,7 @@
 
 	const inspect = async (index) => {
 		selectionIndex = index;
-		chrome.runtime.sendMessage({ action: "inspect" });
+		storeMessaging.set({action: Actions.StartInspect})
 	};
 
 	const saveForm = async () => {
@@ -114,22 +116,23 @@
 	const updateFieldValues = () => {
 		let paths = currentForm.fields.map((field) => field.treePath);
 
-		chrome.runtime.sendMessage(
-			{ action: "getElements", paths: paths },
-			(response) => {
-				if (!response.success) {
-					console.error("failed to get element");
-				} else {
-					response.values.forEach((value, index) => {
-						if(!value){
-							return;
-						}
-						currentForm.fields[index].value = value;
-					});
-				}
-			},
-		);
+		storeMessaging.set({action: Actions.CollectValues, data: {paths: paths}})
 	};
+
+	storeMessaging.subscribe((message) => {
+		const action = message.action;
+		const data = message.data
+		switch(action){
+			case Actions.ValuesCollected:
+				data.values.forEach((value, index) => {
+					if(!value) return;
+					currentForm.fields[index].value = value;
+				})
+				break;
+			default:
+				break;
+		}
+	})
 
 	prevName = currentForm.name;
 
@@ -169,12 +172,13 @@
 
 </script>
 
-<div on:scroll={handleScroll} id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10]">
+<div on:scroll={handleScroll} id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white">
 	{#if isEditing}
 		<div style="display: flex; justify-content:space-between; align-items:end">
 			<div>
 				<p class="text-xl font-semibold">Form Title:</p>
 				<input
+					class="text-black"
 					type="text"
 					placeholder="enter form name"
 					bind:value={currentForm.name}
@@ -183,7 +187,7 @@
 			<div>
 				<p class="text-xl font-semibold">Directory:</p>
 				<div class="relative">
-					<input class={`${validDir ? "" : "outline-red-500"}`}
+					<input class={`${validDir ? "" : "outline-red-500"} text-black`}
 						type="text"
 						placeholder="enter directory"
 						on:input={checkDirValidity}
@@ -198,11 +202,11 @@
 
 				</div>
 			</div>
-			<button class="btn-primary" on:click={addField}>Add Field</button>
+			<button class="btn" on:click={addField}>Add Field</button>
 		</div>
 	{:else}
 		<button
-			class="btn-primary"
+			class="btn"
 			on:click={() => {
 				isEditing = true;
 			}}>Edit</button
@@ -222,7 +226,7 @@
 
 <div
 	id="result"
-	class="flex flex-col text-white h-48 bg-[#1e1e1e] p-3 pb-5 border-t border-[#363636] bottom-0"
+	class="flex flex-col text-white h-48 bg-[#1e1e1e] p-3 pb-5 border-t border-[#363636] bottom-0 font-sans font-normal"
 	bind:this={resultElement}
 >
 	<div class="flex justify-between items-center mb-2">
@@ -240,24 +244,12 @@
 			<p>{fullTitle}</p>
 		</div>
 		{#if isEditing}
-			<button class="btn-primary" on:click={saveForm}>Save</button>
+			<button class="btn" on:click={saveForm}>Save</button>
 		{:else}
-			<button class="btn-primary" on:click={download}>Download</button>
+			<button class="btn" on:click={download}>Download</button>
 		{/if}
 	</div>
 </div>
 
 <style>
-	h2 {
-		@apply my-3 pl-3 font-sans text-2xl font-bold text-white;
-	}
-	p {
-		@apply font-sans font-normal text-white;
-	}
-	button {
-		@apply h-9 rounded-md border-l border-r border-[#3f3f3f] border-t-[#242424] bg-[#363636] px-5 align-middle font-sans text-base text-white shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)] transition-all duration-100;
-	}
-	button:hover {
-		@apply border-[#4e4e4e] bg-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)];
-	}
 </style>

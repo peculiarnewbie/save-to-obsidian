@@ -1,11 +1,12 @@
 <script lang="ts">
 	import DetailedSelector from "./DetailedSelector.svelte";
+	import { storeMessaging, Actions } from "../../utils/stores";
 
 	export let canvas: HTMLCanvasElement;
 	export let extensionId;
 	let selectedElement;
 
-	let hoveredElement;
+	let ctx: CanvasRenderingContext2D;
 
 	enum IdType {
 		ID,
@@ -13,15 +14,10 @@
 		INDEX,
 	}
 
+	let Highlighter = {canvas, ctx, highlightElement}
+
 	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-		if (request.action === "closePopup") {
-			const popup = document.getElementById(`${extensionId}-iframe`);
-			popup.remove();
-			sendResponse({ success: true });
-		} else if (request.action === "inspect") {
-			inspect();
-			sendResponse({ success: true });
-		} else if (request.action === "bgValuesUpdate") {
+		if (request.action === "bgValuesUpdate") {
 			let values = [];
 			request.paths.forEach((path, index) => {
 				values.push(getElementValueFromPath(path));
@@ -40,7 +36,7 @@
 		canvas.style.width = "100vw";
 		canvas.style.height = "100vh";
 
-		const ctx = canvas.getContext("2d");
+		ctx = canvas.getContext("2d");
 
 		document.addEventListener("click", InspectElement, true);
 		document.addEventListener("mouseover", HoverElement, true);
@@ -54,31 +50,35 @@
 			selectedElement = element;
 
 			if (click_count == 1) {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				// ctx.clearRect(0, 0, canvas.width, canvas.height);
 				document.removeEventListener("click", InspectElement, true);
 				document.removeEventListener("mouseover", HoverElement, true);
 				window.removeEventListener("mouseout", ClearCanvas, true);
 			}
 		}
 
-		function HoverElement(event) {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			hoveredElement = event.target;
-			ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
-			const hoveredDom = hoveredElement.getBoundingClientRect();
-			// ctx.fillRect(100, 100, 200, 200);
-			ctx.fillRect(
-				hoveredDom.left,
-				hoveredDom.top,
-				hoveredDom.width,
-				hoveredDom.height,
-			);
+		function HoverElement(e) {
+			highlightElement(e.target)
 		}
 
-		function ClearCanvas() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-		}
 	};
+
+	function highlightElement(hoveredElement) {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+		const hoveredDom = hoveredElement.getBoundingClientRect();
+		// ctx.fillRect(100, 100, 200, 200);
+		ctx.fillRect(
+			hoveredDom.left,
+			hoveredDom.top,
+			hoveredDom.width,
+			hoveredDom.height,
+		);
+	}
+
+	function ClearCanvas() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
 
 	const getElementValueFromPath = (path) => {
 		const getElementFromCurrentPath = (currentPath, currentElement) => {
@@ -117,6 +117,28 @@
 			return element.innerText;
 		}
 	};
+
+	storeMessaging.subscribe((message) => {
+		const action = message.action;
+		const data = message.data
+		switch(action){
+			case Actions.StartInspect:
+				inspect();
+				break;
+			case Actions.ElementSelected:
+				ClearCanvas();
+				break;
+			case Actions.CollectValues:
+				let values = [];
+				data.paths.forEach((path, index) => {
+					values.push(getElementValueFromPath(path));
+				});
+				storeMessaging.set({action: Actions.ValueUpdated, data:{values: values}})
+				break;
+			default:
+				break;
+		}
+	})
 </script>
 
 {#if selectedElement}
@@ -125,6 +147,7 @@
 			{extensionId}
 			bind:selectedElement
 			{getElementValueFromPath}
+			{Highlighter}
 		/>
 	</div>
 {/if}
