@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onDestroy, onMount, tick } from "svelte";
 	import Field from "./Field.svelte";
 	import {formBottomLimit, formScroll, formTopLimit, storeMessaging, Actions} from "../../utils/stores"
 
@@ -42,15 +42,16 @@
 			}}() 
 		+ currentForm.fields[0].value + ".md";
 
-	storeMessaging.subscribe((message) => {
+	const unsubscribe = storeMessaging.subscribe((message) => {
 		const action = message.action;
 		const data = message.data;
 		switch(action){
 			case Actions.ElementSelected:
 				currentForm.fields[selectionIndex].treePath = data.path;
 				currentForm.fields[selectionIndex].value = data.value;
+				storeMessaging.set({action: Actions.OpenPopup})
 				break;
-			case Actions.ValueUpdated:
+			case Actions.ValuesCollected:
 				data.values.forEach((value, index) => {
 					currentForm.fields[index].value = value;
 				})
@@ -119,21 +120,6 @@
 		storeMessaging.set({action: Actions.CollectValues, data: {paths: paths}})
 	};
 
-	storeMessaging.subscribe((message) => {
-		const action = message.action;
-		const data = message.data
-		switch(action){
-			case Actions.ValuesCollected:
-				data.values.forEach((value, index) => {
-					if(!value) return;
-					currentForm.fields[index].value = value;
-				})
-				break;
-			default:
-				break;
-		}
-	})
-
 	prevName = currentForm.name;
 
 	if (!isEditing) {
@@ -156,23 +142,25 @@
 		}
 	}
 
-	const handleScroll = (e) => {
-		formScroll.set((e.target as HTMLElement).scrollTop);
-	}
-
 	onMount(() => {
 		formElement.addEventListener("wheel", function(e){
 			formElement.scrollTop += e.deltaY;
+			formScroll.set((formElement.scrollTop));
 		})
 
 		formTopLimit.set(formElement.getBoundingClientRect().top);
 		formBottomLimit.set(resultElement.getBoundingClientRect().bottom);
 
+		console.log(currentForm)
 	})
+
+	onDestroy(unsubscribe);
+
+	console.log(currentForm)
 
 </script>
 
-<div on:scroll={handleScroll} id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white">
+<div id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white">
 	{#if isEditing}
 		<div style="display: flex; justify-content:space-between; align-items:end">
 			<div>

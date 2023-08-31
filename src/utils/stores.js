@@ -11,17 +11,19 @@ export var Actions = {
     Dummy: "dummy",
     ClosePopup: "closePopup",
     OpenPopup: "openPopup",
+    StartInspect: "startInspect",
     /**
      * data: {path, value}
      */
     ElementSelected: "elementSelected",
-    ValueUpdated: "valueUpdated",
-    StartInspect: "startInspect",
     /**
      * data: {paths}
-     */
+    */
     CollectValues: "collectValues",
-    ValuesCollected: "valuesCollected",
+    /**
+    * data: {values}
+    */
+    ValuesCollected: "valuesCollected"
     
 };
 
@@ -43,3 +45,11 @@ export const formBottomLimit = writable(0);
 export const currentSelectedElement = writable(null)
 
 export const storeMessaging = writable(dummyMessage);
+
+export const initAllStores = () => {
+    formScroll.set(0);
+    formTopLimit.set(0);
+    formBottomLimit.set(0);
+    currentSelectedElement.set(null);
+    storeMessaging.set(dummyMessage)
+}

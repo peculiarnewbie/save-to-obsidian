@@ -1,8 +1,8 @@
 <script lang="ts">
     import Component from "./Main Iframe/Component.svelte";
     import Inspector from "./Content Script/Inspector.svelte";
-	import { onMount } from "svelte";
-	import { formScroll, storeMessaging, Actions } from "../utils/stores";
+	import { onDestroy, onMount } from "svelte";
+	import { formScroll, storeMessaging, Actions, initAllStores } from "../utils/stores";
 
     export let root: HTMLElement;
 
@@ -11,6 +11,9 @@
     let canvas:HTMLCanvasElement;
 
     onMount(() =>{
+
+        initAllStores();
+
         mainIframe.onload = (ev) => {
             mainIframe.style.all = "initial";
 			mainIframe.style.position = "fixed";
@@ -36,9 +39,8 @@
 
     })
 
-    console.log("whaaaaaaaaaaa");
-
-    storeMessaging.subscribe((message) => {
+    const unsubscribe = storeMessaging.subscribe((message) => {
+        console.log(message);
         const action = message.action;
         switch(action){
             case Actions.ClosePopup:
@@ -53,6 +55,8 @@
                 break;
         }
     })
+
+    onDestroy(unsubscribe);
 
 </script>
 

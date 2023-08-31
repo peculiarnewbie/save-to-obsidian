@@ -37,13 +37,15 @@
 		let value = getElementValueFromPath(treePath);
 		document.getElementById(`${extensionId}-iframe`).style.display = "initial";
 
+		// console.log("treePath: ", treePath, "value: ", value);
+
 		storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
 		selectedElement = null;
 	};
 
 	const moveSelection = (element) => {
 		selectedElement = element
-		console.log(element, element.childElementCount, element.parentElement.childElementCount)
+		// console.log(element, element.childElementCount, element.parentElement.childElementCount)
 		childrenCount = selectedElement.childElementCount;
 		siblingCount = selectedElement.parentElement?.childElementCount - 1;
 

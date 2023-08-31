@@ -6,6 +6,23 @@ let firstTime = true;
 
 let extensionId = chrome.runtime.id;
 
+const svelteParent = document.createElement('div')
+svelteParent.id = `${extensionId}-SvelteParent`;
+svelteParent.style.position = "fixed";
+svelteParent.style.top = "10px";
+svelteParent.style.right = "10px";
+svelteParent.style.backgroundColor = "transparent";
+svelteParent.style.zIndex = "9997";
+svelteParent.style.display = "block";
+svelteParent.style.pointerEvents = "all";
+
+new SvelteParent({
+	target: svelteParent,
+	props: {root: svelteParent}
+})
+
+
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	if (message.action === "popup") {
 		// if (!document.getElementById(`${extensionId}-iframe`)) {
@@ -28,21 +45,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 			// document.body.appendChild(iframe);
 
-			const svelteParent = document.createElement('div')
-			svelteParent.id = `${extensionId}-SvelteParent`;
-			svelteParent.style.position = "fixed";
-			svelteParent.style.top = "10px";
-			svelteParent.style.right = "10px";
-			svelteParent.style.backgroundColor = "transparent";
-			svelteParent.style.zIndex = "9997";
-			svelteParent.style.display = "block";
-			svelteParent.style.pointerEvents = "all";
-
-			new SvelteParent({
-				target: svelteParent,
-				props: {root: svelteParent}
-			})
-
 			document.body.appendChild(svelteParent);
 		} else {
 			console.log("popup already exists");
@@ -53,7 +55,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		sendResponse({ success: true });
 	}
 	else if (message.action === "closeExtension") {
-		console.log("byee")
 		const parent = document.getElementById(`${extensionId}-SvelteParent`);
 		parent.remove();
 	}

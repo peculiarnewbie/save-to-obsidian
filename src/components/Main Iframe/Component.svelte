@@ -3,6 +3,7 @@
 	import back from "../../../public/Back.svg";
 	import "../../app.css"
 	import { InputEnum } from "../../utils/FieldInputType";
+	import { storeMessaging, Actions } from "../../utils/stores";
 
 	let root: HTMLElement;
 	let loading = true;
@@ -17,7 +18,7 @@
 	let openForm = false;
 
 	const closePopup = () => {
-		console.log("pressed x")
+		storeMessaging.set({action: Actions.Dummy})
 		chrome.runtime.sendMessage({ action: "closeExtension" });
 	};
 
@@ -149,8 +150,8 @@
 								</div>
 								<button
 									class="btn"
-									on:click={() => {
-										currentForm = JSON.parse(JSON.stringify(allData[`form_${form}`]));
+									on:click={async () => {
+										currentForm = await JSON.parse(JSON.stringify(allData[`form_${form}`]));
 										isEditing = false;
 										openForm = true;
 									}}>Open Form</button

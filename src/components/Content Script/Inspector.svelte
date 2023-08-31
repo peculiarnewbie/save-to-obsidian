@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DetailedSelector from "./DetailedSelector.svelte";
 	import { storeMessaging, Actions } from "../../utils/stores";
+	import { onDestroy, tick } from "svelte";
 
 	export let canvas: HTMLCanvasElement;
 	export let extensionId;
@@ -118,11 +119,12 @@
 		}
 	};
 
-	storeMessaging.subscribe((message) => {
+	const unsubscribe = storeMessaging.subscribe((message) => {
 		const action = message.action;
 		const data = message.data
 		switch(action){
 			case Actions.StartInspect:
+				storeMessaging.set({action: Actions.ClosePopup})
 				inspect();
 				break;
 			case Actions.ElementSelected:
@@ -131,14 +133,23 @@
 			case Actions.CollectValues:
 				let values = [];
 				data.paths.forEach((path, index) => {
-					values.push(getElementValueFromPath(path));
+					const value = getElementValueFromPath(path)
+					// console.log(value)
+					values.push(value);
 				});
-				storeMessaging.set({action: Actions.ValueUpdated, data:{values: values}})
+				ValuesCollected(values);
 				break;
 			default:
 				break;
 		}
 	})
+
+	const ValuesCollected = async(values) =>{
+		await tick()
+		storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
+	}
+
+	onDestroy(unsubscribe)
 </script>
 
 {#if selectedElement}
