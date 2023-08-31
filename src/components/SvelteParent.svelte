@@ -15,7 +15,7 @@
         initAllStores();
 
         mainIframe.onload = (ev) => {
-            mainIframe.style.all = "initial";
+            // mainIframe.style.all = "initial";
 			mainIframe.style.position = "fixed";
 			mainIframe.style.top = "10px";
 			mainIframe.style.right = "10px";

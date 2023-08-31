@@ -1,7 +1,7 @@
 <script lang="ts">
 	import DetailedSelector from "./DetailedSelector.svelte";
-	import { storeMessaging, Actions } from "../../utils/stores";
-	import { onDestroy, tick } from "svelte";
+	import { storeMessaging, Actions, currentSelectedElement } from "../../utils/stores";
+	import { onDestroy, onMount, tick } from "svelte";
 
 	export let canvas: HTMLCanvasElement;
 	export let extensionId;
@@ -16,6 +16,10 @@
 	}
 
 	let Highlighter = {canvas, ctx, highlightElement}
+	let detailIframe:HTMLIFrameElement;
+	let hoverSelecting = true;
+
+	$:{console.log(hoverSelecting)}
 
 	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		if (request.action === "bgValuesUpdate") {
@@ -51,10 +55,11 @@
 			selectedElement = element;
 
 			if (click_count == 1) {
-				// ctx.clearRect(0, 0, canvas.width, canvas.height);
 				document.removeEventListener("click", InspectElement, true);
 				document.removeEventListener("mouseover", HoverElement, true);
 				window.removeEventListener("mouseout", ClearCanvas, true);
+				currentSelectedElement.set(selectedElement);
+				hoverSelecting = false;
 			}
 		}
 
@@ -64,8 +69,92 @@
 
 	};
 
+	const generatePath = () => {
+		const CheckForDuplicateIds = (id) => {
+			let elements = document.querySelectorAll("#" + id);
+			if (elements.length > 1) {
+				return false;
+			} else {
+				return true;
+			}
+		};
+
+		const searchElements = (elements, element) => {
+			for (let i = 0; i < elements.length; i++) {
+				if (elements[i] == element) {
+					return { found: true, index: i };
+				}
+			}
+			console.error("failed to find element");
+			return { found: false, index: 0 };
+		};
+
+		const validateClass = (className) => {
+			if (className.includes(" ")) {
+				return false;
+			} else if (className.length > 40) {
+				return false;
+			} else {
+				let regex = /\d/;
+				if (regex.test(className)) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		};
+
+		let path = [];
+		let currentElement = selectedElement;
+		let searchResult = { found: false, index: 0 };
+
+		while (currentElement != document.body) {
+			if (currentElement.id != "") {
+				if (CheckForDuplicateIds(currentElement.id)) {
+					path.push({
+						type: IdType.ID,
+						value: currentElement.id,
+						index: 0,
+					});
+					break;
+				}
+			} else if (currentElement.className != "") {
+				if (validateClass(currentElement.className)) {
+					let queriedElements = document.getElementsByClassName(
+						currentElement.className,
+					);
+					if (queriedElements.length < 5) {
+						searchResult = searchElements(queriedElements, currentElement);
+						path.push({
+							type: IdType.CLASS,
+							value: currentElement.className,
+							index: searchResult.index,
+						});
+						break;
+					}
+				}
+			}
+
+			path.push({
+				type: IdType.INDEX,
+				value: "",
+				index: Array.from(currentElement.parentElement.children).indexOf(
+					currentElement,
+				),
+			});
+			currentElement = currentElement.parentElement;
+			continue;
+		}
+
+		return path.reverse();
+	};
+	
+
+
 	function highlightElement(hoveredElement) {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		if(!ctx || !hoveredElement) return;
+
+		ClearCanvas()
 		ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
 		const hoveredDom = hoveredElement.getBoundingClientRect();
 		// ctx.fillRect(100, 100, 200, 200);
@@ -119,7 +208,7 @@
 		}
 	};
 
-	const unsubscribe = storeMessaging.subscribe((message) => {
+	const unsub1 = storeMessaging.subscribe((message) => {
 		const action = message.action;
 		const data = message.data
 		switch(action){
@@ -127,7 +216,11 @@
 				storeMessaging.set({action: Actions.ClosePopup})
 				inspect();
 				break;
-			case Actions.ElementSelected:
+			case Actions.FinishSelection:
+				let treePath = generatePath();
+				let value = getElementValueFromPath(treePath);
+				storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
+				hoverSelecting = true;
 				ClearCanvas();
 				break;
 			case Actions.CollectValues:
@@ -144,21 +237,64 @@
 		}
 	})
 
+	$:{highlightElement($currentSelectedElement)}
+
+	const unsubscribe = () => {
+		unsub1()
+	}
+
 	const ValuesCollected = async(values) =>{
 		await tick()
 		storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
 	}
 
+	onMount(() => {
+		detailIframe.onload = (ev) => {
+            // detailIframe.style.all = "initial";
+
+            let link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = chrome.runtime.getURL('assets/svelteContent.css');
+
+            detailIframe.contentDocument.querySelector('head').appendChild(link)
+
+            new DetailedSelector({
+                target: detailIframe.contentWindow.document.body,
+				props: {extensionId:{extensionId}}
+            });
+        }
+
+
+	})
+
+	let detailIframeStyle = ``
+	$:{
+		detailIframeStyle =
+		`position: fixed;
+		top: 10px;
+		right: 10px;
+		width: 320px;
+		height: 500px;
+		padding: 4px;
+		display: ${hoverSelecting ? "none" : "block"};
+		pointer-events: ${hoverSelecting ? "none" : "all"};
+		z-index: 9999;
+		background-color: transparent;`
+	}
+
+
+
 	onDestroy(unsubscribe)
 </script>
 
-{#if selectedElement}
-	<div>
+<!-- {#if selectedElement} -->
+<iframe title="DetailedIframe" bind:this={detailIframe} style={`${detailIframeStyle}`}></iframe>
+	<!-- <div>
 		<DetailedSelector
 			{extensionId}
 			bind:selectedElement
 			{getElementValueFromPath}
 			{Highlighter}
 		/>
-	</div>
-{/if}
+	</div> -->
+<!-- {/if} -->
