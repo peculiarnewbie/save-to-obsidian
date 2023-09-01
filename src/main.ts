@@ -1,15 +1,24 @@
-import DetailedSelector from "./components/Content Script/DetailedSelector.svelte";
+import SvelteParent from "./components/SvelteParent.svelte";
+import TestComponent from "./components/Test/TestComponent.svelte";
+import TestButtons from "./components/Test/TestButtons.svelte";
 
-import Component from "./components/Main Iframe/Component.svelte";
 import "./app.css";
 
 const target = document.getElementById("app");
 const root = document.createElement("div");
 
-new DetailedSelector({
+new SvelteParent({
 	target: root,
-	props: { extensionId: 1, selectedElement: target },
+	props:{root: root}
 });
+
+new TestButtons({
+	target: root
+})
+
+new TestComponent({
+	target: root
+})
 
 // root.style.position = "fixed";
 // root.style.top = "10px";

@@ -1,16 +1,11 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 	import { get } from "svelte/store";
-	import TestButtons from "../Test/TestButtons.svelte";
 	import { currentSelectedElement, storeMessaging, Actions } from "../../utils/stores";
-	import "../../app.css"
 
 	export let extensionId;
-	let getElementValueFromPath;
-	// $: currentElement = selectedElement;
-	
-	let treePath;
-	let selectedElement 
+
+	let selectedElement;
 
 	enum ElementType {
 		TEXT,
@@ -20,14 +15,8 @@
 	let elementType;
 	let elementValue;
 
-	$: {
-		console.log(selectedElement)
-		if(selectedElement){
-			elementType = determineNodeType(selectedElement);
-			elementValue = determineElementValue(selectedElement);
-		} 
-
-	}
+	let elementList: HTMLElement[] = [];
+	let selectingList = false;
 
 	let selectableElements = [];
 	let showChildren = false;
@@ -36,38 +25,36 @@
 	let siblingCount = 0;
 	let childrenCount = 0;
 
-	enum IdType {
-		ID,
-		CLASS,
-		INDEX,
-	}
-
 	const FinishSelection = () => {
 		storeMessaging.set({action: Actions.FinishSelection})
 		
 		selectedElement = null;
 	};
 
-	const moveSelection = (element) => {
-		selectedElement = element
+	const selectAgain = () => {
+		storeMessaging.set({action:Actions.StartInspect})
+	}
+
+	const moveSelection = (element, fromHover) => {
+		selectedElement = element;
+		selectingList = false;
+		
+		elementType = determineNodeType(selectedElement);
+		elementValue = determineElementValue(selectedElement);
 		// console.log(element, element.childElementCount, element.parentElement.childElementCount)
 		childrenCount = selectedElement.childElementCount;
 		siblingCount = selectedElement.parentElement?.childElementCount - 1;
 
-		currentSelectedElement.set(selectedElement);
+		if(!fromHover) currentSelectedElement.set(selectedElement);
 	}
 
 	const getParentElement = () => {
 		if (selectedElement.parentElement) {
-			moveSelection(selectedElement.parentElement);
+			moveSelection(selectedElement.parentElement, false);
 		} else {
-			return selectedElement;
+			return;
 		}
 	};
-
-	
-
-	
 
 	const determineNodeType = (element) => {
 		if (element.nodeName == "IMG") {
@@ -85,80 +72,89 @@
 		}
 	};
 
-	const getElementChildren = (element) => {
-		let children = [];
+	const getElementList = (sibling) => {
+		selectingList = true;
+		let list = [];
+
+		let element;
+		if(sibling) element = selectedElement.parentElement;
+		else element = selectedElement;
+
 		for (let i = 0; i < element.children.length; i++) {
-			children.push(element.children[i]);
+			if(element.children[i] != selectedElement)
+				list.push(element.children[i]);
 		}
-		return children;
-	};
 
-	const getElementSiblings = (element) => {
-		let siblings = [];
-		for (let i = 0; i < element.parentElement.children.length; i++) {
-			siblings.push(element.parentElement.children[i]);
-		}
-		return siblings;
-	};
+		elementList = list;
+	}
 
-	// onMount(() => {
-	// 	selectedElement = get(currentSelectedElement);
-	// 	moveSelection(selectedElement);
-	// })
+	const highlightElement = (element) => {
+		currentSelectedElement.set(element)
+	}
 
 
 	const unsubscribe = storeMessaging.subscribe((message) => {
 		const action = message.action;
 		if(action == Actions.FinishHover){
 			selectedElement = get(currentSelectedElement);
-			moveSelection(selectedElement);
+			console.log(selectedElement)
+			moveSelection(selectedElement, true);
 		}
 	})
-
-	$:{
-		selectedElement = $currentSelectedElement;
-	}
 
 	onDestroy(unsubscribe);
 
 </script>
 
-<div class="flex bg-[#242424] w-fit rounded-md">
-	<div class="flex flex-col p-2 gap-3">
-		<div style="color: white;">
-			Result:
-			<div id="resultBox" class="bg-[#1e1e1e] h-fit p-1 mt-2 min-h-[50px] max-w-xs max-h-64 overflow-auto">
-				{#if elementType == ElementType.TEXT}
-					<p>{elementValue}</p>
-				{:else if elementType == ElementType.IMG}
-					<div class="max-w-250px max-h-[250px]">
-						<img
-							class="max-w-full max-h-full"
-							src={elementValue}
-							alt="selected"
-						/>
+<div class="w-full flex justify-end">
+	<div class="flex bg-[#242424] w-full rounded-md">
+		<div class="flex flex-col w-full p-2 gap-3 self-end">
+			<div class="text-white">
+				Result:
+				<div id="resultBox" class="bg-[#1e1e1e] p-1 mt-2 w-full h-64 overflow-auto">
+					{#if elementType == ElementType.TEXT}
+						<p>{elementValue}</p>
+					{:else if elementType == ElementType.IMG}
+						<div class="w-full h-60">
+							<img
+								class="max-w-full max-h-full"
+								src={elementValue}
+								alt="selected"
+							/>
+						</div>
+					{/if}
+				</div>
+			</div>
+			{#if selectingList}
+				<div class="flex flex-col gap-4">
+					<button on:click={() => {selectingList = false; highlightElement(selectedElement)}} class="btn">Back</button>
+					<div class="flex flex-col gap-2">
+						{#each elementList as element}
+							<button on:pointerenter={() => highlightElement(element)} on:click={() => moveSelection(element, false)} class="max-h-12 bg-slate-700 flex">
+								<div class="w-1/5">
+									{element.tagName}
+								</div>
+								<div class=" overflow-hidden h-12">
+									{element.innerText}
+								</div>
+							</button>
+						{/each}
 					</div>
-				{/if}
-			</div>
-		</div>
-		<div style="display: flex; gap:12px">
-			<div>
-				<p>siblings: {siblingCount}</p>
-				<p>direct childrens: {childrenCount}</p>
-			</div>
-			<button class="btn" on:click={getParentElement}
-				>Select Parent</button
-			>
-			<button class="btn" on:click={FinishSelection}
-				>Done</button
-			>
+				</div>
+			{:else}
+				<div class="gap-3 flex flex-col">
+					
+					<button class="btn" on:click={getParentElement}>Select Parent</button>
+					<button class="btn" on:click={() => getElementList(true)}>Select Siblings ({siblingCount})</button>
+					<button class="btn" on:click={() => getElementList(false)}>Select Children ({childrenCount})</button>
+					<button class="btn" on:click={selectAgain}>Select Again</button>
+					<button class="btn" on:click={FinishSelection}>Done</button>
+				</div>
+			{/if}
 		</div>
 	</div>
-</div>
 
-{#if import.meta.env.DEV}
-	<TestButtons bind:selectedElement />
-{/if}
+</div>
 
 <style>
 </style>

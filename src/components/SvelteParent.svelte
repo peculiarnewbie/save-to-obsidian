@@ -5,8 +5,11 @@
 	import { formScroll, storeMessaging, Actions, initAllStores } from "../utils/stores";
 
     export let root: HTMLElement;
-
-    let extensionId = chrome.runtime.id;
+    
+    let extensionId 
+    if(!import.meta.env.DEV) extensionId = chrome.runtime.id;
+    else extensionId = "id";
+    
     let mainIframe:HTMLIFrameElement;
     let canvas:HTMLCanvasElement;
 
@@ -22,13 +25,16 @@
 			mainIframe.style.width = "450px";
 			mainIframe.style.height = "700px";
 			mainIframe.style.backgroundColor = "transparent";
+            mainIframe.style.border = "none"
 			mainIframe.style.zIndex = "9998";
             mainIframe.style.display = "block";
             mainIframe.style.pointerEvents = "all";
 
             let link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = chrome.runtime.getURL('assets/svelteContent.css');
+            
+            if(!import.meta.env.DEV) link.href = chrome.runtime.getURL('assets/svelteContent.css');
+            else link.href = "src/app.css"
 
             mainIframe.contentDocument.querySelector('head').appendChild(link)
 
@@ -40,7 +46,7 @@
     })
 
     const unsubscribe = storeMessaging.subscribe((message) => {
-        console.log(message);
+        // console.log(message);
         const action = message.action;
         switch(action){
             case Actions.ClosePopup:

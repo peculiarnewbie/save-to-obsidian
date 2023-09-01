@@ -2,6 +2,7 @@
 	import DetailedSelector from "./DetailedSelector.svelte";
 	import { storeMessaging, Actions, currentSelectedElement } from "../../utils/stores";
 	import { onDestroy, onMount, tick } from "svelte";
+	import { get } from "svelte/store";
 
 	export let canvas: HTMLCanvasElement;
 	export let extensionId;
@@ -19,20 +20,21 @@
 	let detailIframe:HTMLIFrameElement;
 	let hoverSelecting = true;
 
-	$:{console.log(hoverSelecting)}
-
-	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-		if (request.action === "bgValuesUpdate") {
-			let values = [];
-			request.paths.forEach((path, index) => {
-				values.push(getElementValueFromPath(path));
-			});
-			sendResponse({ success: true, values: values });
-		}
-	});
+	if(!import.meta.env.DEV){
+		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+			if (request.action === "bgValuesUpdate") {
+				let values = [];
+				request.paths.forEach((path, index) => {
+					values.push(getElementValueFromPath(path));
+				});
+				sendResponse({ success: true, values: values });
+			}
+		});
+	}
 
 	const inspect = async () => {
 		let click_count = 0;
+		hoverSelecting = true;
 
 		document.getElementById(`${extensionId}-iframe`).style.display = "none";
 
@@ -59,6 +61,7 @@
 				document.removeEventListener("mouseover", HoverElement, true);
 				window.removeEventListener("mouseout", ClearCanvas, true);
 				currentSelectedElement.set(selectedElement);
+				storeMessaging.set({action: Actions.FinishHover})
 				hoverSelecting = false;
 			}
 		}
@@ -69,7 +72,7 @@
 
 	};
 
-	const generatePath = () => {
+	const generatePath = (selectedElement) => {
 		const CheckForDuplicateIds = (id) => {
 			let elements = document.querySelectorAll("#" + id);
 			if (elements.length > 1) {
@@ -217,7 +220,7 @@
 				inspect();
 				break;
 			case Actions.FinishSelection:
-				let treePath = generatePath();
+				let treePath = generatePath(get(currentSelectedElement));
 				let value = getElementValueFromPath(treePath);
 				storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
 				hoverSelecting = true;
@@ -254,7 +257,9 @@
 
             let link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = chrome.runtime.getURL('assets/svelteContent.css');
+			
+            if(!import.meta.env.DEV) link.href = chrome.runtime.getURL('assets/svelteContent.css');
+            else link.href = "src/app.css"
 
             detailIframe.contentDocument.querySelector('head').appendChild(link)
 
@@ -273,13 +278,14 @@
 		`position: fixed;
 		top: 10px;
 		right: 10px;
-		width: 320px;
-		height: 500px;
+		width: 260px;
+		height: 600px;
 		padding: 4px;
 		display: ${hoverSelecting ? "none" : "block"};
 		pointer-events: ${hoverSelecting ? "none" : "all"};
 		z-index: 9999;
-		background-color: transparent;`
+		background-color: transparent;
+		border: none;`
 	}
 
 

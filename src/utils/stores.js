@@ -67,8 +67,6 @@ export var HoverActions = {
 }
 
 export const currentSelectedElement = writable(null);
-export const hoverMessaging = writable()
-
 
 export const initAllStores = () => {
     formScroll.set(0);
