@@ -10,7 +10,7 @@
 
     export let field;
 
-    let today = dayjs("2023/08/25").format("YYYY-MM-DD");
+    let today = dayjs().format("YYYY-MM-DD");
     // console.log(today, typeof today)
     let currentDate = today;
     let currentMonth = dayjs().month();

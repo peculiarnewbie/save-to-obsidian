@@ -53,18 +53,34 @@ export const formTopLimit = writable(0);
 export const formBottomLimit = writable(0);
 
 
-/***************************/
-/* Hove Messaging Section */
+/*****************/
+/* Header Stuff */
 
 /**
  * Enum for message actions values.
  * @readonly
  * @enum {string}
  */
-export var HoverActions = {
-    GetParent: "getParent",
+export var HeaderTypes = {
+    /** The true value */
+    Title: "title",
+    URL: "url",
+    Image: "image"
+};
 
-}
+/** 
+ * @typedef {Object} Headers 
+ * @property {HTMLMetaElement} title 
+ * @property {HTMLMetaElement} url
+ * @property {HTMLMetaElement} image
+ */
+
+/**
+ * @type {Headers}
+ */
+let dummyHeader = {title: null, url: null, image: null};
+
+export const docHeaders = writable(dummyHeader)
 
 export const currentSelectedElement = writable(null);
 

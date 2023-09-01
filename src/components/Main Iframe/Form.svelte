@@ -99,6 +99,7 @@
 	};
 
 	const saveForm = async () => {
+		console.log(currentForm)
 		if (!forms.includes(currentForm.name)) {
 			await chrome.storage.local.remove([`form_${prevName}`]);
 			let temp = forms;
@@ -204,7 +205,7 @@
 	{#each currentForm.fields as field, i}
 		<Field
 			index={i}
-			bind:field
+			{field}
 			parentInspect={inspect}
 			on:deleteField={deleteField}
 			{isEditing}

@@ -7,7 +7,7 @@
 	import CustomImage from "../CustomImage.svelte";
 	import StickyModals from "../StickyModals.svelte";
 
-	import { formTopLimit, formBottomLimit } from "../../utils/stores";
+	import { formTopLimit, formBottomLimit, docHeaders, HeaderTypes } from "../../utils/stores";
     import { get } from "svelte/store";
 
 	export let index = 0;
@@ -19,10 +19,11 @@
 	let changingType = false;
 	let typeButton: HTMLElement;
 	let typeMenu: HTMLElement;
+	let selectingHead = false;
 
 	// for floating menu
-	let topLimit = 0;
-	let bottomLimit = 0;
+	let topLimit = get(formTopLimit);
+	let bottomLimit = get(formBottomLimit);
 	let xOffset = 0;
 
 	$:{
@@ -32,6 +33,13 @@
 		else{
 			document.removeEventListener("click", listenToOutsideClicks)
 		}
+	}
+
+	enum IdType {
+		ID,
+		CLASS,
+		INDEX,
+		HEAD,
 	}
 
 	const dispatch = createEventDispatcher();
@@ -64,6 +72,36 @@
 		changingType = !changingType;
 	};
 
+	const startSelectHead = () => {
+		topLimit = get(formTopLimit);
+		bottomLimit = get(formBottomLimit);
+		console.log("top: ", topLimit, "bottom: ", bottomLimit)
+		selectingHead = true;
+	}
+
+	const selectHead = (type: HeaderTypes) => {
+		let header : HTMLMetaElement;
+		let path: string;
+		switch(type){
+			case HeaderTypes.Title:
+				header = get(docHeaders).title;
+				path = "title"
+				break;
+			case HeaderTypes.URL:
+				header = get(docHeaders).url;
+				path = "url";
+				break;
+			case HeaderTypes.Image:
+				header = get(docHeaders).image;
+				path = "image"
+				break;
+		}
+		field.value = header.content;
+		field.treePath = [{type: IdType.HEAD, value: path}]
+
+		selectingHead = false
+	}
+
 	if(index == 0){
 		field.type = InputEnum.Filename;
 	}
@@ -87,6 +125,21 @@
 			>
 				<CustomImage src={select} alt="select" width="15px" />
 			</button>
+			<button
+				class="p-2 rounded-md bg-transparent hover:bg-[#363636] pb-1"
+				on:click={startSelectHead}
+			>
+				<CustomImage src={select} alt="select" width="15px" />
+			</button>
+			{#if selectingHead}
+				<StickyModals needToFlip={false} {topLimit} {bottomLimit} yOffset={-4} xOffset={28}>
+					<div class="left-12 flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
+						<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => selectHead(HeaderTypes.Title)}>Title</button>
+						<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => selectHead(HeaderTypes.URL)}>URL</button>
+						<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => selectHead(HeaderTypes.Image)}>Image</button>
+					</div>
+				</StickyModals>
+			{/if}
 			<FieldInput
 				bind:field={field}
 			/>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DetailedSelector from "./DetailedSelector.svelte";
-	import { storeMessaging, Actions, currentSelectedElement } from "../../utils/stores";
+	import { storeMessaging, Actions, currentSelectedElement, docHeaders, HeaderTypes } from "../../utils/stores";
 	import { onDestroy, onMount, tick } from "svelte";
 	import { get } from "svelte/store";
 
@@ -14,23 +14,11 @@
 		ID,
 		CLASS,
 		INDEX,
+		HEAD,
 	}
 
-	let Highlighter = {canvas, ctx, highlightElement}
 	let detailIframe:HTMLIFrameElement;
 	let hoverSelecting = true;
-
-	if(!import.meta.env.DEV){
-		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			if (request.action === "bgValuesUpdate") {
-				let values = [];
-				request.paths.forEach((path, index) => {
-					values.push(getElementValueFromPath(path));
-				});
-				sendResponse({ success: true, values: values });
-			}
-		});
-	}
 
 	const inspect = async () => {
 		let click_count = 0;
@@ -111,6 +99,13 @@
 		let currentElement = selectedElement;
 		let searchResult = { found: false, index: 0 };
 
+		if(currentElement.tagName == "META"){
+			let type = currentElement.getAttribute('property');
+			type.splice(0, 3);
+			path.push({type: IdType.HEAD, value: type, index: 0});
+			return path;
+		} 
+
 		while (currentElement != document.body) {
 			if (currentElement.id != "") {
 				if (CheckForDuplicateIds(currentElement.id)) {
@@ -186,6 +181,8 @@
 					];
 				case IdType.INDEX:
 					return currentElement.children[currentPath.index];
+				case IdType.HEAD:
+					return getHeaderElement(currentPath.value)
 			}
 		};
 
@@ -203,8 +200,25 @@
 		return determineElementValue(element);
 	};
 
+	const getHeaderElement = (type) => {
+		console.log("type: ", type, "is URL?: ", (type == HeaderTypes.URL))
+		let headers = get(docHeaders);
+		switch(type){
+			case HeaderTypes.Title:
+				return headers.title;
+			case HeaderTypes.URL:
+				return headers.url;
+			case HeaderTypes.Image:
+				return headers.image;
+
+		}
+	}
+
 	const determineElementValue = (element) => {
-		if (element.nodeName == "IMG") {
+		if(element.nodeName == "META"){
+			return element.content;
+		}
+		else if (element.nodeName == "IMG") {
 			return element.src;
 		} else {
 			return element.innerText;

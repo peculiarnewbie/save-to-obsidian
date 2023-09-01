@@ -12,15 +12,13 @@
 		IMG,
 	}
 
+	let tempElement = null;
+
 	let elementType;
 	let elementValue;
 
 	let elementList: HTMLElement[] = [];
 	let selectingList = false;
-
-	let selectableElements = [];
-	let showChildren = false;
-	let showSiblings = false;
 
 	let siblingCount = 0;
 	let childrenCount = 0;
@@ -48,14 +46,6 @@
 		if(!fromHover) currentSelectedElement.set(selectedElement);
 	}
 
-	const getParentElement = () => {
-		if (selectedElement.parentElement) {
-			moveSelection(selectedElement.parentElement, false);
-		} else {
-			return;
-		}
-	};
-
 	const determineNodeType = (element) => {
 		if (element.nodeName == "IMG") {
 			return ElementType.IMG;
@@ -72,20 +62,22 @@
 		}
 	};
 
-	const getElementList = (sibling) => {
+	const getElementList = (element) => {
 		selectingList = true;
 		let list = [];
 
-		let element;
-		if(sibling) element = selectedElement.parentElement;
-		else element = selectedElement;
-
 		for (let i = 0; i < element.children.length; i++) {
-			if(element.children[i] != selectedElement)
-				list.push(element.children[i]);
+			list.push(element.children[i]);
 		}
 
 		elementList = list;
+	}
+
+	const setDetailElement = (element) => {
+		tempElement = element
+		elementType = determineNodeType(element)
+		elementValue = determineElementValue(element)
+		getElementList(element)
 	}
 
 	const highlightElement = (element) => {
@@ -127,10 +119,10 @@
 			</div>
 			{#if selectingList}
 				<div class="flex flex-col gap-4">
-					<button on:click={() => {selectingList = false; highlightElement(selectedElement)}} class="btn">Back</button>
+					<button on:click={() => {setDetailElement(tempElement.parentElement ? tempElement.parentElement : tempElement)}} class="btn">Select Parent</button>
 					<div class="flex flex-col gap-2">
 						{#each elementList as element}
-							<button on:pointerenter={() => highlightElement(element)} on:click={() => moveSelection(element, false)} class="max-h-12 bg-slate-700 flex">
+							<button on:pointerenter={() => highlightElement(element)} on:click={() => setDetailElement(element)} class="max-h-12 bg-slate-700 flex">
 								<div class="w-1/5">
 									{element.tagName}
 								</div>
@@ -139,14 +131,16 @@
 								</div>
 							</button>
 						{/each}
+						<div class="flex gap-2">
+							<button class="btn w-full" on:click={() => {moveSelection(selectedElement, false)}}>Cancel</button>
+							<button class="btn w-full" on:click={() => {moveSelection(tempElement, false)}}>Done</button>
+						</div>
 					</div>
 				</div>
 			{:else}
 				<div class="gap-3 flex flex-col">
-					
-					<button class="btn" on:click={getParentElement}>Select Parent</button>
-					<button class="btn" on:click={() => getElementList(true)}>Select Siblings ({siblingCount})</button>
-					<button class="btn" on:click={() => getElementList(false)}>Select Children ({childrenCount})</button>
+					<button class="btn" on:click={() => {selectingList = true; setDetailElement(selectedElement)}}>Detail Select</button>
+					<!-- <button class="btn" on:click={() => getElementList(false)}>Select Children ({childrenCount})</button> -->
 					<button class="btn" on:click={selectAgain}>Select Again</button>
 					<button class="btn" on:click={FinishSelection}>Done</button>
 				</div>

@@ -2,7 +2,7 @@
     import Component from "./Main Iframe/Component.svelte";
     import Inspector from "./Content Script/Inspector.svelte";
 	import { onDestroy, onMount } from "svelte";
-	import { formScroll, storeMessaging, Actions, initAllStores } from "../utils/stores";
+	import { formScroll, storeMessaging, Actions, initAllStores, docHeaders } from "../utils/stores";
 
     export let root: HTMLElement;
     
@@ -15,7 +15,7 @@
 
     onMount(() =>{
 
-        initAllStores();
+        initStores();
 
         mainIframe.onload = (ev) => {
             // mainIframe.style.all = "initial";
@@ -61,6 +61,17 @@
                 break;
         }
     })
+
+    const initStores = () => {
+        // let title = document.title;
+        // let url = document.URL;
+        let title = document.querySelector('meta[property="og:title"]') as HTMLMetaElement;
+        let url = document.querySelector('meta[property="og:url"]') as HTMLMetaElement
+        let image = document.querySelector('meta[property="og:image"]') as HTMLMetaElement;
+
+        docHeaders.set({title: title, url: url, image: image})
+        initAllStores();
+    }
 
     onDestroy(unsubscribe);
 
