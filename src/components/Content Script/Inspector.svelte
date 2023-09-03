@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DetailedSelector from "./DetailedSelector.svelte";
 	import { storeMessaging, Actions, currentSelectedElement, docHeaders, HeaderTypes } from "../../utils/stores";
+	import { getElementValueFromPath, IdType, collectValues } from "../../utils/ElementFetcher";
 	import { onDestroy, onMount, tick } from "svelte";
 	import { get } from "svelte/store";
 
@@ -9,13 +10,6 @@
 	let selectedElement;
 
 	let ctx: CanvasRenderingContext2D;
-
-	enum IdType {
-		ID,
-		CLASS,
-		INDEX,
-		HEAD,
-	}
 
 	let detailIframe:HTMLIFrameElement;
 	let hoverSelecting = true;
@@ -168,63 +162,6 @@
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
 
-	const getElementValueFromPath = (path) => {
-		const getElementFromCurrentPath = (currentPath, currentElement) => {
-			switch (currentPath.type) {
-				case IdType.ID:
-					return currentElement.querySelectorAll("#" + currentPath.value)[
-						currentPath.index
-					];
-				case IdType.CLASS:
-					return currentElement.querySelectorAll("." + currentPath.value)[
-						currentPath.index
-					];
-				case IdType.INDEX:
-					return currentElement.children[currentPath.index];
-				case IdType.HEAD:
-					return getHeaderElement(currentPath.value)
-			}
-		};
-
-		if (!path) {
-			return "";
-		}
-
-		let element;
-		element = getElementFromCurrentPath(path[0], document.body);
-
-		for (let i = 1; i < path.length; i++) {
-			element = getElementFromCurrentPath(path[i], element);
-		}
-
-		return determineElementValue(element);
-	};
-
-	const getHeaderElement = (type) => {
-		console.log("type: ", type, "is URL?: ", (type == HeaderTypes.URL))
-		let headers = get(docHeaders);
-		switch(type){
-			case HeaderTypes.Title:
-				return headers.title;
-			case HeaderTypes.URL:
-				return headers.url;
-			case HeaderTypes.Image:
-				return headers.image;
-
-		}
-	}
-
-	const determineElementValue = (element) => {
-		if(element.nodeName == "META"){
-			return element.content;
-		}
-		else if (element.nodeName == "IMG") {
-			return element.src;
-		} else {
-			return element.innerText;
-		}
-	};
-
 	const unsub1 = storeMessaging.subscribe((message) => {
 		const action = message.action;
 		const data = message.data
@@ -235,19 +172,14 @@
 				break;
 			case Actions.FinishSelection:
 				let treePath = generatePath(get(currentSelectedElement));
-				let value = getElementValueFromPath(treePath);
+				// console.log(treePath, document)
+				let value = getElementValueFromPath(treePath, document);
 				storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
 				hoverSelecting = true;
 				ClearCanvas();
 				break;
 			case Actions.CollectValues:
-				let values = [];
-				data.paths.forEach((path, index) => {
-					const value = getElementValueFromPath(path)
-					// console.log(value)
-					values.push(value);
-				});
-				ValuesCollected(values);
+				CollectValues(data.fields);
 				break;
 			default:
 				break;
@@ -260,10 +192,42 @@
 		unsub1()
 	}
 
-	const ValuesCollected = async(values) =>{
-		await tick()
+	const CollectValues = async (fields) => {
+		chrome.runtime.sendMessage(
+			{
+				action: "fetchDocument"
+			},
+		);
+
+		let values = []
+		let headDoc;
+
+		const eventPromise = new Promise((resolve) => {
+			chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+				if(message.action == "documentFetched"){
+					console.log("fetched doc: ", message.data)
+					const url = message.data
+					let parser = new DOMParser();
+					const doc = parser.parseFromString(url, 'text/html')
+					resolve(doc);
+				}
+			})
+		});
+
+		// wait for background to fetch the updated document
+		headDoc = await eventPromise;
+
+		if(headDoc) values = collectValues(fields, document, headDoc)
+		else values = collectValues(fields, document)
+
 		storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
+
+		console.log("collect value via url result: ", values)
+		// let values = await collectValues(fields, document)
+		
 	}
+
+	
 
 	onMount(() => {
 		detailIframe.onload = (ev) => {

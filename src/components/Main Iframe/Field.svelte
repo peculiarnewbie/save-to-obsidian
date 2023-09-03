@@ -6,6 +6,7 @@
 	import FieldInput from "./FieldInput.svelte";
 	import CustomImage from "../CustomImage.svelte";
 	import StickyModals from "../StickyModals.svelte";
+	import { IdType } from "../../utils/ElementFetcher";
 
 	import { formTopLimit, formBottomLimit, docHeaders, HeaderTypes } from "../../utils/stores";
     import { get } from "svelte/store";
@@ -33,13 +34,6 @@
 		else{
 			document.removeEventListener("click", listenToOutsideClicks)
 		}
-	}
-
-	enum IdType {
-		ID,
-		CLASS,
-		INDEX,
-		HEAD,
 	}
 
 	const dispatch = createEventDispatcher();
@@ -97,7 +91,7 @@
 				break;
 		}
 		field.value = header.content;
-		field.treePath = [{type: IdType.HEAD, value: path}]
+		field.path = [{type: IdType.HEAD, value: path}]
 
 		selectingHead = false
 	}

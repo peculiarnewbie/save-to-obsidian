@@ -19,6 +19,7 @@
 			return `${field.key}: ${field.value}`;
 		})
 		.join("<br>")}<br>---<br>`;
+
 	export let forms;
 	export let refresh;
 	let selectionIndex: number;
@@ -47,7 +48,7 @@
 		const data = message.data;
 		switch(action){
 			case Actions.ElementSelected:
-				currentForm.fields[selectionIndex].treePath = data.path;
+				currentForm.fields[selectionIndex].path = data.path;
 				currentForm.fields[selectionIndex].value = data.value;
 				storeMessaging.set({action: Actions.OpenPopup})
 				break;
@@ -99,7 +100,7 @@
 	};
 
 	const saveForm = async () => {
-		console.log(currentForm)
+		console.log("saving: ", currentForm)
 		if (!forms.includes(currentForm.name)) {
 			await chrome.storage.local.remove([`form_${prevName}`]);
 			let temp = forms;
@@ -116,9 +117,7 @@
 	};
 
 	const updateFieldValues = () => {
-		let paths = currentForm.fields.map((field) => field.treePath);
-
-		storeMessaging.set({action: Actions.CollectValues, data: {paths: paths}})
+		storeMessaging.set({action: Actions.CollectValues, data: {fields: currentForm.fields}})
 	};
 
 	prevName = currentForm.name;
@@ -151,13 +150,11 @@
 
 		formTopLimit.set(formElement.getBoundingClientRect().top);
 		formBottomLimit.set(resultElement.getBoundingClientRect().bottom);
-
-		console.log(currentForm)
 	})
 
 	onDestroy(unsubscribe);
 
-	console.log(currentForm)
+	console.log("On Form: ", currentForm)
 
 </script>
 
@@ -205,7 +202,7 @@
 	{#each currentForm.fields as field, i}
 		<Field
 			index={i}
-			{field}
+			bind:field={field}
 			parentInspect={inspect}
 			on:deleteField={deleteField}
 			{isEditing}

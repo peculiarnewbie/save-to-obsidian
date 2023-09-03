@@ -1,3 +1,5 @@
+import { fetchDocument } from "../utils/ElementFetcher";
+
 chrome.action.onClicked.addListener((tab) => {
 	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 		chrome.tabs.sendMessage(tabs[0].id, { action: "popup" }, (response) => {});
@@ -35,77 +37,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		sendResponse({ success: true });
 		reader.readAsArrayBuffer(blob);
 		return;
-	} else if (request.action === "inspect") {
-		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-			chrome.tabs.sendMessage(tabs[0].id, { action: "inspect" }, (response) => {
-				sendResponse(response);
-			});
-		});
-		return;
-	} else if (request.action === "elementSelected") {
-		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-			chrome.tabs.sendMessage(
-				tabs[0].id,
-				{
-					action: "bgElementSelected",
-					path: request.path,
-					value: request.value,
-				},
-				(response) => {
-					sendResponse(response);
-				},
-			);
-		});
-		return;
-	} else if (request.action === "getElement") {
-		(async () => {
-			let actualResponse;
-
-			chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-				chrome.tabs.sendMessage(
-					tabs[0].id,
-					{ action: "bgGetElement", path: request.path },
-					(response) => {
-						// Handle the response from the content script
-						actualResponse = response;
-						sendResponse(actualResponse);
-					},
-				);
-			});
-
-			const result = await new Promise((resolve, reject) => {
-				setInterval(() => {
-					if (actualResponse) {
-						resolve(actualResponse);
-					}
-				}, 10);
-			});
-		})();
-		return true;
-	} else if (request.action === "getElements") {
-		(async () => {
-			let actualResponse;
-			chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-				chrome.tabs.sendMessage(
-					tabs[0].id,
-					{ action: "bgValuesUpdate", paths: request.paths },
-					(response) => {
-						// Handle the response from the content script
-						actualResponse = response;
-						sendResponse(actualResponse);
-					},
-				);
-			});
-
-			const result = await new Promise((resolve, reject) => {
-				setInterval(() => {
-					if (actualResponse) {
-						resolve(actualResponse);
-					}
-				}, 10);
-			});
-		})();
-		return true;
 	} else if (request.action === "closeExtension") {
 		console.log("background x")
 		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -118,5 +49,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			);
 		});
 		return;
+	} else if (request.action === "fetchDocument"){
+		chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+			FetchDocument(tabs[0].url)
+			sendResponse("collecting");
+		});
 	}
 });
+
+const FetchDocument = async (url) => {
+	console.log("calling fetcher from bg: ", url)
+	const docText = await fetchDocument(url)
+
+	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+		chrome.tabs.sendMessage(
+			tabs[0].id,
+			{
+				action: "documentFetched",
+				data: docText,
+			},
+			(response) => {
+				console.log(response)
+			},
+		);
+	});
+}

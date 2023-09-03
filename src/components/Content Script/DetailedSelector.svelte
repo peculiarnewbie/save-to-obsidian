@@ -7,10 +7,11 @@
 
 	let selectedElement;
 
-	enum ElementType {
-		TEXT,
-		IMG,
-	}
+	const ElementType = {
+		TEXT : "text",
+		IMG: "img",
+
+	} as const
 
 	let tempElement = null;
 
