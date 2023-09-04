@@ -6,13 +6,14 @@ export const IdType = {
 
 } as const
 
+/** collect values from current doc on the dom. If headDoc is provided, it will fetch the meta elements from headDoc */
 export const collectValues = (fields:[{path:[{type:string, value:string}], value:string}], doc:Document, headDoc?:Document) => {
     let values:string[] = [];
 
-    console.log("fields in fetcher: ", fields, "doc: ", doc);
+    // console.log("fields in fetcher: ", fields, "doc: ", doc);
 
     fields.forEach((field, index) => {
-        console.log("fetching field: ", field)
+        // console.log("fetching field: ", field)
         let value;
         if(field.path){
             if(field.path[0].type == IdType.HEAD && headDoc) value = getElementValueFromPath(field.path, headDoc); 
@@ -20,7 +21,7 @@ export const collectValues = (fields:[{path:[{type:string, value:string}], value
         }
         else value = field.value;
 
-        console.log("each fetcher: ", value);
+        // console.log("each fetcher: ", value);
 
         values.push(value);
     });

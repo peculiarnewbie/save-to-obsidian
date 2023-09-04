@@ -9,6 +9,7 @@
 	let fields;
 	let prevName;
 	let hoveredElement;
+	let isLoading = false;
 	$: {
 		let temp = [...currentForm.fields];
 		temp.splice(0, 1);
@@ -33,6 +34,11 @@
 		currentForm.directory = "Obsidian/";
 	}
 
+	const waitATick = async (func) => {
+		await tick()
+		func()
+	}
+
 	$: fullTitle =
 		function(){
 			let lastChar = directory.charAt(directory.length - 1);
@@ -48,6 +54,7 @@
 		const data = message.data;
 		switch(action){
 			case Actions.ElementSelected:
+				console.log("in Form, element selected: ", message)
 				currentForm.fields[selectionIndex].path = data.path;
 				currentForm.fields[selectionIndex].value = data.value;
 				storeMessaging.set({action: Actions.OpenPopup})
@@ -55,6 +62,10 @@
 			case Actions.ValuesCollected:
 				data.values.forEach((value, index) => {
 					currentForm.fields[index].value = value;
+				})
+				waitATick(() => {
+					isLoading = false;
+					console.log("back")
 				})
 				break;
 			default:
@@ -117,7 +128,8 @@
 	};
 
 	const updateFieldValues = () => {
-		storeMessaging.set({action: Actions.CollectValues, data: {fields: currentForm.fields}})
+		storeMessaging.set({action: Actions.CollectValues, data: {fields: currentForm.fields, fromBackground: currentForm.fromBackground}})
+		isLoading = true;
 	};
 
 	prevName = currentForm.name;
@@ -142,6 +154,8 @@
 		}
 	}
 
+	
+
 	onMount(() => {
 		formElement.addEventListener("wheel", function(e){
 			formElement.scrollTop += e.deltaY;
@@ -159,55 +173,60 @@
 </script>
 
 <div id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white">
-	{#if isEditing}
-		<div style="display: flex; justify-content:space-between; align-items:end">
-			<div>
-				<p class="text-xl font-semibold">Form Title:</p>
-				<input
-					class="text-black"
-					type="text"
-					placeholder="enter form name"
-					bind:value={currentForm.name}
-				/>
-			</div>
-			<div>
-				<p class="text-xl font-semibold">Directory:</p>
-				<div class="relative">
-					<input class={`${validDir ? "" : "outline-red-500"} text-black`}
-						type="text"
-						placeholder="enter directory"
-						on:input={checkDirValidity}
-						on:blur={checkDirValidity}
-						bind:value={currentForm.directory}
-					/>
-					{#if !validDir}
-						<div class="absolute">
-							<p class=" text-red-500">invalid path</p>
-						</div>
-					{/if}
-
-				</div>
-			</div>
-			<button class="btn" on:click={addField}>Add Field</button>
-		</div>
+	{#if isLoading}
+		<div>{`loading...: ${isLoading}`}</div>
 	{:else}
-		<button
-			class="btn"
-			on:click={() => {
-				isEditing = true;
-			}}>Edit</button
-		>
-	{/if}
+		{#if isEditing}
+			<div style="display: flex; justify-content:space-between; align-items:end">
+				<div>
+					<p class="text-xl font-semibold">Form Title:</p>
+					<input
+						class="text-black"
+						type="text"
+						placeholder="enter form name"
+						bind:value={currentForm.name}
+					/>
+				</div>
+				<div>
+					<p class="text-xl font-semibold">Directory:</p>
+					<div class="relative">
+						<input class={`${validDir ? "" : "outline-red-500"} text-black`}
+							type="text"
+							placeholder="enter directory"
+							on:input={checkDirValidity}
+							on:blur={checkDirValidity}
+							bind:value={currentForm.directory}
+						/>
+						{#if !validDir}
+							<div class="absolute">
+								<p class=" text-red-500">invalid path</p>
+							</div>
+						{/if}
 
-	{#each currentForm.fields as field, i}
-		<Field
-			index={i}
-			bind:field={field}
-			parentInspect={inspect}
-			on:deleteField={deleteField}
-			{isEditing}
-		/>
-	{/each}
+					</div>
+				</div>
+				<button class="btn" on:click={addField}>Add Field</button>
+				<button class="btn" on:click={() => {currentForm.fromBackground = !currentForm.fromBackground}}>{`fromBackground: ${currentForm.fromBackground}`}</button>
+			</div>
+		{:else}
+			<button
+				class="btn"
+				on:click={() => {
+					isEditing = true;
+				}}>Edit</button
+			>
+		{/if}
+
+		{#each currentForm.fields as field, i}
+			<Field
+				index={i}
+				bind:field={field}
+				parentInspect={inspect}
+				on:deleteField={deleteField}
+				{isEditing}
+			/>
+		{/each}
+	{/if}
 </div>
 
 <div

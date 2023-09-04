@@ -56,11 +56,17 @@
 
 	const generatePath = (selectedElement) => {
 		const CheckForDuplicateIds = (id) => {
-			let elements = document.querySelectorAll("#" + id);
-			if (elements.length > 1) {
+			let elements ;
+			try{
+				elements = document.querySelectorAll("#" + id);
+			} catch (e) {
 				return false;
-			} else {
+			}
+			
+			if (elements.length == 1) {
 				return true;
+			} else {
+				return false;
 			}
 		};
 
@@ -89,6 +95,8 @@
 			}
 		};
 
+		// console.log("generating path for: ", selectedElement);
+
 		let path = [];
 		let currentElement = selectedElement;
 		let searchResult = { found: false, index: 0 };
@@ -101,6 +109,7 @@
 		} 
 
 		while (currentElement != document.body) {
+			// console.log("while generating: currentElement: ", currentElement);
 			if (currentElement.id != "") {
 				if (CheckForDuplicateIds(currentElement.id)) {
 					path.push({
@@ -171,15 +180,15 @@
 				inspect();
 				break;
 			case Actions.FinishSelection:
-				let treePath = generatePath(get(currentSelectedElement));
-				// console.log(treePath, document)
+				let treePath = generatePath($currentSelectedElement);
+				console.log(treePath, document)
 				let value = getElementValueFromPath(treePath, document);
 				storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
 				hoverSelecting = true;
 				ClearCanvas();
 				break;
 			case Actions.CollectValues:
-				CollectValues(data.fields);
+				CollectValues(data.fields, data.fromBackground);
 				break;
 			default:
 				break;
@@ -192,15 +201,22 @@
 		unsub1()
 	}
 
-	const CollectValues = async (fields) => {
+	const CollectValues = async (fields, fromBackground:boolean) => {
+		let values = []
+		
+		if(!fromBackground){
+			values = collectValues(fields, document);
+			storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
+			return;
+		}
+
+		let headDoc;
+
 		chrome.runtime.sendMessage(
 			{
 				action: "fetchDocument"
 			},
 		);
-
-		let values = []
-		let headDoc;
 
 		const eventPromise = new Promise((resolve) => {
 			chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -222,7 +238,7 @@
 
 		storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
 
-		console.log("collect value via url result: ", values)
+		// console.log("collect value via url result: ", values)
 		// let values = await collectValues(fields, document)
 		
 	}

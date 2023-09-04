@@ -11,7 +11,7 @@
 	let forms: string[] = [];
 	let allData = {};
 	let isEditing = false;
-	let currentForm = { name: "", directory: "", fields: fields };
+	let currentForm: {name:string, directory:string, fields:any, fromBackground:boolean} = { name: "", directory: "", fields: fields, fromBackground:false };
 
 	let defaultDir = "Obsidian/"
 
@@ -52,7 +52,7 @@
 
 	const addForm = () => {
 		fields = [{ key: "file title", value: "Untitled", type: InputEnum.Filename }];
-		currentForm = { name: "New Form", directory:defaultDir, fields: fields };
+		currentForm = { name: "New Form", directory:defaultDir, fields: fields, fromBackground:false };
 		isEditing = true;
 		openForm = true;
 	}
@@ -132,7 +132,7 @@
 				{#if openForm}
 					<Form
 						{root}
-						{currentForm}
+						bind:currentForm
 						{isEditing}
 						bind:forms
 						refresh={getChromeStorage}

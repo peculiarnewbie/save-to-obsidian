@@ -25,6 +25,7 @@
 	let childrenCount = 0;
 
 	const FinishSelection = () => {
+		// console.log("finished in detail selector")
 		storeMessaging.set({action: Actions.FinishSelection})
 		
 		selectedElement = null;
