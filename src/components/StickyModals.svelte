@@ -7,6 +7,7 @@
     export let bottomLimit = 700;
     export let yOffset = 0;
     export let xOffset = 0;
+    export let menuTarget = null;
     
     let divHeight = 0;
     let formScrollValue = 0;
@@ -27,6 +28,7 @@
     }
 
     onMount(() => {
+        if(menuTarget) menuTarget.appendChild(thisElement);
         const rect = thisElement.getBoundingClientRect()
         divHeight = rect.height;
         initTop = rect.top - formScrollValue;
@@ -64,6 +66,6 @@
 </script>
 
 
-<div class="absolute overscroll-none p-2" bind:this={thisElement} style={`will-change:transform; transform: translate3d(${xOffset}px, ${yOffset-yTransform}px, 0px);`}>
+<div class="absolute overscroll-none p-2" bind:this={thisElement} style={`will-change:transform; transform: translate3d(${xOffset}px, ${yOffset-yTransform}px, 0px); z-index: 9999999`}>
     <slot/>
 </div>

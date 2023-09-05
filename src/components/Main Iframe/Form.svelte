@@ -172,14 +172,14 @@
 
 </script>
 
-<div id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white">
+<div id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white gap-[1px]">
 	{#if isLoading}
 		<div>{`loading...: ${isLoading}`}</div>
 	{:else}
 		{#if isEditing}
 			<div style="display: flex; justify-content:space-between; align-items:end">
 				<div>
-					<p class="text-xl font-semibold">Form Title:</p>
+					<p class="text-xl font-semibold">Form Name:</p>
 					<input
 						class="text-black"
 						type="text"
@@ -205,7 +205,7 @@
 
 					</div>
 				</div>
-				<button class="btn" on:click={addField}>Add Field</button>
+				
 				<button class="btn" on:click={() => {currentForm.fromBackground = !currentForm.fromBackground}}>{`fromBackground: ${currentForm.fromBackground}`}</button>
 			</div>
 		{:else}
@@ -226,6 +226,7 @@
 				{isEditing}
 			/>
 		{/each}
+		<button class="btn mt-2" on:click={addField}>Add Property</button>
 	{/if}
 </div>
 

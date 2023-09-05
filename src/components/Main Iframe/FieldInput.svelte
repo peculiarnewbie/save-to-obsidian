@@ -2,7 +2,10 @@
     import sanitizeString from "../../utils/SanitizeString";
     import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
 	import DatePicker from "../DatePicker.svelte";
+	import { onMount, tick } from "svelte";
     export let field;
+	export let valueFocus;
+	export let menuTarget: HTMLElement = null;
     
     let errorMessage = "";
     let validInput = true;
@@ -13,7 +16,7 @@
 		}
 	}
 
-
+	let datePicker;
 
     const checkNameValidity = (event: Event) => {
 		const target = event.target as HTMLInputElement;
@@ -50,7 +53,7 @@
 
 {#if field.type == InputEnum.Filename}
 <input
-    class=" font-normal text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
+    class=" font-normal text-small text-white h-7 bg-transparent outline-none "
     type="text"
     placeholder="select data or type here"
     on:input={checkNameValidity}
@@ -59,13 +62,16 @@
 />
 {:else if field.type == InputEnum.Text}
 <input
-    class=" font-normal text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
-    type="text"
+    class=" font-normal text-small text-white bg-transparent w-12 grow h-auto pl-2 outline-none overflow-visible"
     placeholder="select data or type here"
     bind:value={field.value}
+	on:focus={() => {valueFocus = true}}
+	on:blur={() => {valueFocus = false}}
 />
 {:else if field.type == InputEnum.Date}
-	<DatePicker bind:field={field}/>
+	<div bind:this={datePicker}>
+		<DatePicker bind:field={field} bind:menuTarget={menuTarget} />
+	</div>
 {/if}
 
 {#if !validInput}

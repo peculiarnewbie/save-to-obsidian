@@ -70,7 +70,7 @@
 
 <div
 	id="ActualRoot"
-	class="ext flex flex-col rounded-xl h-full w-full bg-[#242424] overflow-hidden font-sans"
+	class="ext flex flex-col rounded-xl h-full w-full bg-[#1e1e1e] overflow-hidden font-sans"
 >
 	<div id="Header" class="ext flex justify-between bg-[#363636]">
 		{#if !openForm}

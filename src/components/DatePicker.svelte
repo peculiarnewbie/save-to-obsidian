@@ -5,10 +5,12 @@
     import CustomImage from "./CustomImage.svelte";
 	import StickyModals from "./StickyModals.svelte";
 
-    import { formTopLimit, formBottomLimit } from "../utils/stores";
+    import { formTopLimit, formBottomLimit, mainIframeDoc } from "../utils/stores";
     import { get } from "svelte/store";
 
     export let field;
+
+    export let menuTarget;
 
     let today = dayjs().format("YYYY-MM-DD");
     // console.log(today, typeof today)
@@ -30,7 +32,7 @@
     const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
     const startEditing = (e) => {
-        document.addEventListener("click", handleStartEditing);
+        $mainIframeDoc.addEventListener("click", handleStartEditing);
         updateRows()
 
         //silly hack to show current day and selected
@@ -44,7 +46,7 @@
         if(isEditing && !dateElement?.contains(e.target) && e.target != dateButton ){
             isEditing = false;
             currentDate = field.value;
-            document.removeEventListener("click", handleStartEditing);
+            $mainIframeDoc.removeEventListener("click", handleStartEditing);
         }
     }
 
@@ -54,7 +56,7 @@
 
         field.value = currentDate;
         isEditing = false;
-        document.removeEventListener("click", handleStartEditing);
+        $mainIframeDoc.removeEventListener("click", handleStartEditing);
     }
 
 
@@ -142,13 +144,13 @@
 <button 
     bind:this={dateButton}
     on:click={startEditing}
-    class=" shadow-md bg-[#363636] rounded-md hover:bg-[#4e4e4e] text-[#bababa] px-2"
+    class=" shadow-md bg-[#363636] rounded-md hover:bg-[#4e4e4e] text-[#bababa] px-2 h-full"
     >
     {field.value}
 </button>
 
 {#if isEditing}
-<StickyModals {topLimit} {bottomLimit} yOffset={24} xOffset={28}>
+<StickyModals {topLimit} {bottomLimit} yOffset={-4} xOffset={-12} menuTarget={menuTarget}>
     <div bind:this={dateElement} class="left-12 flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md">
         <div class="flex justify-between px-1">
             <div class="flex text-2xl">

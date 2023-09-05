@@ -2,7 +2,7 @@
     import Component from "./Main Iframe/Component.svelte";
     import Inspector from "./Content Script/Inspector.svelte";
 	import { onDestroy, onMount } from "svelte";
-	import { formScroll, storeMessaging, Actions, initAllStores, docHeaders } from "../utils/stores";
+	import { formScroll, storeMessaging, Actions, initAllStores, docHeaders, mainIframeDoc } from "../utils/stores";
 
     export let root: HTMLElement;
     
@@ -41,6 +41,8 @@
             new Component({
                 target: mainIframe.contentWindow.document.body
             });
+
+            mainIframeDoc.set(mainIframe.contentDocument);
         }
 
     })

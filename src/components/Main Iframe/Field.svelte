@@ -8,7 +8,7 @@
 	import StickyModals from "../StickyModals.svelte";
 	import { IdType } from "../../utils/ElementFetcher";
 
-	import { formTopLimit, formBottomLimit, docHeaders, HeaderTypes } from "../../utils/stores";
+	import { formTopLimit, formBottomLimit, docHeaders, HeaderTypes, mainIframeDoc } from "../../utils/stores";
     import { get } from "svelte/store";
 
 	export let index = 0;
@@ -21,6 +21,16 @@
 	let typeButton: HTMLElement;
 	let typeMenu: HTMLElement;
 	let selectingHead = false;
+	let menuTarget: HTMLElement;
+
+	let keyFocus = false;
+	let valueFocus = false;
+
+	let isBeingDragged = false;
+	let xDrag = 0;
+	let yDrag = 0;
+	let xDragInit = 0;
+	let yDragInit = 0;
 
 	// for floating menu
 	let topLimit = get(formTopLimit);
@@ -32,7 +42,7 @@
 			xOffset = typeButton.getBoundingClientRect().left;
 		}
 		else{
-			document.removeEventListener("click", listenToOutsideClicks)
+			$mainIframeDoc.removeEventListener("click", listenToOutsideClicks)
 		}
 	}
 
@@ -49,7 +59,7 @@
 	const startChangeFieldType = (e) => {	
 		topLimit = get(formTopLimit)
 		bottomLimit = get(formBottomLimit);
-		document.addEventListener("click", listenToOutsideClicks)
+		$mainIframeDoc.addEventListener("click", listenToOutsideClicks)
 		if(changingType) typeButton.blur()
 		changingType = !changingType;
 	};
@@ -65,6 +75,25 @@
 		field.type = type;
 		changingType = !changingType;
 	};
+
+	const handleStartDragging = (e:DragEvent) => {
+		xDragInit = e.clientX;
+		yDragInit = e.clientY;
+		isBeingDragged = true;
+	}
+
+	const handleStopDragging = (e:DragEvent) => {
+		xDrag = 0;
+		yDrag = 0;
+		isBeingDragged = false;
+	}
+
+	const handleDragging = (e:DragEvent) => {
+		e.preventDefault()
+		console.log("x: ", xDragInit, xDrag, "y: ", yDragInit, yDrag)
+		xDrag = xDragInit - e.clientX;
+		yDrag = yDragInit - e.clientY
+	}
 
 	const startSelectHead = () => {
 		topLimit = get(formTopLimit);
@@ -99,20 +128,104 @@
 	if(index == 0){
 		field.type = InputEnum.Filename;
 	}
-
-	// initField()
 </script>
 
-<div id="FieldRoot" class="pt-3">
+<div>
 	<!-- <p>{index}</p> -->
-	{#if isEditing}
-		<input
-			class="font-bold text-base text-white w-full min-w-[40px] h-8 bg-transparent outline-none border-b border-[#3e4446]"
-			type="text"
-			placeholder="key title"
-			bind:value={field.key}
-		/>
-		<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
+	{#if index == 0}
+		{#if isEditing}
+			<div class="pt-4">
+				<p class=" text-sm font-bold mb-1">File Title</p>
+				<div class="flex border border-transparent hover:border-neutral-600 rounded-md py-1">
+					<button
+							id="typebutton"
+							class="p-1 h-7 w-7 rounded-md bg-transparent hover:bg-[#363636] focus:bg-[#363636] shrink-0"
+							on:click={selectElement}
+							bind:this={typeButton}
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mouse-pointer-square w-full h-full"><path d="M21 11V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/><path d="m12 12 4 10 1.7-4.3L22 16Z"/></svg>
+						</button>
+					<input
+						class="font-bold text-xl text-white h-7 w-full bg-transparent outline-none p-1 pr-2 "
+						type="text"
+						placeholder="key title"
+						bind:value={field.value}
+					/>
+				</div>
+				<p class="pt-2 text-base font-semibold mb-1">Properties</p>
+			</div>
+		{:else}
+			<div></div>
+		{/if}
+	{:else}
+		{#if isEditing}
+			<div class="h-8 w-full">
+				<div class={`w-full bg-[#1e1e1e] flex border border-transparent hover:border-neutral-600 rounded-md h-8 ${keyFocus || valueFocus || changingType ? "border-2 border-neutral-600 p-0 z-[999999]" : "p-[1px]"}`}
+					style={`will-change:transform; transform: translate3d(${-xDrag}px, ${-yDrag}px, 0px); ${isBeingDragged? "z-index: 999999;" : ""}`}>
+					<div class={`flex w-36 items-center ${keyFocus ? "bg-[#2f2f2f]" : "bg-transparent"}`} >
+						
+						<button
+							id="typebutton"
+							class="p-1 h-7 w-7 rounded-md bg-transparent hover:bg-[#363636] focus:bg-[#363636] shrink-0"
+							on:click={startChangeFieldType}
+							on:dragstart={handleStartDragging}
+							on:drag={handleDragging}
+							on:dragend={handleStopDragging}
+							bind:this={typeButton}
+							draggable="true"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tags w-full h-full pointer-events-none"><path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"/><path d="M6 9.01V9"/><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/></svg>
+							
+						</button>
+
+						{#if changingType}
+							<StickyModals needToFlip={false} {topLimit} {bottomLimit} yOffset={0} xOffset={-12} menuTarget={menuTarget}>
+								<div bind:this={typeMenu} class="flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
+									<button class="">ulala</button>
+									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
+									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.List)}>List</button>
+									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.MultiList)}>MultiList</button>
+									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Date)}>Date</button>
+								</div>
+							</StickyModals>
+						{/if}
+	
+						
+						<input
+							class="font-normal text-sm text-white h-7 w-full bg-transparent outline-none p-1 pr-2"
+							type="text"
+							placeholder="key title"
+							bind:value={field.key}
+							on:focus={() => {keyFocus = true}}
+							on:blur={() => {keyFocus = false}}
+						/>
+					</div>
+					<div class={`${valueFocus ? "bg-[#2f2f2f]" : "bg-transparent"} grow flex`}>
+						<FieldInput
+							bind:field={field}
+							bind:valueFocus={valueFocus}
+							bind:menuTarget={menuTarget}
+						/>
+					</div>
+				</div>
+				<div bind:this={menuTarget}/>
+				{#if isBeingDragged}
+					<div class="h-8 w-full bg-white"></div>
+				{/if}
+			</div>
+			
+			
+		{:else}
+			<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
+				<p style="font-weight:700; font-size:16px">{field.key}</p>
+				<FieldInput
+					bind:field={field}
+					bind:valueFocus={valueFocus}
+				/>
+			</div>
+		{/if}
+	{/if}
+		<!-- <div id="FieldComponent" class="flex gap-1 align-middle pt-1">
 			<button
 				class="p-2 rounded-md bg-transparent hover:bg-[#363636] pb-1"
 				on:click={selectElement}
@@ -134,25 +247,16 @@
 					</div>
 				</StickyModals>
 			{/if}
-			<FieldInput
-				bind:field={field}
-			/>
-		</div>
-		{#if index != 0}
+			
+		</div> -->
+		<!-- {#if index != 0}
 			<button
 				class="p-2 rounded-md bg-transparent hover:bg-[#363636]"
 				on:click={deleteField}
 			>
 				<CustomImage src={trash} alt="trash" width="15px" />
 			</button>
-			<button
-				id="typebutton"
-				class="p-2 rounded-md bg-transparent hover:bg-[#363636] focus:bg-[#363636]"
-				on:click={startChangeFieldType}
-				bind:this={typeButton}
-			>
-				<CustomImage src={trash} alt="trash" width="15px" />
-			</button>
+			
 			{#if changingType}
 				<StickyModals needToFlip={false} {topLimit} {bottomLimit} yOffset={-4} xOffset={28}>
 					<div bind:this={typeMenu} class="left-12 flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
@@ -163,15 +267,7 @@
 					</div>
 				</StickyModals>
 			{/if}
-		{/if}
-	{:else}
-		<div id="FieldComponent" class="flex gap-1 align-middle pt-1">
-			<p style="font-weight:700; font-size:16px">{field.key}</p>
-			<FieldInput
-				bind:field={field}
-			/>
-		</div>
-	{/if}
+		{/if} -->
 </div>
 
 <style>
