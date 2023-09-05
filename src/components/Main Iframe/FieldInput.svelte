@@ -70,7 +70,7 @@
 />
 {:else if field.type == InputEnum.Date}
 	<div bind:this={datePicker}>
-		<DatePicker bind:field={field} bind:menuTarget={menuTarget} />
+		<DatePicker bind:field={field} bind:menuTarget={menuTarget} bind:isEditing={valueFocus}/>
 	</div>
 {/if}
 

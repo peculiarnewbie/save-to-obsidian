@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from "svelte";
+	import { onDestroy, onMount, tick } from "svelte";
     import { formScroll, formTopLimit } from "../utils/stores";
 
     export let needToFlip = true;
@@ -8,6 +8,10 @@
     export let yOffset = 0;
     export let xOffset = 0;
     export let menuTarget = null;
+    export let isActive = true;
+    export let clickOffDoc:Document = null;
+
+    export let padding = 8;
     
     let divHeight = 0;
     let formScrollValue = 0;
@@ -29,12 +33,32 @@
 
     onMount(() => {
         if(menuTarget) menuTarget.appendChild(thisElement);
+        
         const rect = thisElement.getBoundingClientRect()
         divHeight = rect.height;
         initTop = rect.top - formScrollValue;
         initScroll = yTransform = getcurrentScroll()
         mounted = true;
+        
+        if(clickOffDoc) {
+            setTimeout(() => {
+                clickOffDoc.addEventListener("click", handleClickOff)
+            }, 0);
+
+            return () => {
+                clickOffDoc.removeEventListener("click", handleClickOff)
+            }
+        }
     })
+
+    const handleClickOff = (e) => {
+        const element = e.target
+        if(!thisElement.contains(element)){
+            clickOffDoc.removeEventListener("click", handleClickOff)
+			isActive = false;
+            console.log("clicking off")
+		}
+    }
 
     function outputPos(){
         const bottomPos = initTop + divHeight + (initScroll - formScrollValue)
@@ -66,6 +90,6 @@
 </script>
 
 
-<div class="absolute overscroll-none p-2" bind:this={thisElement} style={`will-change:transform; transform: translate3d(${xOffset}px, ${yOffset-yTransform}px, 0px); z-index: 9999999`}>
+<div class="absolute overscroll-none" bind:this={thisElement} style={`will-change:transform; transform: translate3d(${xOffset - padding}px, ${yOffset-yTransform - padding}px, 0px); z-index: 9999999; padding: ${padding}px`}>
     <slot/>
 </div>

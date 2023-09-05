@@ -6,10 +6,11 @@
 	import FieldInput from "./FieldInput.svelte";
 	import CustomImage from "../CustomImage.svelte";
 	import StickyModals from "../StickyModals.svelte";
-	import { IdType } from "../../utils/ElementFetcher";
+	import { IdType } from "../../utils/ElementFetcher"
 
 	import { formTopLimit, formBottomLimit, docHeaders, HeaderTypes, mainIframeDoc } from "../../utils/stores";
     import { get } from "svelte/store";
+	import FieldMenu from "./FieldMenu.svelte";
 
 	export let index = 0;
 	export let field;
@@ -33,17 +34,16 @@
 	let yDragInit = 0;
 
 	// for floating menu
-	let topLimit = get(formTopLimit);
-	let bottomLimit = get(formBottomLimit);
+	
 	let xOffset = 0;
 
 	$:{
 		if(changingType){
 			xOffset = typeButton.getBoundingClientRect().left;
 		}
-		else{
-			$mainIframeDoc.removeEventListener("click", listenToOutsideClicks)
-		}
+		// else{
+		// 	$mainIframeDoc.removeEventListener("click", listenToOutsideClicks)
+		// }
 	}
 
 	const dispatch = createEventDispatcher();
@@ -56,20 +56,20 @@
 		dispatch("deleteField", {index: index});
 	};
 
-	const startChangeFieldType = (e) => {	
-		topLimit = get(formTopLimit)
-		bottomLimit = get(formBottomLimit);
-		$mainIframeDoc.addEventListener("click", listenToOutsideClicks)
+	const startChangeFieldType = (e:Event) => {
+		// topLimit = get(formTopLimit)
+		// bottomLimit = get(formBottomLimit);
+		// $mainIframeDoc.addEventListener("click", listenToOutsideClicks)
 		if(changingType) typeButton.blur()
 		changingType = !changingType;
 	};
 
-	const listenToOutsideClicks = (e) => {
-		const element = e.target as HTMLElement;
-		if(changingType && !typeMenu.contains(element) && element != typeButton){
-			changingType = false;
-		}
-	}
+	// const listenToOutsideClicks = (e) => {
+	// 	const element = e.target as HTMLElement;
+	// 	if(changingType && !typeMenu.contains(element) && element != typeButton){
+	// 		changingType = false;
+	// 	}
+	// }
 
 	const changeFieldType = (type: FieldInputKeys) => {
 		field.type = type;
@@ -95,12 +95,12 @@
 		yDrag = yDragInit - e.clientY
 	}
 
-	const startSelectHead = () => {
-		topLimit = get(formTopLimit);
-		bottomLimit = get(formBottomLimit);
-		console.log("top: ", topLimit, "bottom: ", bottomLimit)
-		selectingHead = true;
-	}
+	// const startSelectHead = () => {
+	// 	topLimit = get(formTopLimit);
+	// 	bottomLimit = get(formBottomLimit);
+	// 	console.log("top: ", topLimit, "bottom: ", bottomLimit)
+	// 	selectingHead = true;
+	// }
 
 	const selectHead = (type: HeaderTypes) => {
 		let header : HTMLMetaElement;
@@ -127,6 +127,10 @@
 
 	if(index == 0){
 		field.type = InputEnum.Filename;
+	}
+
+	$: {
+		console.log(changingType)
 	}
 </script>
 
@@ -160,7 +164,7 @@
 	{:else}
 		{#if isEditing}
 			<div class="h-8 w-full">
-				<div class={`w-full bg-[#1e1e1e] flex border border-transparent hover:border-neutral-600 rounded-md h-8 ${keyFocus || valueFocus || changingType ? "border-2 border-neutral-600 p-0 z-[999999]" : "p-[1px]"}`}
+				<div class={`w-full bg-[#1e1e1e] flex border hover:border-neutral-600 rounded-md h-8 ${keyFocus || valueFocus || changingType ? "border-2 border-neutral-600 p-0 z-[999999]" : "p-[1px] border-transparent"}`}
 					style={`will-change:transform; transform: translate3d(${-xDrag}px, ${-yDrag}px, 0px); ${isBeingDragged? "z-index: 999999;" : ""}`}>
 					<div class={`flex w-36 items-center ${keyFocus ? "bg-[#2f2f2f]" : "bg-transparent"}`} >
 						
@@ -179,17 +183,8 @@
 						</button>
 
 						{#if changingType}
-							<StickyModals needToFlip={false} {topLimit} {bottomLimit} yOffset={0} xOffset={-12} menuTarget={menuTarget}>
-								<div bind:this={typeMenu} class="flex flex-col font-bold text-base shadow-lg text-white w-44 min-w-[40px] bg-[#363636] outline-none p-2 rounded-md">
-									<button class="">ulala</button>
-									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Text)}>Text</button>
-									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.List)}>List</button>
-									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.MultiList)}>MultiList</button>
-									<button class="p-1 rounded-md hover:bg-[#4e4e4e] text-left" on:click={() => changeFieldType(InputEnum.Date)}>Date</button>
-								</div>
-							</StickyModals>
+							<FieldMenu bind:changingType={changingType} menuTarget={menuTarget} bind:field={field}/>
 						{/if}
-	
 						
 						<input
 							class="font-normal text-sm text-white h-7 w-full bg-transparent outline-none p-1 pr-2"
