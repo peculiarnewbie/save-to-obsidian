@@ -4,11 +4,13 @@
 	import DatePicker from "../DatePicker.svelte";
 	import { onMount, tick } from "svelte";
     export let field;
-	export let valueFocus;
+	export let valueFocus:boolean = false;
 	export let menuTarget: HTMLElement = null;
     
     let errorMessage = "";
     let validInput = true;
+
+	let isPlaceholder = false;
 
     $: {
 		if(field.type == InputEnum.Filename){
@@ -49,25 +51,53 @@
 		}
 	}
 
+	const textFocus = (e:Event, focus:boolean) => {
+		const div = e.target as HTMLElement;
+		if(focus){
+			if(div.innerText == "No Value") div.innerText = ""
+			valueFocus = true;
+			isPlaceholder = false;
+		}
+		else{
+			if(div.innerText == "") div.innerText = "No Value"
+			valueFocus = false;
+			checkForPlaceholder()
+		}
+	}
+
+	const checkForPlaceholder = () => {
+		if(field.type == InputEnum.Text ){
+			if(field.value == "No Value" || field.value == "") isPlaceholder = true;
+			else isPlaceholder = false;
+		}
+	}
+
+	onMount(() => {
+		checkForPlaceholder()
+	})
+
 </script>
 
 {#if field.type == InputEnum.Filename}
 <input
-    class=" font-normal text-small text-white h-7 bg-transparent outline-none "
+    class=" font-normal text-small text-white h-7 bg-transparent outline-none w-full p-1"
     type="text"
     placeholder="select data or type here"
     on:input={checkNameValidity}
-    on:blur={checkNameValidity}
-    bind:value={field.value}
+	on:focus={() => {valueFocus = true}}
+    on:blur={(e) => {checkNameValidity(e); valueFocus = false}}
+	bind:value={field.value}
 />
 {:else if field.type == InputEnum.Text}
-<input
-    class=" font-normal text-small text-white bg-transparent w-12 grow h-auto pl-2 outline-none overflow-visible"
+<div
+    class={`font-normal text-small bg-transparent w-12 grow h-auto max-h-20 pl-2 outline-none overflow-auto break-all whitespace-pre-wrap ${isPlaceholder ? "text-[#666666]" : "text-white"}`}
     placeholder="select data or type here"
-    bind:value={field.value}
-	on:focus={() => {valueFocus = true}}
-	on:blur={() => {valueFocus = false}}
+    contenteditable="true"
+	bind:textContent={field.value}
+	on:focus={(e) => {textFocus(e, true)}}
+	on:blur={(e) => {textFocus(e, false)}}
 />
+<!-- <p class="break-all whitespace-pre-wrap">{field.value}</p> -->
 {:else if field.type == InputEnum.Date}
 	<div bind:this={datePicker}>
 		<DatePicker bind:field={field} bind:menuTarget={menuTarget} bind:isEditing={valueFocus}/>
@@ -75,5 +105,7 @@
 {/if}
 
 {#if !validInput}
-    <p class="text-red-500">{errorMessage}</p>
+	<div class="absolute bg-red-500 w-fit h-fit right-1/2 translate-x-1/2 top-0 p-1 px-4 rounded-md">
+		<p class="text-white font-medium">{errorMessage}</p>
+	</div>
 {/if}

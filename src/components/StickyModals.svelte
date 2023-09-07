@@ -7,6 +7,7 @@
     export let bottomLimit = 700;
     export let yOffset = 0;
     export let xOffset = 0;
+    export let sourceHeight = 0;
     export let menuTarget = null;
     export let isActive = true;
     export let clickOffDoc:Document = null;
@@ -71,7 +72,7 @@
         else if(bottomPos > bottomLimit){
             // console.log("exceed bot");
             if(bottomPos < bottomLimit + divHeight + yOffset && needToFlip){
-                yTransform = formScrollValue + divHeight + yOffset;
+                yTransform = formScrollValue + divHeight + yOffset + sourceHeight;
             }
             else{
                 yTransform = formScrollValue + bottomPos - bottomLimit;

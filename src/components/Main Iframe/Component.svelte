@@ -144,7 +144,7 @@
 							on:click={() => addForm()}>Add Form</button
 						>
 						{#each forms as form, i}
-							<div id="Form">
+							<div>
 								<div class="text-2xl text-white font-bold my-3 pl-3 font-sans">
 									{form}
 								</div>

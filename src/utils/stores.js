@@ -54,6 +54,8 @@ export const formBottomLimit = writable(0);
 
 export const mainIframeDoc = writable(null);
 
+export const fieldReordering = writable(false);
+
 
 /*****************/
 /* Header Stuff */

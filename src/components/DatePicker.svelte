@@ -141,7 +141,7 @@
 </button>
 
 {#if isEditing}
-<StickyModals {topLimit} {bottomLimit} yOffset={0} xOffset={dateButton.offsetLeft} menuTarget={menuTarget} clickOffDoc={doc} bind:isActive={isEditing}>
+<StickyModals {topLimit} {bottomLimit} yOffset={0} xOffset={dateButton.offsetLeft} menuTarget={menuTarget} clickOffDoc={doc} bind:isActive={isEditing} sourceHeight={15}>
     <div bind:this={dateElement} class="flex flex-col text-base shadow-lg text-[#bababa] w-fit bg-[#363636] outline-none p-2 rounded-md">
         <div class="flex justify-between px-1">
             <div class="flex text-2xl">

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount, tick } from "svelte";
 	import Field from "./Field.svelte";
-	import {formBottomLimit, formScroll, formTopLimit, storeMessaging, Actions} from "../../utils/stores"
+	import {formBottomLimit, formScroll, formTopLimit, storeMessaging, Actions, fieldReordering} from "../../utils/stores"
 
 	export let root: HTMLElement;
 	export let currentForm;
@@ -29,6 +29,7 @@
 	let validDir = true;
 	let formElement: HTMLElement;
 	let resultElement: HTMLElement;
+	let menuTarget:HTMLElement
 
 	if(directory == ""){
 		currentForm.directory = "Obsidian/";
@@ -96,7 +97,8 @@
 	};
 
 	const addField = () => {
-		currentForm.fields = [...currentForm.fields, { key: "", value: "", type: "text" }];
+		let index = currentForm.fields.length
+		currentForm.fields = [...currentForm.fields, { key: `property ${index}`, value: "No Value", type: "text" }];
 	};
 
 	function deleteField(event) {
@@ -154,6 +156,17 @@
 		}
 	}
 
+	const reOrderField = (index:number, offset) => {
+		// console.log("reorder: ", index, offset)
+		fieldReordering.set(true)
+		let temp = currentForm.fields
+		let newPos = index + offset
+		if(newPos < 1) newPos = 1
+		var element = temp[index];
+		temp.splice(index, 1);
+		temp.splice(newPos, 0, element);
+		currentForm.fields = temp;
+	}
 	
 
 	onMount(() => {
@@ -172,12 +185,12 @@
 
 </script>
 
-<div id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto flex-grow-[10] font-sans font-normal text-white gap-[1px]">
+<div id="Form" bind:this={formElement} class="pt-1 min-h-28 p-4 overflow-y-auto overflow-x-hidden flex-grow-[10] font-sans font-normal text-white gap-[1px]">
 	{#if isLoading}
 		<div>{`loading...: ${isLoading}`}</div>
 	{:else}
 		{#if isEditing}
-			<div style="display: flex; justify-content:space-between; align-items:end">
+			<div class="flex-col" style="display: flex; justify-content:space-between;">
 				<div>
 					<p class="text-xl font-semibold">Form Name:</p>
 					<input
@@ -216,17 +229,21 @@
 				}}>Edit</button
 			>
 		{/if}
-
-		{#each currentForm.fields as field, i}
-			<Field
-				index={i}
-				bind:field={field}
-				parentInspect={inspect}
-				on:deleteField={deleteField}
-				{isEditing}
-			/>
-		{/each}
+		<div class="">
+			{#each currentForm.fields as field, i (field.key)}
+				<Field
+					index={i}
+					bind:field={field}
+					reOrderField={reOrderField}
+					parentInspect={inspect}
+					on:deleteField={deleteField}
+					{isEditing}
+					length={currentForm.fields.length}
+				/>
+			{/each}
+		</div>
 		<button class="btn mt-2" on:click={addField}>Add Property</button>
+		<div bind:this={menuTarget}></div>
 	{/if}
 </div>
 
