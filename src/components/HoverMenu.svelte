@@ -11,22 +11,22 @@
 	let closeTimeout;
 
 	const openPropertyMenu = async () => {
-		console.log("enter");
+		// console.log("enter");
 		isHover = true;
 		clearTimeout(closeTimeout);
 		openTimeout = setTimeout(() => {
-			console.log("open");
+			// console.log("open");
 			if (isHover) isOpen = true;
 		}, 100);
-		console.log("end enter");
+		// console.log("end enter");
 	};
 
 	const closePropertyMenu = async () => {
-		console.log("leave");
+		// console.log("leave");
 		isHover = false;
 		clearTimeout(openTimeout);
 		closeTimeout = setTimeout(() => {
-			console.log("close");
+			// console.log("close");
 			if (!isHover) isOpen = false;
 		}, 100);
 	};

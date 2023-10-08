@@ -108,7 +108,10 @@
 		</div>
 		<p class="pt-2 text-base font-semibold mb-1">Properties</p>
 	{:else}
-		<div></div>
+		<div class="flex gap-1 align-middle pt-1">
+			<p style="font-weight:700; font-size:16px">{field.key}</p>
+			<FieldInput bind:field bind:valueFocus />
+		</div>
 	{/if}
 {:else}
 	<ReorderableList
@@ -134,7 +137,7 @@
 						}`}
 					>
 						<div
-							class={`flex w-36 items-start ${
+							class={`flex w-1/3 shrink-0 items-start ${
 								keyFocus ? "bg-[#2f2f2f]" : "bg-transparent"
 							}`}
 						>
@@ -174,7 +177,7 @@
 						<div
 							class={`${
 								valueFocus ? "bg-[#2f2f2f]" : "bg-transparent"
-							} grow flex`}
+							} w-2/3 grow-0`}
 						>
 							<FieldInput bind:field bind:valueFocus bind:menuTarget />
 						</div>
@@ -183,7 +186,7 @@
 			{:else}
 				<div class="flex gap-1 align-middle pt-1">
 					<p style="font-weight:700; font-size:16px">{field.key}</p>
-					<FieldInput bind:field bind:valueFocus />
+					<FieldInput bind:field bind:valueFocus {menuTarget} />
 				</div>
 			{/if}
 		</div>

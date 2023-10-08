@@ -40,7 +40,7 @@
 		field.value = header.content;
 		field.path = [{ type: IdType.HEAD, value: path }];
 
-		// selectingHead = false;
+		changingType = false;
 	};
 </script>
 
@@ -97,7 +97,10 @@
 		</HoverMenu>
 		<button
 			class="text-left hover:bg-[#363636] w-full flex p-1 rounded-md justify-between gap-3 items-center h-7"
-			on:click={inspect}
+			on:click={() => {
+				changingType = false;
+				inspect();
+			}}
 		>
 			<div class="flex gap-2 items-center">
 				<div class=" h-4 w-4">

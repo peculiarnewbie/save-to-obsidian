@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Form from "./Form.svelte";
 	import back from "../../../public/Back.svg";
-	import "../../app.css"
+	import "../../app.css";
 	import { InputEnum } from "../../utils/FieldInputType";
 	import { storeMessaging, Actions } from "../../utils/stores";
 
@@ -11,14 +11,19 @@
 	let forms: string[] = [];
 	let allData = {};
 	let isEditing = false;
-	let currentForm: {name:string, directory:string, fields:any, fromBackground:boolean} = { name: "", directory: "", fields: fields, fromBackground:false };
+	let currentForm: {
+		name: string;
+		directory: string;
+		fields: any;
+		fromBackground: boolean;
+	} = { name: "", directory: "", fields: fields, fromBackground: false };
 
-	let defaultDir = "Obsidian/"
+	let defaultDir = "Obsidian/";
 
 	let openForm = false;
 
 	const closePopup = () => {
-		storeMessaging.set({action: Actions.Dummy})
+		storeMessaging.set({ action: Actions.Dummy });
 		chrome.runtime.sendMessage({ action: "closeExtension" });
 	};
 
@@ -51,11 +56,19 @@
 	};
 
 	const addForm = () => {
-		fields = [{ key: "file title", value: "Untitled", type: InputEnum.Filename }];
-		currentForm = { name: "New Form", directory:defaultDir, fields: fields, fromBackground:false };
+		fields = [
+			{ key: "file title", value: "Untitled", type: InputEnum.Filename },
+			{ key: "content", value: "", type: InputEnum.Text },
+		];
+		currentForm = {
+			name: "New Form",
+			directory: defaultDir,
+			fields: fields,
+			fromBackground: false,
+		};
 		isEditing = true;
 		openForm = true;
-	}
+	};
 
 	const deleteForm = async (form) => {
 		await chrome.storage.local.remove([`form_${form}`]);
@@ -65,7 +78,6 @@
 	};
 
 	const promise = getChromeStorage();
-
 </script>
 
 <div
@@ -94,7 +106,12 @@
 						<img src={chrome.runtime.getURL(back)} alt="back" width="20px" />
 					{/if}
 				</button>
-				<h2 class="my-3 pl-3 font-sans text-2xl font-bold text-white" id="ExtensionTitle">{currentForm.name}</h2>
+				<h2
+					class="my-3 pl-3 font-sans text-2xl font-bold text-white"
+					id="ExtensionTitle"
+				>
+					{currentForm.name}
+				</h2>
 			</div>
 		{/if}
 		<button
@@ -117,10 +134,7 @@
 				/>
 			{:else}
 				<div class="ext p-3">
-					<button
-						class="btn"
-						on:click={() => addForm()}
-					>
+					<button class="btn" on:click={() => addForm()}>
 						<div class="text-white font-normal font-sans">Add Form</div>
 					</button>
 				</div>
@@ -139,10 +153,7 @@
 					/>
 				{:else}
 					<div class="p-3">
-						<button
-							class="btn"
-							on:click={() => addForm()}>Add Form</button
-						>
+						<button class="btn" on:click={() => addForm()}>Add Form</button>
 						{#each forms as form, i}
 							<div>
 								<div class="text-2xl text-white font-bold my-3 pl-3 font-sans">
@@ -151,7 +162,9 @@
 								<button
 									class="btn"
 									on:click={async () => {
-										currentForm = await JSON.parse(JSON.stringify(allData[`form_${form}`]));
+										currentForm = await JSON.parse(
+											JSON.stringify(allData[`form_${form}`]),
+										);
 										isEditing = false;
 										openForm = true;
 									}}>Open Form</button
