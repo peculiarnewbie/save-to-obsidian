@@ -33,7 +33,7 @@
 </script>
 
 <div
-	class={`max-h-32 outline-none w-full overscroll-y-auto overflow-y-auto px-2 ${
+	class={`max-h-32 outline-none w-full overscroll-y-auto overflow-y-auto px-2 rounded-r-md ${
 		isPlaceholder ? "text-neutral-600" : ""
 	} ${
 		hasOutline

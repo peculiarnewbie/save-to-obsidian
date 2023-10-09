@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onDestroy } from "svelte";
+	import { createEventDispatcher, onDestroy, onMount } from "svelte";
 	import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
 	import FieldInput from "./FieldInput.svelte";
 
@@ -32,7 +32,7 @@
 	// for floating menu
 
 	let xOffset = 0;
-	let iconName = icons.tags;
+	let iconName: string;
 
 	$: {
 		if (changingType) {
@@ -77,12 +77,39 @@
 		fieldReordering.set(false);
 	};
 
+	const updateIcon = (type) => {
+		switch (type) {
+			case InputEnum.Text:
+				iconName = icons.text;
+				break;
+			case InputEnum.Date:
+				iconName = icons.date;
+				break;
+			case HeaderTypes.Title:
+				iconName = icons.title;
+				break;
+			case HeaderTypes.URL:
+				iconName = icons.url;
+				break;
+			case HeaderTypes.Image:
+				iconName = icons.image;
+				break;
+			default:
+				iconName = icons.text;
+				break;
+		}
+	};
+
 	$: {
 		if ($fieldReordering) {
 			changingType = false;
 			valueFocus = false;
 		}
 	}
+
+	onMount(() => {
+		updateIcon(field.type);
+	});
 </script>
 
 {#if index == 0}
@@ -108,10 +135,13 @@
 		</div>
 		<p class="pt-2 text-base font-semibold mb-1">Properties</p>
 	{:else}
-		<div class="flex gap-1 align-middle pt-1">
-			<p style="font-weight:700; font-size:16px">{field.key}</p>
+		<p class="text-base font-bold mb-1">{field.key}</p>
+		<div
+			class="flex gap-1 align-middle p-1 border hover:border-neutral-600 rounded-md border-transparent"
+		>
 			<FieldInput bind:field bind:valueFocus />
 		</div>
+		<p class="pt-2 text-base font-semibold mb-1">Properties</p>
 	{/if}
 {:else}
 	<ReorderableList
@@ -158,6 +188,8 @@
 									bind:field
 									inspect={selectElement}
 									{deleteField}
+									bind:iconName
+									{updateIcon}
 								/>
 							{/if}
 
@@ -185,9 +217,30 @@
 					</div>
 				</div>
 			{:else}
-				<div class="flex gap-1 align-middle pt-1">
-					<p style="font-weight:700; font-size:16px">{field.key}</p>
-					<FieldInput bind:field bind:valueFocus {menuTarget} />
+				<div
+					class={`flex gap-1 align-middle hover:border-neutral-600 rounded-md ${
+						valueFocus
+							? "border-2 border-neutral-600 p-0 z-[999999]"
+							: "border p-[1px] border-transparent"
+					}`}
+				>
+					<div class="flex w-1/4 shrink-0 items-start">
+						<div class="p-1 h-7 w-7 shrink-0">
+							<Icons {iconName}></Icons>
+						</div>
+						<p
+							class="font-normal text-sm text-white h-7 w-full bg-transparent outline-none p-1 pr-2"
+						>
+							{field.key}
+						</p>
+					</div>
+					<div
+						class={`${
+							valueFocus ? "bg-[#2f2f2f]" : "bg-transparent"
+						} w-3/4 grow-0`}
+					>
+						<FieldInput bind:field bind:valueFocus {menuTarget} />
+					</div>
 				</div>
 			{/if}
 		</div>

@@ -73,6 +73,7 @@ export const getElementValueFromPath = (path, document) => {
 		if (element.nodeName == "META") {
 			return element.content;
 		} else if (element.nodeName == "IMG") {
+			return element.src;
 		} else {
 			return element.innerText;
 		}

@@ -40,10 +40,16 @@
 					name: "example",
 					directory: "example/",
 					fields: [
-						{ key: "title", value: "Example Title" },
-						{ key: "tags", value: "example, tags" },
-						{ key: "description", value: "Example Description" },
+						{
+							key: "file title",
+							value: "Example Title",
+							type: InputEnum.Filename,
+						},
+						{ key: "content", value: "", type: InputEnum.Text },
+						{ key: "tags", value: "example, tags", type: InputEnum.Text },
+						{ key: "date", value: "", type: InputEnum.Date },
 					],
+					fromBackground: false,
 				};
 				await chrome.storage.local.set({
 					forms: forms,

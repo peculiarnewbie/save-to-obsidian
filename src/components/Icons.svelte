@@ -9,6 +9,8 @@
 		date: "date",
 		image: "image",
 		bin: "bin",
+		text: "text",
+		title: "title",
 	} as const;
 </script>
 
@@ -66,5 +68,15 @@
 		<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
 		<line x1="10" x2="10" y1="11" y2="17" />
 		<line x1="14" x2="14" y1="11" y2="17" />
+	{:else if iconName == icons.text}
+		<path d="M17 6.1H3" />
+		<path d="M21 12.1H3" />
+		<path d="M15.1 18H3" />
+	{:else if iconName == icons.title}
+		<path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+		<polyline points="14 2 14 8 20 8" />
+		<path d="M2 13v-1h6v1" />
+		<path d="M4 18h2" />
+		<path d="M5 12v6" />
 	{/if}
 </svg>

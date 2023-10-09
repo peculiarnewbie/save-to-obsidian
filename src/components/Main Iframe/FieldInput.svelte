@@ -65,17 +65,17 @@
 		}}
 		bind:value={field.value}
 	/>
-{:else if field.type == InputEnum.Text}
+{:else if field.type == InputEnum.Date}
+	<div bind:this={datePicker}>
+		<DatePicker bind:field bind:menuTarget bind:isEditing={valueFocus} />
+	</div>
+{:else}
 	<TextInput
 		bind:inputValue={field.value}
 		placeholder="No Value"
 		bind:valueFocus
 	/>
 	<!-- <p class="break-all whitespace-pre-wrap">{field.value}</p> -->
-{:else if field.type == InputEnum.Date}
-	<div bind:this={datePicker}>
-		<DatePicker bind:field bind:menuTarget bind:isEditing={valueFocus} />
-	</div>
 {/if}
 
 {#if !validInput}

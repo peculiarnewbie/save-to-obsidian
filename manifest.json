@@ -14,5 +14,11 @@
 			"run_at": "document_end"
 		}
 	],
+	"web_accessible_resources": [
+		{
+			"resources": ["assets/svelteContent.css"],
+			"matches": ["<all_urls>"]
+		}
+	],
 	"permissions": ["activeTab", "downloads", "scripting", "storage"]
 }

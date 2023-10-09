@@ -14,10 +14,15 @@
 	export let inspect;
 	export let deleteField;
 
+	export let iconName;
+	export let updateIcon;
+
 	let typeMenu;
 
 	const changeFieldType = (type) => {
 		field.type = type;
+		updateIcon(type);
+
 		changingType = false;
 	};
 
@@ -40,6 +45,9 @@
 		}
 		field.value = header.content;
 		field.path = [{ type: IdType.HEAD, value: path }];
+		field.type = type;
+
+		updateIcon(type);
 
 		changingType = false;
 	};
@@ -60,10 +68,24 @@
 				class="flex flex-col font-normal text-base text-left shadow-lg text-white w-fit min-w-[40px] bg-[#262626] outline-none rounded-md p-2 border border-[#3f3f3f]"
 			>
 				<button
-					class="p-1 rounded-md hover:bg-[#363636] text-left"
-					on:click={() => changeFieldType(InputEnum.Text)}>Text</button
+					class="flex gap-2 items-center hover:bg-[#363636] px-2 py-[2px] rounded-md w-32"
+					on:click={() => changeFieldType(InputEnum.Text)}
 				>
+					<div class=" h-4 w-4">
+						<Icons iconName={icons.text}></Icons>
+					</div>
+					<p>Text</p>
+				</button>
 				<button
+					class="flex gap-2 items-center hover:bg-[#363636] px-2 py-[2px] rounded-md w-32"
+					on:click={() => changeFieldType(InputEnum.Date)}
+				>
+					<div class=" h-4 w-4">
+						<Icons iconName={icons.date}></Icons>
+					</div>
+					<p>Date</p>
+				</button>
+				<!-- <button
 					class="p-1 rounded-md hover:bg-[#363636] text-left"
 					on:click={() => changeFieldType(InputEnum.List)}>List</button
 				>
@@ -71,11 +93,7 @@
 					class="p-1 rounded-md hover:bg-[#363636] text-left"
 					on:click={() => changeFieldType(InputEnum.MultiList)}
 					>MultiList</button
-				>
-				<button
-					class="p-1 rounded-md hover:bg-[#363636] text-left"
-					on:click={() => changeFieldType(InputEnum.Date)}>Date</button
-				>
+				> -->
 			</div></HoverMenu
 		>
 		<HoverMenu iconName={icons.header} buttonText="Header">
@@ -83,17 +101,32 @@
 				class="flex flex-col font-normal text-base text-left shadow-lg text-white w-fit min-w-[40px] bg-[#262626] outline-none rounded-md p-2 border border-[#3f3f3f]"
 			>
 				<button
-					class="p-1 rounded-md hover:bg-[#4e4e4e] text-left"
-					on:click={() => selectHead(HeaderTypes.Title)}>Title</button
+					class="flex gap-2 items-center hover:bg-[#363636] px-2 py-[2px] rounded-md w-32"
+					on:click={() => selectHead(HeaderTypes.Title)}
 				>
+					<div class=" h-4 w-4">
+						<Icons iconName={icons.title}></Icons>
+					</div>
+					<p>Title</p>
+				</button>
 				<button
-					class="p-1 rounded-md hover:bg-[#4e4e4e] text-left"
-					on:click={() => selectHead(HeaderTypes.URL)}>URL</button
+					class="flex gap-2 items-center hover:bg-[#363636] px-2 py-[2px] rounded-md w-32"
+					on:click={() => selectHead(HeaderTypes.URL)}
 				>
+					<div class=" h-4 w-4">
+						<Icons iconName={icons.url}></Icons>
+					</div>
+					<p>URL</p>
+				</button>
 				<button
-					class="p-1 rounded-md hover:bg-[#4e4e4e] text-left"
-					on:click={() => selectHead(HeaderTypes.Image)}>Image</button
+					class="flex gap-2 items-center hover:bg-[#363636] px-2 py-[2px] rounded-md w-32"
+					on:click={() => selectHead(HeaderTypes.Image)}
 				>
+					<div class=" h-4 w-4">
+						<Icons iconName={icons.image}></Icons>
+					</div>
+					<p>Image</p>
+				</button>
 			</div>
 		</HoverMenu>
 		<button
