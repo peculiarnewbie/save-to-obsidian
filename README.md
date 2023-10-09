@@ -21,11 +21,19 @@ A chrome extension to precisely get data from webpages. created with the intent 
 8. Open up a different page with equal page structure and open the previously saved form
 9. The properties will be automatically filled with the equivalent element's values
 
+## Example
+
+This is an example of a form I made for youtube videos:
+![Youtube Page](./public/example/Youtube%20Page.png)
+
+it resulted in this md file:
+![Youtube Result](./public/example/Youtube%20Result.png)
+
 ## Roadmap
 
 - add every obsidian property type (number, tags, checkbox, and tags)
 - better date selection experience
 - Integrate with Obsidian using Obsidian local rest api extension
-- lots more options for the properties, such as default regex, inline option,
+- lots more options for the properties, such as default regex, inline option, etc
 - better detailed selection experience
 - header data selection system
