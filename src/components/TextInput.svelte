@@ -5,6 +5,7 @@
 	export let inputValue = "";
 	export let placeholder = "No value";
 	export let valueFocus = false;
+	export let hasOutline = false;
 
 	let isPlaceholder = true;
 
@@ -34,6 +35,12 @@
 <div
 	class={`max-h-32 outline-none w-full overscroll-y-auto overflow-y-auto px-2 ${
 		isPlaceholder ? "text-neutral-600" : ""
+	} ${
+		hasOutline
+			? `border border-neutral-600 rounded-lg py-1 ${
+					valueFocus ? "bg-[#2f2f2f]" : ""
+			  }`
+			: ""
 	}`}
 	contenteditable="true"
 	bind:textContent={inputValue}

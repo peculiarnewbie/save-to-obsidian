@@ -157,6 +157,7 @@
 									{menuTarget}
 									bind:field
 									inspect={selectElement}
+									{deleteField}
 								/>
 							{/if}
 

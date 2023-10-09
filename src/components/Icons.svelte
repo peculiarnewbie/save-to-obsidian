@@ -5,6 +5,10 @@
 		tags: "tags",
 		rightArrow: "rightArrow",
 		header: "header",
+		url: "url",
+		date: "date",
+		image: "image",
+		bin: "bin",
 	} as const;
 </script>
 
@@ -44,5 +48,23 @@
 	{:else if iconName == icons.header}
 		<rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
 		<line x1="3" x2="21" y1="9" y2="9" />
+	{:else if iconName == icons.url}
+		<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+		<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+	{:else if iconName == icons.date}
+		<rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+		<line x1="16" x2="16" y1="2" y2="6" />
+		<line x1="8" x2="8" y1="2" y2="6" />
+		<line x1="3" x2="21" y1="10" y2="10" />
+	{:else if iconName == icons.image}
+		<rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+		<circle cx="9" cy="9" r="2" />
+		<path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+	{:else if iconName == icons.bin}
+		<path d="M3 6h18" />
+		<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+		<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+		<line x1="10" x2="10" y1="11" y2="17" />
+		<line x1="14" x2="14" y1="11" y2="17" />
 	{/if}
 </svg>

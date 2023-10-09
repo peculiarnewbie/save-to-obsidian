@@ -101,6 +101,9 @@
 
 	const addField = () => {
 		let index = currentForm.fields.length;
+		while (currentForm.fields.some((e) => e.key == `property ${index}`)) {
+			index++;
+		}
 		currentForm.fields = [
 			...currentForm.fields,
 			{ key: `property ${index}`, value: "No Value", type: "text" },
@@ -249,12 +252,12 @@
 					</div>
 				</div>
 
-				<button
+				<!-- <button
 					class="btn"
 					on:click={() => {
 						currentForm.fromBackground = !currentForm.fromBackground;
 					}}>{`fromBackground: ${currentForm.fromBackground}`}</button
-				>
+				> -->
 			</div>
 		{:else}
 			<button
@@ -301,6 +304,7 @@
 			<TextInput
 				bind:inputValue={currentForm.fields[1].value}
 				placeholder="Put extra notes here"
+				hasOutline={true}
 			/>
 		</div>
 		<div bind:this={menuTarget}></div>

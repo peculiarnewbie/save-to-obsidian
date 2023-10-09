@@ -12,6 +12,7 @@
 	export let field;
 
 	export let inspect;
+	export let deleteField;
 
 	let typeMenu;
 
@@ -107,6 +108,20 @@
 					<Icons iconName={icons.inspect}></Icons>
 				</div>
 				<p>Element</p>
+			</div>
+		</button>
+		<button
+			class="text-left hover:bg-[#363636] w-full flex p-1 rounded-md justify-between gap-3 items-center h-7"
+			on:click={() => {
+				changingType = false;
+				deleteField();
+			}}
+		>
+			<div class="flex gap-2 items-center">
+				<div class=" h-4 w-4">
+					<Icons iconName={icons.bin}></Icons>
+				</div>
+				<p>Remove</p>
 			</div>
 		</button>
 	</div>
