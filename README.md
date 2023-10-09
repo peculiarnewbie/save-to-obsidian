@@ -24,9 +24,11 @@ A chrome extension to precisely get data from webpages. created with the intent 
 ## Example
 
 This is an example of a form I made for youtube videos:
+
 ![Youtube Page](./public/example/Youtube%20Page.png)
 
 it will result in this md file:
+
 ![Youtube Result](./public/example/Youtube%20Result.png)
 
 ## Roadmap
