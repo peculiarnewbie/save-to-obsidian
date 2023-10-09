@@ -1,6 +1,6 @@
 {
-	"name": "A Svelte Tailwind Chrome Extension",
-	"description": "Sample Extension using Svelte and Tailwind",
+	"name": "Precise MD Clipper",
+	"description": "Early WIP Web Clipper intended for use with Obsidian.md",
 	"version": "1.0",
 	"manifest_version": 3,
 	"background": {

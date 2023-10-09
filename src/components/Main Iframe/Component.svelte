@@ -104,6 +104,13 @@
 					class="flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] items-center cursor-pointer"
 					on:click={() => {
 						openForm = false;
+						currentForm = {
+							name: "",
+							directory: "",
+							fields: [],
+							fromBackground: false,
+						};
+						storeMessaging.set({ action: Actions.Dummy });
 					}}
 				>
 					{#if import.meta.env.DEV}

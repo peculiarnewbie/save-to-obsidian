@@ -54,6 +54,7 @@
 	const unsubscribe = storeMessaging.subscribe((message) => {
 		const action = message.action;
 		const data = message.data;
+		console.log("message: ", message);
 		switch (action) {
 			case Actions.ElementSelected:
 				console.log("in Form, element selected: ", message);
@@ -186,6 +187,10 @@
 
 		formTopLimit.set(formElement.getBoundingClientRect().top);
 		formBottomLimit.set(resultElement.getBoundingClientRect().bottom);
+
+		if (!isEditing) {
+			updateFieldValues();
+		}
 	});
 
 	onDestroy(unsubscribe);
@@ -203,10 +208,6 @@
 		".md";
 
 	prevName = currentForm.name;
-
-	if (!isEditing) {
-		updateFieldValues();
-	}
 
 	console.log("On Form: ", currentForm);
 </script>

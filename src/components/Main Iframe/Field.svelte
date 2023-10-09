@@ -229,7 +229,7 @@
 							<Icons {iconName}></Icons>
 						</div>
 						<p
-							class="font-normal text-sm text-white h-7 w-full bg-transparent outline-none p-1 pr-2"
+							class="font-normal text-sm text-white h-fit w-full bg-transparent outline-none p-1 pr-2"
 						>
 							{field.key}
 						</p>
