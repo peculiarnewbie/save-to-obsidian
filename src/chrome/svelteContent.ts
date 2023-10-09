@@ -2,15 +2,11 @@ import Inspector from "../components/Content Script/Inspector.svelte";
 import Component from "../components/Main Iframe/Component.svelte";
 import SvelteParent from "../components/SvelteParent.svelte";
 
-let firstTime = true;
-
-let extensionId = chrome.runtime.id;
-const svelteParent = document.createElement("div");
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+	let extensionId = chrome.runtime.id;
 	if (message.action === "popup") {
-		if (firstTime) {
-			firstTime = false;
+		if (!document.getElementById(`${extensionId}-SvelteParent`)) {
+			const svelteParent = document.createElement("div");
 
 			svelteParent.id = `${extensionId}-SvelteParent`;
 			svelteParent.style.position = "fixed";
@@ -25,8 +21,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 				target: svelteParent,
 				props: { root: svelteParent },
 			});
-		}
-		if (!document.getElementById(`${extensionId}-SvelteParent`)) {
+
 			document.body.appendChild(svelteParent);
 		} else {
 			console.log("popup already exists");
