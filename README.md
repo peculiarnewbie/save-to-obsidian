@@ -26,7 +26,7 @@ A chrome extension to precisely get data from webpages. created with the intent 
 This is an example of a form I made for youtube videos:
 ![Youtube Page](./public/example/Youtube%20Page.png)
 
-it resulted in this md file:
+it will result in this md file:
 ![Youtube Result](./public/example/Youtube%20Result.png)
 
 ## Roadmap
@@ -37,3 +37,7 @@ it resulted in this md file:
 - lots more options for the properties, such as default regex, inline option, etc
 - better detailed selection experience
 - header data selection system
+
+### Extra
+
+don't worry about the env files, it's just an easy way to tell the extension wether it's in dev mode or not
