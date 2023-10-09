@@ -2,15 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @layer components {
-    .btn-primary{
-        @apply bg-[#363636] align-middle text-white px-5 rounded-md h-9 transition-all duration-100 border-l border-r border-t border-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)]
-                    hover:bg-[#3f3f3f] hover:border-[#4e4e4e] hover:shadow-[0_2px_5px_-2px_rgba(0,0,0,1)]
-    }
-    .ext-h2{
-        @apply text-2xl font-bold text-white my-3 pl-3
-    }
-    .ext-h4{
-        @apply text-lg font-bold text-white m-0
-    }
-} */
+@layer components {
+    .btn {
+		@apply h-9 rounded-md border-l border-r border-[#3f3f3f] border-t-[#242424] bg-[#363636] px-5 align-middle font-sans text-base text-white shadow-[0_2px_5px_-2px_rgba(0,0,0,0.67)] transition-all duration-100;
+	}
+    .btn:hover{
+		@apply border-[#4e4e4e] bg-[#3f3f3f] shadow-[0_2px_5px_-2px_rgba(0,0,0,1)];
+	}
+  }

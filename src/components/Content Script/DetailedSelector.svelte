@@ -1,151 +1,52 @@
 <script lang="ts">
-	import TestButtons from "../Test/TestButtons.svelte";
+	import { onDestroy, onMount } from "svelte";
+	import { get } from "svelte/store";
+	import { currentSelectedElement, storeMessaging, Actions } from "../../utils/stores";
 
 	export let extensionId;
-	export let selectedElement;
-	export let getElementValueFromPath;
-	$: currentElement = selectedElement;
-	let treePath;
 
-	enum ElementType {
-		TEXT,
-		IMG,
-	}
+	let selectedElement;
 
-	$: elementType = determineNodeType(currentElement);
-	$: elementValue = determineElementValue(currentElement);
+	const ElementType = {
+		TEXT : "text",
+		IMG: "img",
 
-	let selectableElements = [];
-	let showChildren = false;
-	let showSiblings = false;
+	} as const
 
-	enum IdType {
-		ID,
-		CLASS,
-		INDEX,
-	}
+	let tempElement = null;
 
-	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			if (request.action == "bgGetElement") {
-				const value = getElementValueFromPath(request.path);
-				if (value) {
-					sendResponse({ success: true, value: value });
-				} else {
-					sendResponse({ success: false });
-				}
-			}
-		});
-	}
+	let elementType;
+	let elementValue;
+
+	let elementList: HTMLElement[] = [];
+	let selectingList = false;
+
+	let siblingCount = 0;
+	let childrenCount = 0;
 
 	const FinishSelection = () => {
-		generatePath();
-		let value = getElementValueFromPath(treePath);
-		document.getElementById(`${extensionId}-iframe`).style.display = "initial";
-		chrome.runtime.sendMessage({
-			action: "elementSelected",
-			path: treePath,
-			value: value,
-		});
+		// console.log("finished in detail selector")
+		storeMessaging.set({action: Actions.FinishSelection})
+		
 		selectedElement = null;
 	};
 
-	const getParentElement = () => {
-		if (currentElement.parentElement) {
-			selectedElement = currentElement.parentElement;
-		} else {
-			return currentElement;
-		}
-	};
-
-	if (!import.meta.env.DEV) {
-		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			if (request.action == "bgElementSelected") {
-				selectedElement = request.element;
-				sendResponse({ success: true });
-			}
-		});
+	const selectAgain = () => {
+		storeMessaging.set({action:Actions.StartInspect})
 	}
 
-	const generatePath = () => {
-		let path = [];
-		let currentElement = selectedElement;
-		let searchResult = { found: false, index: 0 };
+	const moveSelection = (element, fromHover) => {
+		selectedElement = element;
+		selectingList = false;
+		
+		elementType = determineNodeType(selectedElement);
+		elementValue = determineElementValue(selectedElement);
+		// console.log(element, element.childElementCount, element.parentElement.childElementCount)
+		childrenCount = selectedElement.childElementCount;
+		siblingCount = selectedElement.parentElement?.childElementCount - 1;
 
-		while (currentElement != document.body) {
-			if (currentElement.id != "") {
-				if (CheckForDuplicateIds(currentElement.id)) {
-					path.push({
-						type: IdType.ID,
-						value: currentElement.id,
-						index: 0,
-					});
-					break;
-				}
-			} else if (currentElement.className != "") {
-				if (validateClass(currentElement.className)) {
-					let queriedElements = document.getElementsByClassName(
-						currentElement.className,
-					);
-					if (queriedElements.length < 5) {
-						searchResult = searchElements(queriedElements, currentElement);
-						path.push({
-							type: IdType.CLASS,
-							value: currentElement.className,
-							index: searchResult.index,
-						});
-						break;
-					}
-				}
-			}
-
-			path.push({
-				type: IdType.INDEX,
-				value: "",
-				index: Array.from(currentElement.parentElement.children).indexOf(
-					currentElement,
-				),
-			});
-			currentElement = currentElement.parentElement;
-			continue;
-		}
-
-		treePath = path.reverse();
-	};
-
-	const validateClass = (className) => {
-		if (className.includes(" ")) {
-			return false;
-		} else if (className.length > 40) {
-			return false;
-		} else {
-			let regex = /\d/;
-			if (regex.test(className)) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-	};
-
-	const searchElements = (elements, element) => {
-		for (let i = 0; i < elements.length; i++) {
-			if (elements[i] == element) {
-				return { found: true, index: i };
-			}
-		}
-		console.error("failed to find element");
-		return { found: false, index: 0 };
-	};
-
-	const CheckForDuplicateIds = (id) => {
-		let elements = document.querySelectorAll("#" + id);
-		if (elements.length > 1) {
-			return false;
-		} else {
-			return true;
-		}
-	};
+		if(!fromHover) currentSelectedElement.set(selectedElement);
+	}
 
 	const determineNodeType = (element) => {
 		if (element.nodeName == "IMG") {
@@ -163,110 +64,93 @@
 		}
 	};
 
-	const getElementChildren = (element) => {
-		let children = [];
+	const getElementList = (element) => {
+		selectingList = true;
+		let list = [];
+
 		for (let i = 0; i < element.children.length; i++) {
-			children.push(element.children[i]);
+			list.push(element.children[i]);
 		}
-		return children;
-	};
 
-	const getElementSiblings = (element) => {
-		let siblings = [];
-		for (let i = 0; i < element.parentElement.children.length; i++) {
-			siblings.push(element.parentElement.children[i]);
+		elementList = list;
+	}
+
+	const setDetailElement = (element) => {
+		tempElement = element
+		elementType = determineNodeType(element)
+		elementValue = determineElementValue(element)
+		getElementList(element)
+	}
+
+	const highlightElement = (element) => {
+		currentSelectedElement.set(element)
+	}
+
+
+	const unsubscribe = storeMessaging.subscribe((message) => {
+		const action = message.action;
+		if(action == Actions.FinishHover){
+			selectedElement = get(currentSelectedElement);
+			console.log(selectedElement)
+			moveSelection(selectedElement, true);
 		}
-		return siblings;
-	};
+	})
 
-	const buttonStyle = `
-        background-color: #363636;
-        color: white;
-        border-top: 1px solid #242424;
-        border-left: 1px solid #3f3f3f;
-        border-right: 1px solid #3f3f3f;
-        box-shadow: 0 2px 5px -2px rgba(0,0,0,0.67);
-        border-radius: 6px;
-        padding: 0 20px 0 20px;
-        align-items: center;
-        height: 36px;
-        cursor: pointer;
-    `;
+	onDestroy(unsubscribe);
 
-	const rootStyle = `
-        all:initial; 
-        display:flex; 
-        background-color: #242424; 
-        width: fit-content;
-        border-radius: 6px; 
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    `;
-
-	const parentStyle = `
-        display: flex;
-        flex-direction: column;
-        padding: 8px;
-        gap: 12px;
-    `;
-
-	const imgContainer = `
-        max-width: 250px;
-        height: 250px;
-        max-height: 250px;
-    `;
-
-	const imgElement = `
-        max-width: 100%;
-        max-height: 100%;
-    `;
-
-	const resultBox = `
-        background-color: #1e1e1e;
-        height:fit-content;
-        padding:4px;
-        margin-top:8px;
-        min-height: 50px;
-        max-width: 250px;
-        max-height: 250px;
-        overflow-y: auto;
-        overflow-x: auto;
-    `;
 </script>
 
-<div style={`${rootStyle}`}>
-	<div style={`${parentStyle}`}>
-		<div style="all:unset; color: white;">
-			Result:
-			<div id="resultBox" style={resultBox}>
-				{#if elementType == ElementType.TEXT}
-					<p>{elementValue}</p>
-				{:else if elementType == ElementType.IMG}
-					<div style={`${imgContainer}`}>
-						<img
-							style={`all:unset ${imgElement}`}
-							src={elementValue}
-							alt="selected"
-						/>
-					</div>
-				{/if}
+<div class="w-full flex justify-end">
+	<div class="flex bg-[#242424] w-full rounded-md">
+		<div class="flex flex-col w-full p-2 gap-3 self-end">
+			<div class="text-white">
+				Result:
+				<div id="resultBox" class="bg-[#1e1e1e] p-1 mt-2 w-full h-64 overflow-auto">
+					{#if elementType == ElementType.TEXT}
+						<p>{elementValue}</p>
+					{:else if elementType == ElementType.IMG}
+						<div class="w-full h-60">
+							<img
+								class="max-w-full max-h-full"
+								src={elementValue}
+								alt="selected"
+							/>
+						</div>
+					{/if}
+				</div>
 			</div>
-		</div>
-		<div style="all:unset; display: flex; gap:12px">
-			<button style={`all:unset; ${buttonStyle}`} on:click={getParentElement}
-				>Select Parent</button
-			>
-			<button style={`all:unset; ${buttonStyle}`} on:click={FinishSelection}
-				>Done</button
-			>
+			{#if selectingList}
+				<div class="flex flex-col gap-4">
+					<button on:click={() => {setDetailElement(tempElement.parentElement ? tempElement.parentElement : tempElement)}} class="btn">Select Parent</button>
+					<div class="flex flex-col gap-2">
+						{#each elementList as element}
+							<button on:pointerenter={() => highlightElement(element)} on:click={() => setDetailElement(element)} class="max-h-12 bg-slate-700 flex">
+								<div class="w-1/5">
+									{element.tagName}
+								</div>
+								<div class=" overflow-hidden h-12">
+									{element.innerText}
+								</div>
+							</button>
+						{/each}
+						<div class="flex gap-2">
+							<button class="btn w-full" on:click={() => {moveSelection(selectedElement, false)}}>Cancel</button>
+							<button class="btn w-full" on:click={() => {moveSelection(tempElement, false)}}>Done</button>
+						</div>
+					</div>
+				</div>
+			{:else}
+				<div class="gap-3 flex flex-col">
+					<button class="btn" on:click={() => {selectingList = true; setDetailElement(selectedElement)}}>Detail Select</button>
+					<!-- <button class="btn" on:click={() => getElementList(false)}>Select Children ({childrenCount})</button> -->
+					<button class="btn" on:click={selectAgain}>Select Again</button>
+					<button class="btn" on:click={FinishSelection}>Done</button>
+				</div>
+			{/if}
 		</div>
 	</div>
+
 </div>
 
-{#if import.meta.env.DEV}
-	<TestButtons bind:selectedElement />
-{/if}
-
 <style>
-	.no {
-	}
 </style>

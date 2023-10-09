@@ -1,4 +1,5 @@
 export default function sanitizeString(str) {
+	if (!str) return "";
 	return str.replace(/[<>:"/\\|?*]+/g, function (char) {
 		switch (char) {
 			case "<":
