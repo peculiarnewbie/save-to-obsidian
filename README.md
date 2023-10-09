@@ -31,6 +31,10 @@ it will result in this md file:
 
 ![Youtube Result](./public/example/Youtube%20Result.png)
 
+You can then do all kinds of things with the file. For example I use Obsidian and Dataview to have interesting videos, music, and movies that i consumed that day queried in my daily note
+
+![Daily Note](./public/example/Daily%20Note.png)
+
 ## Roadmap
 
 - add every obsidian property type (number, tags, checkbox, and tags)
