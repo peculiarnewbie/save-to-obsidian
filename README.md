@@ -1,6 +1,6 @@
 # Precise MD Clipper
 
-A chrome extension to precisely get data from webpages. created with the intent to use with [Obsidian.md](https://obsidian.md/) properties.
+A chrome extension to precisely get data from webpages. created with the intent to use with [Obsidian.md](https://obsidian.md/) properties. Heavily inspired by [Save to Notion](https://chrome.google.com/webstore/detail/save-to-notion/ldmmifpegigmeammaeckplhnjbbpccmm)
 
 ## Installation
 
