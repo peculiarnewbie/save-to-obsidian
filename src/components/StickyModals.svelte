@@ -15,9 +15,9 @@
 	export let yOffset = 0;
 	export let xOffset = 0;
 	export let sourceHeight = 0;
-	export let menuTarget = null;
+	export let menuTarget: HTMLElement | null = null;
 	export let isActive = true;
-	export let clickOffDoc: Document = null;
+	export let clickOffDoc: Document | null = null;
 
 	export let padding = 8;
 
@@ -58,18 +58,18 @@
 		if (!clickOffDoc) clickOffDoc = get(mainIframeDoc);
 
 		setTimeout(() => {
-			clickOffDoc.addEventListener("click", handleClickOff);
+			clickOffDoc?.addEventListener("click", handleClickOff);
 		}, 0);
 
 		return () => {
-			clickOffDoc.removeEventListener("click", handleClickOff);
+			clickOffDoc?.removeEventListener("click", handleClickOff);
 		};
 	});
 
-	const handleClickOff = (e) => {
-		const element = e.target;
+	const handleClickOff = (e: MouseEvent) => {
+		const element = e.target as HTMLElement;
 		if (!thisElement.contains(element)) {
-			clickOffDoc.removeEventListener("click", handleClickOff);
+			clickOffDoc?.removeEventListener("click", handleClickOff);
 			isActive = false;
 			console.log("clicking off");
 		}

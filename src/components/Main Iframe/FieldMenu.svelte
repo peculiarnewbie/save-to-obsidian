@@ -1,33 +1,39 @@
 <script lang="ts">
 	import { get } from "svelte/store";
 	import StickyModals from "../StickyModals.svelte";
-	import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
-	import { HeaderTypes, docHeaders } from "../../utils/stores";
-	import { IdType } from "../../utils/ElementFetcher";
+	import { docHeaders } from "../../utils/stores";
 	import HoverMenu from "../HoverMenu.svelte";
 	import Icons, { icons } from "../Icons.svelte";
 
+	import {
+		InputEnum,
+		IdType,
+		HeaderTypes,
+		type FieldType,
+		type HeaderTypeKeys,
+		type FieldInputKeys,
+	} from "../../utils/types";
+
 	export let changingType = false;
-	export let menuTarget;
-	export let field;
+	export let menuTarget: HTMLElement;
+	export let field: FieldType;
 
-	export let inspect;
-	export let deleteField;
+	export let inspect: () => void;
+	export let deleteField: () => void;
 
-	export let iconName;
-	export let updateIcon;
+	export let updateIcon: (type: HeaderTypeKeys | FieldInputKeys) => void;
 
 	let typeMenu;
 
-	const changeFieldType = (type) => {
+	const changeFieldType = (type: HeaderTypeKeys | FieldInputKeys) => {
 		field.type = type;
 		updateIcon(type);
 
 		changingType = false;
 	};
 
-	const selectHead = (type: HeaderTypes) => {
-		let header: HTMLMetaElement;
+	const selectHead = (type: HeaderTypeKeys) => {
+		let header: HTMLMetaElement | null;
 		let path: string;
 		switch (type) {
 			case HeaderTypes.Title:
@@ -43,8 +49,8 @@
 				path = "image";
 				break;
 		}
-		field.value = header.content;
-		field.path = [{ type: IdType.HEAD, value: path }];
+		if (header) field.value = header.content;
+		field.path = [{ type: IdType.HEAD, value: path, index: 0 }];
 		field.type = type;
 
 		updateIcon(type);

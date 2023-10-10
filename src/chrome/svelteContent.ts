@@ -5,7 +5,8 @@ import SvelteParent from "../components/SvelteParent.svelte";
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	let extensionId = chrome.runtime.id;
 	if (message.action === "popup") {
-		if (!document.getElementById(`${extensionId}-SvelteParent`)) {
+		const svelteParent = document.getElementById(`${extensionId}-SvelteParent`);
+		if (!svelteParent) {
 			const svelteParent = document.createElement("div");
 
 			svelteParent.id = `${extensionId}-SvelteParent`;
@@ -25,15 +26,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			document.body.appendChild(svelteParent);
 		} else {
 			console.log("popup already exists");
-			const svelteParent = document.getElementById(
-				`${extensionId}-SvelteParent`,
-			);
+
 			svelteParent.style.display = "block";
 			svelteParent.style.pointerEvents = "all";
 		}
 		sendResponse({ success: true });
 	} else if (message.action === "closeExtension") {
 		const parent = document.getElementById(`${extensionId}-SvelteParent`);
-		parent.remove();
+		if (parent) parent.remove();
 	}
 });

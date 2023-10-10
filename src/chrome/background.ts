@@ -2,7 +2,11 @@ import { fetchDocument } from "../utils/ElementFetcher";
 
 chrome.action.onClicked.addListener((tab) => {
 	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-		chrome.tabs.sendMessage(tabs[0].id, { action: "popup" }, (response) => {});
+		chrome.tabs.sendMessage(
+			tabs[0].id ?? 0,
+			{ action: "popup" },
+			(response) => {},
+		);
 	});
 });
 
@@ -15,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		// use BlobReader object to read Blob data
 		const reader = new FileReader();
 		reader.onload = () => {
-			const buffer = reader.result;
+			const buffer = reader.result as ArrayBufferLike;
 			const blobUrl = `data:${blob.type};base64,${btoa(
 				new Uint8Array(buffer).reduce(
 					(data, byte) => data + String.fromCharCode(byte),
@@ -38,10 +42,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		reader.readAsArrayBuffer(blob);
 		return;
 	} else if (request.action === "closeExtension") {
-		console.log("background x")
+		console.log("background x");
 		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 			chrome.tabs.sendMessage(
-				tabs[0].id,
+				tabs[0].id ?? 0,
 				{ action: "closeExtension" },
 				(response) => {
 					sendResponse(response);
@@ -49,28 +53,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			);
 		});
 		return;
-	} else if (request.action === "fetchDocument"){
+	} else if (request.action === "fetchDocument") {
 		chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-			FetchDocument(tabs[0].url)
-			sendResponse("collecting");
+			if (tabs[0].url) {
+				FetchDocument(tabs[0].url);
+				sendResponse("collecting");
+			} else {
+				sendResponse("no url");
+			}
 		});
 	}
 });
 
-const FetchDocument = async (url) => {
-	console.log("calling fetcher from bg: ", url)
-	const docText = await fetchDocument(url)
+const FetchDocument = async (url: string) => {
+	console.log("calling fetcher from bg: ", url);
+	const docText = await fetchDocument(url);
 
 	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 		chrome.tabs.sendMessage(
-			tabs[0].id,
+			tabs[0].id ?? 0,
 			{
 				action: "documentFetched",
 				data: docText,
 			},
 			(response) => {
-				console.log(response)
+				console.log(response);
 			},
 		);
 	});
-}
+};

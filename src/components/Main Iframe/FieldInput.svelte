@@ -1,13 +1,13 @@
 <script lang="ts">
 	import sanitizeString from "../../utils/SanitizeString";
-	import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
 	import DatePicker from "../DatePicker.svelte";
 	import { onMount, tick } from "svelte";
 	import TextInput from "../TextInput.svelte";
+	import { InputEnum, type FieldType } from "../../utils/types";
 
-	export let field;
+	export let field: FieldType;
 	export let valueFocus: boolean = false;
-	export let menuTarget: HTMLElement = null;
+	export let menuTarget: HTMLElement | null = null;
 
 	let errorMessage = "";
 	let validInput = true;

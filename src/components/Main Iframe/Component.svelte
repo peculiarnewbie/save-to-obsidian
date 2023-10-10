@@ -2,21 +2,28 @@
 	import Form from "./Form.svelte";
 	import back from "../../../public/Back.svg";
 	import "../../app.css";
-	import { InputEnum } from "../../utils/FieldInputType";
 	import { storeMessaging, Actions } from "../../utils/stores";
+
+	import type {
+		FieldType,
+		FieldsType,
+		FormType,
+		AllDataType,
+	} from "../../utils/types";
+	import { InputEnum } from "../../utils/types";
 
 	let root: HTMLElement;
 	let loading = true;
-	let fields = [{ key: "", value: "", type: "" }];
+	let fields = [] as FieldsType;
 	let forms: string[] = [];
-	let allData = {};
+	let allData = {} as AllDataType;
 	let isEditing = false;
-	let currentForm: {
-		name: string;
-		directory: string;
-		fields: any;
-		fromBackground: boolean;
-	} = { name: "", directory: "", fields: fields, fromBackground: false };
+	let currentForm = {
+		name: "",
+		directory: "",
+		fields: fields,
+		fromBackground: false,
+	} as FormType;
 
 	let defaultDir = "Obsidian/";
 
@@ -76,9 +83,9 @@
 		openForm = true;
 	};
 
-	const deleteForm = async (form) => {
-		await chrome.storage.local.remove([`form_${form}`]);
-		let newForms = forms.filter((item) => item != form);
+	const deleteForm = async (formName: string) => {
+		await chrome.storage.local.remove([`form_${formName}`]);
+		let newForms = forms.filter((item) => item != formName);
 		await chrome.storage.local.set({ forms: newForms });
 		forms = newForms;
 	};

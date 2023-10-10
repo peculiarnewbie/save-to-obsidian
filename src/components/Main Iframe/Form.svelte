@@ -11,12 +11,14 @@
 		pauseScrolling,
 	} from "../../utils/stores";
 	import TextInput from "../TextInput.svelte";
+	import type { FieldsType, FormType } from "../../utils/types";
+	import type { EventHandler } from "svelte/elements";
 
 	export let root: HTMLElement;
-	export let currentForm;
-	export let isEditing;
-	let fields;
-	let prevName;
+	export let currentForm: FormType;
+	export let isEditing: boolean;
+	let fields: FieldsType;
+	let prevName: string;
 	let hoveredElement;
 	let isLoading = false;
 	$: {
@@ -30,8 +32,8 @@
 		})
 		.join("<br>")}<br>---<br>`;
 
-	export let forms;
-	export let refresh;
+	export let forms: string[];
+	export let refresh: () => Promise<void>;
 	let selectionIndex: number;
 
 	$: directory = currentForm.directory;
@@ -46,7 +48,7 @@
 		currentForm.directory = "Obsidian/";
 	}
 
-	const waitATick = async (func) => {
+	const waitATick = async (func: () => void) => {
 		await tick();
 		func();
 	};
@@ -64,7 +66,7 @@
 				break;
 			case Actions.ValuesCollected:
 				if (data.values) {
-					data.values.forEach((value, index) => {
+					data.values.forEach((value: string, index: number) => {
 						currentForm.fields[index].value = value;
 					});
 				}
@@ -102,7 +104,7 @@
 
 	const addField = () => {
 		let index = currentForm.fields.length;
-		while (currentForm.fields.some((e) => e.key == `property ${index}`)) {
+		while (currentForm.fields.some((item) => item.key == `property ${index}`)) {
 			index++;
 		}
 		currentForm.fields = [
@@ -111,13 +113,13 @@
 		];
 	};
 
-	function deleteField(event) {
+	function deleteField(event: { detail: any }) {
 		let temps = [...currentForm.fields];
 		temps.splice(event.detail.index, 1);
 		currentForm.fields = temps;
 	}
 
-	const inspect = async (index) => {
+	const inspect = async (index: number) => {
 		selectionIndex = index;
 		storeMessaging.set({ action: Actions.StartInspect });
 	};
@@ -166,7 +168,7 @@
 		}
 	};
 
-	const reOrderField = (index: number, offset) => {
+	const reOrderField = (index: number, offset: number) => {
 		// console.log("reorder: ", index, offset)
 		fieldReordering.set(true);
 		let temp = currentForm.fields;

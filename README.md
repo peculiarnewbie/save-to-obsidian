@@ -9,6 +9,8 @@ A chrome extension to precisely get data from webpages. created with the intent 
 3. Open the Chrome Extension page and enable developer mode
 4. Choose load unpacked and select the unzipped folder that contains the manifest file
 
+Or you can build from source. But note that on the generated manifest, you'll need to delete the css portion of the content scripts or it might affect your pages' styles
+
 ## Usage
 
 1. Open the webpage you'd like to clip
@@ -39,7 +41,7 @@ You can then do all kinds of things with the file. For example I use Obsidian an
 
 - add every obsidian property type (number, tags, checkbox, and tags)
 - better date selection experience
-- Integrate with Obsidian using Obsidian local rest api extension
+- Integrate with Obsidian using Obsidian local rest api plugin
 - lots more options for the properties, such as default regex, inline option, etc
 - better detailed selection experience
 - header data selection system

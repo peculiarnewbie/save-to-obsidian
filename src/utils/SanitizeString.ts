@@ -1,4 +1,4 @@
-export default function sanitizeString(str) {
+export default function sanitizeString(str: string) {
 	if (!str) return "";
 	return str.replace(/[<>:"/\\|?*]+/g, function (char) {
 		switch (char) {

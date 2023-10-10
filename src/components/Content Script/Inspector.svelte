@@ -1,24 +1,34 @@
 <script lang="ts">
 	import DetailedSelector from "./DetailedSelector.svelte";
-	import { storeMessaging, Actions, currentSelectedElement, docHeaders, HeaderTypes } from "../../utils/stores";
-	import { getElementValueFromPath, IdType, collectValues } from "../../utils/ElementFetcher";
+	import {
+		storeMessaging,
+		Actions,
+		currentSelectedElement,
+		docHeaders,
+	} from "../../utils/stores";
+	import {
+		getElementValueFromPath,
+		collectValues,
+	} from "../../utils/ElementFetcher";
+	import { IdType, type FieldsType, type PathType } from "../../utils/types";
 	import { onDestroy, onMount, tick } from "svelte";
 	import { get } from "svelte/store";
 
 	export let canvas: HTMLCanvasElement;
-	export let extensionId;
-	let selectedElement;
+	export let extensionId: string;
+	let selectedElement: HTMLElement;
 
-	let ctx: CanvasRenderingContext2D;
+	let ctx: CanvasRenderingContext2D | null;
 
-	let detailIframe:HTMLIFrameElement;
+	let detailIframe: HTMLIFrameElement;
 	let hoverSelecting = true;
 
 	const inspect = async () => {
 		let click_count = 0;
 		hoverSelecting = true;
+		const iframe = document.getElementById(`${extensionId}-iframe`);
 
-		document.getElementById(`${extensionId}-iframe`).style.display = "none";
+		if (iframe) iframe.style.display = "none";
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
@@ -31,11 +41,11 @@
 		document.addEventListener("mouseover", HoverElement, true);
 		window.addEventListener("mouseout", ClearCanvas, true);
 
-		function InspectElement(event) {
+		function InspectElement(event: MouseEvent) {
 			click_count++;
 			event.preventDefault();
 			event.stopPropagation();
-			const element = event.target;
+			const element = event.target as HTMLElement;
 			selectedElement = element;
 
 			if (click_count == 1) {
@@ -43,26 +53,25 @@
 				document.removeEventListener("mouseover", HoverElement, true);
 				window.removeEventListener("mouseout", ClearCanvas, true);
 				currentSelectedElement.set(selectedElement);
-				storeMessaging.set({action: Actions.FinishHover})
+				storeMessaging.set({ action: Actions.FinishHover });
 				hoverSelecting = false;
 			}
 		}
 
-		function HoverElement(e) {
-			highlightElement(e.target)
+		function HoverElement(e: MouseEvent) {
+			highlightElement(e.target as HTMLElement);
 		}
-
 	};
 
-	const generatePath = (selectedElement) => {
-		const CheckForDuplicateIds = (id) => {
-			let elements ;
-			try{
+	const generatePath = (selectedElement: HTMLElement) => {
+		const CheckForDuplicateIds = (id: string) => {
+			let elements;
+			try {
 				elements = document.querySelectorAll("#" + id);
 			} catch (e) {
 				return false;
 			}
-			
+
 			if (elements.length == 1) {
 				return true;
 			} else {
@@ -70,7 +79,10 @@
 			}
 		};
 
-		const searchElements = (elements, element) => {
+		const searchElements = (
+			elements: HTMLCollectionOf<Element>,
+			element: HTMLElement,
+		) => {
 			for (let i = 0; i < elements.length; i++) {
 				if (elements[i] == element) {
 					return { found: true, index: i };
@@ -80,7 +92,7 @@
 			return { found: false, index: 0 };
 		};
 
-		const validateClass = (className) => {
+		const validateClass = (className: string) => {
 			if (className.includes(" ")) {
 				return false;
 			} else if (className.length > 40) {
@@ -97,16 +109,16 @@
 
 		// console.log("generating path for: ", selectedElement);
 
-		let path = [];
+		let path: PathType[] = [];
 		let currentElement = selectedElement;
 		let searchResult = { found: false, index: 0 };
 
-		if(currentElement.tagName == "META"){
-			let type = currentElement.getAttribute('property');
-			type.splice(0, 3);
-			path.push({type: IdType.HEAD, value: type, index: 0});
+		if (currentElement.tagName == "META") {
+			let type = currentElement.getAttribute("property") ?? "";
+			// if (type) type.splice(0, 3);
+			path.push({ type: IdType.HEAD, value: type, index: 0 });
 			return path;
-		} 
+		}
 
 		while (currentElement != document.body) {
 			// console.log("while generating: currentElement: ", currentElement);
@@ -136,26 +148,26 @@
 				}
 			}
 
-			path.push({
-				type: IdType.INDEX,
-				value: "",
-				index: Array.from(currentElement.parentElement.children).indexOf(
-					currentElement,
-				),
-			});
-			currentElement = currentElement.parentElement;
+			if (currentElement.parentElement) {
+				path.push({
+					type: IdType.INDEX,
+					value: "",
+					index: Array.from(currentElement.parentElement.children).indexOf(
+						currentElement,
+					),
+				});
+				currentElement = currentElement.parentElement;
+			}
 			continue;
 		}
 
 		return path.reverse();
 	};
-	
 
+	function highlightElement(hoveredElement: HTMLElement) {
+		if (!ctx || !hoveredElement) return;
 
-	function highlightElement(hoveredElement) {
-		if(!ctx || !hoveredElement) return;
-
-		ClearCanvas()
+		ClearCanvas();
 		ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
 		const hoveredDom = hoveredElement.getBoundingClientRect();
 		// ctx.fillRect(100, 100, 200, 200);
@@ -168,22 +180,25 @@
 	}
 
 	function ClearCanvas() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
 
 	const unsub1 = storeMessaging.subscribe((message) => {
 		const action = message.action;
-		const data = message.data
-		switch(action){
+		const data = message.data;
+		switch (action) {
 			case Actions.StartInspect:
-				storeMessaging.set({action: Actions.ClosePopup})
+				storeMessaging.set({ action: Actions.ClosePopup });
 				inspect();
 				break;
 			case Actions.FinishSelection:
 				let treePath = generatePath($currentSelectedElement);
-				console.log(treePath, document)
+				console.log(treePath, document);
 				let value = getElementValueFromPath(treePath, document);
-				storeMessaging.set({action: Actions.ElementSelected, data: {path: treePath, value: value}})
+				storeMessaging.set({
+					action: Actions.ElementSelected,
+					data: { path: treePath, value: value },
+				});
 				hoverSelecting = true;
 				ClearCanvas();
 				break;
@@ -193,83 +208,88 @@
 			default:
 				break;
 		}
-	})
+	});
 
-	$:{highlightElement($currentSelectedElement)}
-
-	const unsubscribe = () => {
-		unsub1()
+	$: {
+		highlightElement($currentSelectedElement);
 	}
 
-	const CollectValues = async (fields, fromBackground:boolean) => {
-		let values = []
-		
-		if(!fromBackground){
+	const unsubscribe = () => {
+		unsub1();
+	};
+
+	const CollectValues = async (fields: FieldsType, fromBackground: boolean) => {
+		let values = [];
+
+		if (!fromBackground) {
 			values = collectValues(fields, document);
-			storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
+			storeMessaging.set({
+				action: Actions.ValuesCollected,
+				data: { values: values },
+			});
 			return;
 		}
 
-		let headDoc;
+		let headDoc: Document;
 
-		chrome.runtime.sendMessage(
-			{
-				action: "fetchDocument"
-			},
-		);
+		chrome.runtime.sendMessage({
+			action: "fetchDocument",
+		});
 
-		const eventPromise = new Promise((resolve) => {
+		const eventPromise = new Promise<Document>((resolve) => {
 			chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-				if(message.action == "documentFetched"){
-					console.log("fetched doc: ", message.data)
-					const url = message.data
+				if (message.action == "documentFetched") {
+					console.log("fetched doc: ", message.data);
+					const url = message.data;
 					let parser = new DOMParser();
-					const doc = parser.parseFromString(url, 'text/html')
+					const doc = parser.parseFromString(url, "text/html");
 					resolve(doc);
 				}
-			})
+			});
 		});
 
 		// wait for background to fetch the updated document
 		headDoc = await eventPromise;
 
-		if(headDoc) values = collectValues(fields, document, headDoc)
-		else values = collectValues(fields, document)
+		if (headDoc) values = collectValues(fields, document, headDoc);
+		else values = collectValues(fields, document);
 
-		storeMessaging.set({action: Actions.ValuesCollected, data:{values: values}})
+		storeMessaging.set({
+			action: Actions.ValuesCollected,
+			data: { values: values },
+		});
 
 		// console.log("collect value via url result: ", values)
 		// let values = await collectValues(fields, document)
-		
-	}
-
-	
+	};
 
 	onMount(() => {
 		detailIframe.onload = (ev) => {
-            // detailIframe.style.all = "initial";
+			// detailIframe.style.all = "initial";
 
-            let link = document.createElement('link');
-            link.rel = 'stylesheet';
-			
-            if(!import.meta.env.DEV) link.href = chrome.runtime.getURL('assets/svelteContent.css');
-            else link.href = "src/app.css"
+			let link = document.createElement("link");
+			link.rel = "stylesheet";
 
-            detailIframe.contentDocument.querySelector('head').appendChild(link)
+			if (!import.meta.env.DEV)
+				link.href = chrome.runtime.getURL("assets/svelteContent.css");
+			else link.href = "src/app.css";
 
-            new DetailedSelector({
-                target: detailIframe.contentWindow.document.body,
-				props: {extensionId:{extensionId}}
-            });
-        }
+			const headElement = detailIframe.contentDocument?.querySelector("head");
+			if (headElement) headElement.appendChild(link);
 
+			if (detailIframe.contentWindow) {
+				new DetailedSelector({
+					target: detailIframe.contentWindow.document.body,
+					//@ts-ignore
+					props: { extensionId: { extensionId } },
+				});
+			}
+		};
+	});
 
-	})
-
-	let detailIframeStyle = ``
-	$:{
-		detailIframeStyle =
-		`position: fixed;
+	let detailIframeStyle = ``;
+	$: {
+		detailIframeStyle = `position: fixed;
 		top: 10px;
 		right: 10px;
 		width: 260px;
@@ -279,17 +299,19 @@
 		pointer-events: ${hoverSelecting ? "none" : "all"};
 		z-index: 9999;
 		background-color: transparent;
-		border: none;`
+		border: none;`;
 	}
 
-
-
-	onDestroy(unsubscribe)
+	onDestroy(unsubscribe);
 </script>
 
 <!-- {#if selectedElement} -->
-<iframe title="DetailedIframe" bind:this={detailIframe} style={`${detailIframeStyle}`}></iframe>
-	<!-- <div>
+<iframe
+	title="DetailedIframe"
+	bind:this={detailIframe}
+	style={`${detailIframeStyle}`}
+></iframe>
+<!-- <div>
 		<DetailedSelector
 			{extensionId}
 			bind:selectedElement

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Icons, { icons } from "./Icons.svelte";
+	import Icons, { icons, type IconstType } from "./Icons.svelte";
 	import StickyModals from "./StickyModals.svelte";
 
-	export let iconName;
-	export let buttonText;
-	let menuTarget;
+	export let iconName: IconstType;
+	export let buttonText: string;
+	let menuTarget: HTMLElement | null;
 	let isHover = false;
 	let isOpen = false;
-	let openTimeout;
-	let closeTimeout;
+	let openTimeout: any;
+	let closeTimeout: any;
 
 	const openPropertyMenu = async () => {
 		// console.log("enter");

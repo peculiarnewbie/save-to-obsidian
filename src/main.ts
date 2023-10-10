@@ -9,16 +9,16 @@ const root = document.createElement("div");
 
 new SvelteParent({
 	target: root,
-	props:{root: root}
+	props: { root: root },
 });
 
 new TestButtons({
-	target: root
-})
+	target: root,
+});
 
 new TestComponent({
-	target: root
-})
+	target: root,
+});
 
 // root.style.position = "fixed";
 // root.style.top = "10px";
@@ -29,5 +29,4 @@ new TestComponent({
 // root.style.zIndex = "9998";
 // new Component({target: root, props: { root: target}});
 
-
-target.appendChild(root);
+target?.appendChild(root);

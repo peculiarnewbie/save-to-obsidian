@@ -1,25 +1,31 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy, onMount } from "svelte";
-	import { InputEnum, type FieldInputKeys } from "../../utils/FieldInputType";
+	import {
+		InputEnum,
+		type FieldInputKeys,
+		HeaderTypes,
+		type HeaderTypeKeys,
+		type FieldType,
+	} from "../../utils/types";
 	import FieldInput from "./FieldInput.svelte";
 
-	import { docHeaders, HeaderTypes, fieldReordering } from "../../utils/stores";
+	import { docHeaders, fieldReordering } from "../../utils/stores";
 	import { get } from "svelte/store";
 	import FieldMenu from "./FieldMenu.svelte";
 	import ReorderableList from "../ReorderableList.svelte";
-	import Icons, { icons } from "../Icons.svelte";
+	import Icons, { icons, type IconstType } from "../Icons.svelte";
 
 	export let index = 0;
-	export let length;
-	export let field;
+	export let length: number;
+	export let field: FieldType;
 
-	export let parentInspect;
+	export let parentInspect: (index: number) => void;
 	export let isEditing = false;
 
-	export let reOrderField;
+	export let reOrderField: (index: number, offset: number) => void;
 
 	let changingType = false;
-	export let typeButton: HTMLElement = null;
+	export let typeButton: HTMLElement | null = null;
 	let selectingHead = false;
 	let menuTarget: HTMLElement;
 
@@ -32,11 +38,11 @@
 	// for floating menu
 
 	let xOffset = 0;
-	let iconName: string;
+	let iconName: IconstType;
 
 	$: {
 		if (changingType) {
-			xOffset = typeButton.getBoundingClientRect().left;
+			if (typeButton) xOffset = typeButton.getBoundingClientRect().left;
 		}
 		// else{
 		// 	$mainIframeDoc.removeEventListener("click", listenToOutsideClicks)
@@ -60,7 +66,7 @@
 			(e.target as HTMLElement).blur();
 			return;
 		}
-		if (changingType) typeButton.blur();
+		if (changingType && typeButton) typeButton.blur();
 		changingType = !changingType;
 	};
 
@@ -77,7 +83,7 @@
 		fieldReordering.set(false);
 	};
 
-	const updateIcon = (type) => {
+	const updateIcon = (type: FieldInputKeys | HeaderTypeKeys) => {
 		switch (type) {
 			case InputEnum.Text:
 				iconName = icons.text;
@@ -188,7 +194,6 @@
 									bind:field
 									inspect={selectElement}
 									{deleteField}
-									bind:iconName
 									{updateIcon}
 								/>
 							{/if}

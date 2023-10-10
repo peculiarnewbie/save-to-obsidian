@@ -12,10 +12,12 @@
 		text: "text",
 		title: "title",
 	} as const;
+
+	export type IconstType = (typeof icons)[keyof typeof icons];
 </script>
 
 <script lang="ts">
-	export let iconName;
+	export let iconName: IconstType;
 	export let width = 24;
 	export let height = 24;
 </script>

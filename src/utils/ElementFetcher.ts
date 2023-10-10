@@ -1,13 +1,13 @@
-export const IdType = {
-	ID: "id",
-	CLASS: "class",
-	INDEX: "index",
-	HEAD: "head",
-} as const;
+import {
+	IdType,
+	type FieldsType,
+	type PathType,
+	type HeaderTypeKeys,
+} from "./types";
 
 /** collect values from current doc on the dom. If headDoc is provided, it will fetch the meta elements from headDoc */
 export const collectValues = (
-	fields: [{ path: [{ type: string; value: string }]; value: string }],
+	fields: FieldsType,
 	doc: Document,
 	headDoc?: Document,
 ) => {
@@ -17,10 +17,12 @@ export const collectValues = (
 
 	fields.forEach((field, index) => {
 		// console.log("fetching field: ", field)
-		let value;
+		let value: string;
 		if (field.path) {
 			if (field.path[0].type == IdType.HEAD && headDoc)
+				//@ts-ignore
 				value = getElementValueFromPath(field.path, headDoc);
+			//@ts-ignore
 			else value = getElementValueFromPath(field.path, doc);
 		} else value = field.value;
 
@@ -49,8 +51,11 @@ export const fetchDocument = async (url: string) => {
 	return resText;
 };
 
-export const getElementValueFromPath = (path, document) => {
-	const getHeaderElement = (type) => {
+export const getElementValueFromPath = (
+	path: PathType[],
+	document: Document,
+) => {
+	const getHeaderElement = (type: string) => {
 		switch (type) {
 			case "title":
 				return document.querySelector(
@@ -67,19 +72,27 @@ export const getElementValueFromPath = (path, document) => {
 		}
 	};
 
-	const determineElementValue = (element) => {
+	const determineElementValue = (
+		element: HTMLElement | HTMLMetaElement | HTMLImageElement,
+	) => {
 		if (!element) return;
 		console.log("determining element: ", element);
-		if (element.nodeName == "META") {
+		if (element.nodeName == "META" && element instanceof HTMLMetaElement) {
 			return element.content;
-		} else if (element.nodeName == "IMG") {
+		} else if (
+			element.nodeName == "IMG" &&
+			element instanceof HTMLImageElement
+		) {
 			return element.src;
 		} else {
 			return element.innerText;
 		}
 	};
 
-	const getElementFromCurrentPath = (currentPath, currentElement) => {
+	const getElementFromCurrentPath = (
+		currentPath: PathType,
+		currentElement: Element,
+	) => {
 		if (!currentElement) return;
 		switch (currentPath.type) {
 			case IdType.ID:
@@ -101,12 +114,15 @@ export const getElementValueFromPath = (path, document) => {
 		return "";
 	}
 
-	let element;
+	let element: Element | undefined;
 	element = getElementFromCurrentPath(path[0], document.body);
 
 	for (let i = 1; i < path.length; i++) {
-		element = getElementFromCurrentPath(path[i], element);
+		if (element) {
+			element = getElementFromCurrentPath(path[i], element);
+		}
 	}
 
+	//@ts-ignore
 	return determineElementValue(element);
 };
