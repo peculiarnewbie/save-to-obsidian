@@ -4,6 +4,7 @@ A chrome extension to precisely get data from webpages. created with the intent 
 
 ## Installation
 
+I've submitted the extension to the chrome web store and it's currently being reviewed. In the meantime you can do the following steps:
 1. Download the zip file from releases
 2. Unzip the extension
 3. Open the Chrome Extension page and enable developer mode
