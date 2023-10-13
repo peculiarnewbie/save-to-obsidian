@@ -1,7 +1,8 @@
 {
-	"name": "Precise MD Clipper",
+	"name": "Save to Obsidian",
 	"description": "Early WIP Web Clipper intended for use with Obsidian.md",
-	"version": "1.0",
+	"version": "0.1",
+	"icons": { "128": "public/Group 2.png" },
 	"manifest_version": 3,
 	"background": {
 		"service_worker": "src/chrome/background.ts"
@@ -20,5 +21,5 @@
 			"matches": ["<all_urls>"]
 		}
 	],
-	"permissions": ["activeTab", "downloads", "scripting", "storage"]
+	"permissions": ["activeTab", "downloads", "storage"]
 }
