@@ -5,7 +5,10 @@ An unnoficial chrome extension to precisely get data from webpages. created with
 
 ## Installation
 
-I've submitted the extension to the chrome web store and it's currently being reviewed. In the meantime you can do the following steps:
+You can download the extension through the Chrome Webstore here:
+https://chrome.google.com/webstore/detail/save-to-obsidian/oadbfjklomnnpchhbgchohhejkiibifm
+
+or you can:
 1. Download the zip file from releases
 2. Unzip the extension
 3. Open the Chrome Extension page and enable developer mode
