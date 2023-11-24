@@ -62,6 +62,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				sendResponse("no url");
 			}
 		});
+	} else if (request.action === "exportForms") {
+		console.log("exporting", request.data);
+		let data = request.data;
+		const blob = new Blob([data], { type: "text/json" });
+		const reader = new FileReader();
+		reader.onload = () => {
+			const buffer = reader.result as ArrayBufferLike;
+			const blobUrl = `data:${blob.type};base64,${btoa(
+				new Uint8Array(buffer).reduce(
+					(data, byte) => data + String.fromCharCode(byte),
+					"",
+				),
+			)}`;
+			chrome.downloads.download(
+				{
+					url: blobUrl,
+					filename: `Save-to-Obsidian forms.json`,
+					saveAs: true,
+					conflictAction: "uniquify",
+				},
+				() => {
+					console.log("exported");
+				},
+			);
+		};
+		sendResponse({ success: true });
+		reader.readAsArrayBuffer(blob);
+		return;
 	}
 });
 

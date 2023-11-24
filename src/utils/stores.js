@@ -28,6 +28,7 @@ export var Actions = {
 	 * data: {path, value}
 	 */
 	ElementSelected: "elementSelected",
+	ExportForms: "exportForms",
 };
 
 /**

@@ -11,6 +11,7 @@
 		AllDataType,
 	} from "../../utils/types";
 	import { InputEnum } from "../../utils/types";
+	import ImportForm from "./components/ImportForm.svelte";
 
 	let root: HTMLElement;
 	let loading = true;
@@ -28,6 +29,7 @@
 	let defaultDir = "Obsidian/";
 
 	let openForm = false;
+	let openSettings = false;
 
 	const closePopup = () => {
 		storeMessaging.set({ action: Actions.Dummy });
@@ -37,7 +39,6 @@
 	const getChromeStorage = async () => {
 		await chrome.storage.local.get(null, async (result) => {
 			allData = result;
-			console.log(result);
 			forms = Object.keys(allData)
 				.filter((item) => item.includes("form_"))
 				.map((item) => item.replace("form_", ""));
@@ -90,6 +91,21 @@
 		forms = newForms;
 	};
 
+	const exportForms = () => {
+		console.log("ello", allData);
+		chrome.runtime.sendMessage({
+			action: Actions.ExportForms,
+			data: JSON.stringify(allData),
+		});
+	};
+
+	const importForms = async (input: string) => {
+		const data = JSON.parse(input);
+		await chrome.storage.local.set(data);
+		await getChromeStorage();
+		openSettings = false;
+	};
+
 	const promise = getChromeStorage();
 </script>
 
@@ -99,11 +115,25 @@
 >
 	<div id="Header" class="ext flex justify-between bg-[#363636]">
 		{#if !openForm}
-			<div
-				id="ExtensionTitle"
-				class="ext text-2xl text-white font-bold my-3 pl-3 font-sans"
-			>
-				Markdown Clipper
+			<div class="flex pl-2">
+				{#if openSettings}
+					<button
+						class="flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] items-center cursor-pointer"
+						on:click={() => (openSettings = false)}
+					>
+						{#if import.meta.env.DEV}
+							<img src={back} alt="back" width="20px" />
+						{:else}
+							<img src={chrome.runtime.getURL(back)} alt="back" width="20px" />
+						{/if}
+					</button>
+				{/if}
+				<div
+					id="ExtensionTitle"
+					class="ext text-2xl text-white font-bold my-3 pl-1 font-sans"
+				>
+					Markdown Clipper
+				</div>
 			</div>
 		{:else}
 			<div class="flex pl-2">
@@ -111,6 +141,7 @@
 					class="flex p-2 pb-1 rounded-md bg-transparent hover:bg-[#363636] items-center cursor-pointer"
 					on:click={() => {
 						openForm = false;
+						openSettings = false;
 						currentForm = {
 							name: "",
 							directory: "",
@@ -171,6 +202,12 @@
 						bind:forms
 						refresh={getChromeStorage}
 					/>
+				{:else if openSettings}
+					<div class="p-3 flex flex-col gap-2 w-fit">
+						<button on:click={exportForms} class="btn w-44">Export Forms</button
+						>
+						<ImportForm {importForms} />
+					</div>
 				{:else}
 					<div class="p-3">
 						<button class="btn" on:click={() => addForm()}>Add Form</button>
@@ -194,6 +231,9 @@
 								>
 							</div>
 						{/each}
+						<button class="btn mt-4" on:click={() => (openSettings = true)}>
+							Settings
+						</button>
 					</div>
 				{/if}
 			{/await}
