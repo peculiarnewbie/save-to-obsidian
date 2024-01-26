@@ -4,6 +4,7 @@ import type { PlasmoCSConfig } from "plasmo";
 import { CountButton } from "~features/count-button";
 import CustomIframe from "~features/CustomIframe";
 import MainFrameContainer from "~features/MainFrameContainer";
+import OverlayParent from "~features/OverlayParent";
 
 export const config: PlasmoCSConfig = {
 	matches: ["https://*/*"],
@@ -16,14 +17,7 @@ export const getStyle = () => {
 };
 
 const PlasmoOverlay = () => {
-	return (
-		<div className="plasmo-appearance-none plasmo-z-40 plasmo-flex plasmo-fixed plasmo-top-32 plasmo-right-8">
-			<button className=" p-2 plasmo-bg-white">fuck</button>
-			<CustomIframe>
-				<MainFrameContainer />
-			</CustomIframe>
-		</div>
-	);
+	return <OverlayParent />;
 };
 
 const IframeContent = () => {

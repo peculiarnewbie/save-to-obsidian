@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
-import { useMessage } from "@plasmohq/messaging/hook";
 
 const MainFrameContainer = () => {
 	const [isActive, setIsActive] = useState(false);
-	const [message, setMessage] = useState("no message yet");
-
-	useMessage<string, string>(async (req, res) => {
-		console.log("got message", req.body);
-
-		setMessage(req.body);
-	});
+	const [message, setMessage] = useState("message here");
 
 	return (
 		<>
