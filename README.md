@@ -1,56 +1,33 @@
-# Save to Obsidian
+This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
 
-An unnoficial chrome extension to precisely get data from webpages. created with the intent to use with [Obsidian.md](https://obsidian.md/) properties. Heavily inspired by [Save to Notion](https://chrome.google.com/webstore/detail/save-to-notion/ldmmifpegigmeammaeckplhnjbbpccmm)
-### This extension is unofficial and is **NOT** affiliated in any way with the Obsidian.md team
+## Getting Started
 
-## Installation
+First, run the development server:
 
-You can download the extension through the Chrome Webstore here:
-https://chrome.google.com/webstore/detail/save-to-obsidian/oadbfjklomnnpchhbgchohhejkiibifm
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
-or you can:
-1. Download the zip file from releases
-2. Unzip the extension
-3. Open the Chrome Extension page and enable developer mode
-4. Choose load unpacked and select the unzipped folder that contains the manifest file
+Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
 
-Or you can build from source. But note that on the generated manifest, you'll need to delete the css portion of the content scripts or it might affect your pages' styles
+You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
 
-## Usage
+For further guidance, [visit our Documentation](https://docs.plasmo.com/)
 
-1. Open the webpage you'd like to clip
-2. Click on the extension button
-3. Select Add Form
-4. Provide form name and download directory (it'll be relative to the 'downloads' directory)
-5. Add properties and select page elements that you would like to save
-6. Save the form
-7. Download the MD file
-8. Open up a different page with equal page structure and open the previously saved form
-9. The properties will be automatically filled with the equivalent element's values
+## Making production build
 
-## Example
+Run the following:
 
-This is an example of a form I made for youtube videos:
+```bash
+pnpm build
+# or
+npm run build
+```
 
-![Youtube Page](./public/example/Youtube%20Page.png)
+This should create a production bundle for your extension, ready to be zipped and published to the stores.
 
-it will result in this md file:
+## Submit to the webstores
 
-![Youtube Result](./public/example/Youtube%20Result.png)
-
-You can then do all kinds of things with the file. For example I use Obsidian and Dataview to have interesting videos, music, and movies that i consumed that day queried in my daily note
-
-![Daily Note](./public/example/Daily%20Note.png)
-
-## Roadmap
-
-- add every obsidian property type (number, tags, checkbox, and tags)
-- better date selection experience
-- Integrate with Obsidian using Obsidian local rest api plugin
-- lots more options for the properties, such as default regex, inline option, etc
-- better detailed selection experience
-- header data selection system
-
-### Extra
-
-don't worry about the env files, it's just an easy way to tell the extension wether it's in dev mode or not
+The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
