@@ -3,11 +3,8 @@ import { sendToBackground, sendToContentScript } from "@plasmohq/messaging";
 
 import "~style.css";
 
-function IndexPopup() {
-	useEffect(() => {
-		sendToContentScript({ name: "open", body: "open" });
-	}, []);
-	return <></>;
-}
+sendToContentScript({ name: "open", body: "open" });
+
+function IndexPopup() {}
 
 export default IndexPopup;

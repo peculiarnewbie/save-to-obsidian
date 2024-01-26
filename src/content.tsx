@@ -7,7 +7,8 @@ import MainFrameContainer from "~features/MainFrameContainer";
 import OverlayParent from "~features/OverlayParent";
 
 export const config: PlasmoCSConfig = {
-	matches: ["https://*/*"],
+	//matches: ["https://*/*"],
+	matches: ["https://www.google.com/*"],
 };
 
 export const getStyle = () => {
