@@ -12,15 +12,13 @@ const CustomIframe = ({ children }: { children: any }) => {
 	}, [contentRef]);
 
 	return (
-		<>
-			<iframe ref={setContentRef}>
-				{mountNode != null && mountNode != undefined ? (
-					createPortal(children, mountNode)
-				) : (
-					<></>
-				)}
-			</iframe>
-		</>
+		<iframe ref={setContentRef} className=" w-[450px] h-[700px]">
+			{mountNode != null && mountNode != undefined ? (
+				createPortal(children, mountNode)
+			) : (
+				<></>
+			)}
+		</iframe>
 	);
 };
 

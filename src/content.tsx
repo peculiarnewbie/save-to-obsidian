@@ -4,7 +4,7 @@ import OverlayParent from "~features/OverlayParent";
 
 export const config: PlasmoCSConfig = {
 	//matches: ["https://*/*"],
-	matches: ["https://www.google.com/*"],
+	matches: ["https://www.google.com/*", "https://www.youtube.com/*"],
 };
 
 export const getStyle = () => {
