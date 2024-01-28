@@ -1,16 +1,20 @@
+import { Views, type ViewsKeys } from "../types";
+
 function Header({
 	closePopup,
 	iframeTitle,
-	backButton,
+	currentView,
+	goBack,
 }: {
 	closePopup: () => void;
 	iframeTitle?: string;
-	backButton?: boolean;
+	currentView: ViewsKeys;
+	goBack: () => void;
 }) {
 	return (
 		<div className=" flex justify-between bg-obsidian-300">
 			<div className="flex text-2xl text-white font-bold items-center">
-				{backButton && <button>back</button>}
+				{currentView != Views.Main && <button>back</button>}
 				<div className=" pl-4">{iframeTitle}</div>
 			</div>
 			<button
