@@ -1,10 +1,4 @@
-import { useEffect } from "react";
-import { sendToBackground, sendToContentScript } from "@plasmohq/messaging";
-
-import "~style.css";
+import { sendToContentScript } from "@plasmohq/messaging";
 
 sendToContentScript({ name: "open", body: "open" });
-
-function IndexPopup() {}
-
-export default IndexPopup;
+setTimeout(() => window.close(), 0);

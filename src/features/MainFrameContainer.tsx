@@ -6,6 +6,7 @@ const MainFrameContainer = () => {
 
 	return (
 		<>
+			<div>nahhahah</div>
 			<div>{message}</div>
 			<button onClick={() => setIsActive(!isActive)}>activate</button>
 			{isActive && <>yo</>}

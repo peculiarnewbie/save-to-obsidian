@@ -1463,6 +1463,13 @@
   resolved "https://registry.yarnpkg.com/@plasmohq/init/-/init-0.7.0.tgz#8705db28c3da7e570e8d6f404a4ca1892268d16c"
   integrity sha512-P75g48dqOGneJ+n0AcqnLE/TYflcaPc3B7h6EopnCBBYUDnCNBMwYmKAkaf5pnhsEB0ybPS6TU1C2DTGfqaW7A==
 
+"@plasmohq/messaging@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@plasmohq/messaging/-/messaging-0.6.1.tgz#ce483215487ba4cb1779da43843b2bc34baf32bb"
+  integrity sha512-/nn1k8SG5z++o/NnZu+byHWcC9MhPLxfmvj+AP3buqMn7uwfYDcYWURLuMW2Knw08HBg+wku2v1Ltt4evN0nzA==
+  dependencies:
+    nanoid "5.0.3"
+
 "@plasmohq/parcel-bundler@0.5.5":
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/@plasmohq/parcel-bundler/-/parcel-bundler-0.5.5.tgz#ff4d4f2463b418c3c259557a55b37d62b970d6e4"
@@ -3866,6 +3873,11 @@ mz@^2.7.0:
     any-promise "^1.0.0"
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
+
+nanoid@5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.0.3.tgz#6c97f53d793a7a1de6a38ebb46f50f95bf9793c7"
+  integrity sha512-I7X2b22cxA4LIHXPSqbBCEQSL+1wv8TuoefejsX4HFWyC6jc5JG7CEaxOltiKjc1M+YCS2YkrZZcj4+dytw9GA==
 
 nanoid@^3.3.7:
   version "3.3.7"

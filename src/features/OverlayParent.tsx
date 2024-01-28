@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMessage } from "@plasmohq/messaging/hook";
 import CustomIframe from "./CustomIframe";
 import MainFrameContainer from "./MainFrameContainer";
@@ -18,7 +18,11 @@ const OverlayParent = () => {
 	if (isActive) {
 		return (
 			<div className="plasmo-appearance-none plasmo-z-40 plasmo-flex plasmo-fixed plasmo-top-32 plasmo-right-8">
-				<button onClick={closePopup} className=" p-2 plasmo-bg-white">
+				<button
+					id="lePlasmoButton"
+					onClick={closePopup}
+					className=" p-2 plasmo-bg-white"
+				>
 					fuck
 				</button>
 				<CustomIframe>
@@ -29,7 +33,7 @@ const OverlayParent = () => {
 	}
 	return (
 		<>
-			<div>hiii</div>
+			<div>hello</div>
 		</>
 	);
 };
