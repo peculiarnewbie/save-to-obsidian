@@ -1,3 +1,5 @@
+import { useViewStore } from "~components/MainFrameContainer";
+
 function TemplateList({ newTemplate }: { newTemplate: () => void }) {
 	return (
 		<div>

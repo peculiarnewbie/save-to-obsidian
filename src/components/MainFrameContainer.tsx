@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import cssText from "data-text:~style.css";
 import Header from "./Header";
 import { Views, type ViewsKeys, type TemplateType } from "../types";
 import TemplateList from "./Template/TemplateList";
 import Template from "./Template/Template";
+
+import { create } from "zustand";
+
+interface ViewState {
+	currentView: ViewsKeys;
+	changeView: (view: ViewsKeys) => void;
+}
+
+export const useViewStore = create<ViewState>()((set) => ({
+	currentView: Views.Main,
+	changeView: (view) => set({ currentView: view }),
+}));
 
 export const getStyle = () => {
 	const style = document.createElement("style");
@@ -13,7 +25,9 @@ export const getStyle = () => {
 
 const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 	const [iframeTitle, setIframeTitle] = useState("Save to Obsidian");
-	const [currentView, setCurrentView] = useState<ViewsKeys>(Views.Main);
+	const { currentView, changeView } = useViewStore();
+
+	const [counter, setCounter] = useState(0);
 
 	const [currentTemplate, setCurrentTemplate] = useState<TemplateType>();
 
@@ -21,8 +35,8 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 		if (currentView == Views.EditTemplate) changeView(Views.Main);
 	};
 
-	const changeView = (view: ViewsKeys) => {
-		setCurrentView(view);
+	const switchView = (view: ViewsKeys) => {
+		//changeView(view);
 		switch (view) {
 			case Views.Main:
 				setIframeTitle("Save to Obsidian");
@@ -40,12 +54,10 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 		changeView(Views.EditTemplate);
 	};
 
-	const MainContent = () => {
-		if (currentView == Views.Main)
-			return <TemplateList newTemplate={newTemplate} />;
-		else if (currentView == Views.EditTemplate)
-			return <Template isEditing={true} />;
-	};
+	//================================================================================================================================for testing, get rid of this
+	useEffect(() => {
+		switchView(currentView);
+	}, [currentView]);
 
 	return (
 		<>
@@ -57,10 +69,30 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 					goBack={goBack}
 				/>
 				<MainContent />
+				<p>{counter}</p>
+				<button onClick={() => setCounter(counter + 1)}>+</button>
 			</div>
 			<BodyStyle />
 		</>
 	);
+};
+
+const MainContent = () => {
+	const { currentView, changeView } = useViewStore();
+
+	const newTemplate = () => {
+		changeView(Views.EditTemplate);
+	};
+
+	//================================================================================================================================for testing, get rid of this
+	useEffect(() => {
+		console.log("reeeeee-render");
+	}, [currentView]);
+
+	if (currentView == Views.Main)
+		return <TemplateList newTemplate={newTemplate} />;
+	else if (currentView == Views.EditTemplate)
+		return <Template isEditing={true} />;
 };
 
 const BodyStyle = () => {
