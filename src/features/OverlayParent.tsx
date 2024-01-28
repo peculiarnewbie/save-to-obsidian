@@ -8,7 +8,7 @@ const OverlayParent = () => {
 
 	useMessage<string, string>(async (req, res) => {
 		console.log("got message", req.body);
-		if (req.body == "open") setIsActive(true);
+		if (req.body == "open") setIsActive(!isActive);
 	});
 
 	const closePopup = () => {
@@ -18,24 +18,13 @@ const OverlayParent = () => {
 	if (isActive) {
 		return (
 			<div className="plasmo-appearance-none plasmo-z-40 plasmo-flex plasmo-fixed plasmo-top-32 plasmo-right-8">
-				<button
-					id="lePlasmoButton"
-					onClick={closePopup}
-					className=" p-2 plasmo-bg-white"
-				>
-					fuck
-				</button>
 				<CustomIframe>
-					<MainFrameContainer />
+					<MainFrameContainer closePopup={closePopup} />
 				</CustomIframe>
 			</div>
 		);
 	}
-	return (
-		<>
-			<div>hello</div>
-		</>
-	);
+	return <></>;
 };
 
 export default OverlayParent;
