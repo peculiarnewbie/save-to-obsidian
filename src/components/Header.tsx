@@ -14,7 +14,9 @@ function Header({
 	return (
 		<div className=" flex justify-between bg-obsidian-300">
 			<div className="flex text-2xl text-white font-bold items-center">
-				{currentView != Views.Main && <button>back</button>}
+				{currentView != Views.Main && (
+					<button onClick={goBack}>back</button>
+				)}
 				<div className=" pl-4">{iframeTitle}</div>
 			</div>
 			<button

@@ -47,7 +47,7 @@ export type PageElement = {
 	header?: boolean;
 };
 
-export type Template = {
+export type TemplateType = {
 	title: string;
 	directory: string;
 	fields: Field[];

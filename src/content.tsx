@@ -1,6 +1,6 @@
 import cssText from "data-text:~style.css";
 import type { PlasmoCSConfig } from "plasmo";
-import OverlayParent from "~features/OverlayParent";
+import OverlayParent from "./components/IframeWrapper/OverlayParent";
 
 export const config: PlasmoCSConfig = {
 	//matches: ["https://*/*"],

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMessage } from "@plasmohq/messaging/hook";
 import CustomIframe from "./CustomIframe";
-import MainFrameContainer from "./MainFrameContainer";
+import MainFrameContainer from "../MainFrameContainer";
 
 const OverlayParent = () => {
 	const [isActive, setIsActive] = useState(false);
