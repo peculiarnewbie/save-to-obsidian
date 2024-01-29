@@ -1,16 +1,26 @@
+import { create } from "zustand";
 import { Views, type ViewsKeys } from "../types";
+
+interface IframeTitleState {
+	iframeTitle: string;
+	setIframeTitle: (title: string) => void;
+}
+
+export const useIframeTitleStore = create<IframeTitleState>()((set) => ({
+	iframeTitle: "Save to Obsidian",
+	setIframeTitle: (title) => set({ iframeTitle: title }),
+}));
 
 function Header({
 	closePopup,
-	iframeTitle,
 	currentView,
 	goBack,
 }: {
 	closePopup: () => void;
-	iframeTitle?: string;
 	currentView: ViewsKeys;
 	goBack: () => void;
 }) {
+	const { iframeTitle } = useIframeTitleStore();
 	return (
 		<div className=" flex justify-between bg-obsidian-300">
 			<div className="flex text-2xl text-white font-bold items-center">

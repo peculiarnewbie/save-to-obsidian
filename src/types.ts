@@ -50,6 +50,6 @@ export type PageElement = {
 export type TemplateType = {
 	title: string;
 	directory: string;
-	fields: Field[];
+	fields?: Field[];
 	needsBackground: boolean;
 };
