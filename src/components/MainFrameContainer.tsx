@@ -3,7 +3,7 @@ import cssText from "data-text:~style.css";
 import Header, { useIframeTitleStore } from "./Header";
 import { Views, type ViewsKeys, type TemplateType } from "../types";
 import TemplateList from "./Template/TemplateList";
-import Template from "./Template/Template";
+import Template, { useTemplateStore } from "./Template/Template";
 
 import { create } from "zustand";
 
@@ -15,16 +15,6 @@ interface ViewState {
 export const useViewStore = create<ViewState>()((set) => ({
 	currentView: Views.Main,
 	changeView: (view) => set({ currentView: view }),
-}));
-
-interface TemplateState {
-	currentTemplate: TemplateType;
-	setCurrentTemplate: (template: TemplateType) => void;
-}
-
-export const useTemplateStore = create<TemplateState>()((set) => ({
-	currentTemplate: {} as TemplateType,
-	setCurrentTemplate: (template) => set({ currentTemplate: template }),
 }));
 
 export const getStyle = () => {
@@ -44,6 +34,8 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 
 	const newTemplate = () => {};
 
+	// =========================================================== delete this.
+	// just change the store wherever you're switching views
 	useEffect(() => {
 		switch (currentView) {
 			case Views.Main:
@@ -58,6 +50,8 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 		}
 	}, [currentView]);
 
+	// =====================
+
 	return (
 		<>
 			<div className=" w-full h-full text-text-primary flex flex-col rounded-xl bg-obsidian-100 overflow-hidden">
@@ -66,19 +60,17 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 					currentView={currentView}
 					goBack={goBack}
 				/>
-				<MainContent />
+				<MainContent currentView={currentView} />
 			</div>
 			<BodyStyle />
 		</>
 	);
 };
 
-const MainContent = () => {
-	const { currentView, changeView } = useViewStore();
-
+const MainContent = ({ currentView }: { currentView: ViewsKeys }) => {
 	if (currentView == Views.Main) return <TemplateList />;
-	else if (currentView == Views.EditTemplate)
-		return <Template isEditing={true} />;
+	else if (currentView == Views.Template || currentView == Views.EditTemplate)
+		return <Template />;
 };
 
 const BodyStyle = () => {

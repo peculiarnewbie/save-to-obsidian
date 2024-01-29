@@ -1,9 +1,20 @@
-import { useEffect, type ChangeEvent } from "react";
+import { useEffect, type ChangeEvent, useState } from "react";
 import { useIframeTitleStore } from "../Header";
-import { useTemplateStore } from "../MainFrameContainer";
 import type { TemplateType } from "~types";
+import { create } from "zustand";
 
-function Template({ isEditing }: { isEditing: boolean }) {
+interface TemplateState {
+	currentTemplate: TemplateType;
+	setCurrentTemplate: (template: TemplateType) => void;
+}
+
+export const useTemplateStore = create<TemplateState>()((set) => ({
+	currentTemplate: {} as TemplateType,
+	setCurrentTemplate: (template) => set({ currentTemplate: template }),
+}));
+
+function Template() {
+	const [isEditing, setIsEditing] = useState(true);
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 
 	const { setIframeTitle } = useIframeTitleStore();
@@ -23,7 +34,7 @@ function Template({ isEditing }: { isEditing: boolean }) {
 		<div>
 			<p>title</p>
 			<input onChange={setTitle} value={currentTemplate.title}></input>
-			<div>Template</div>;
+			<div>Template</div>
 		</div>
 	);
 }
