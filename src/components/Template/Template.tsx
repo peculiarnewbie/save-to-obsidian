@@ -2,6 +2,10 @@ import { useEffect, type ChangeEvent, useState } from "react";
 import { useIframeTitleStore } from "../Header";
 import type { TemplateType } from "~types";
 import { create } from "zustand";
+import { useTemplates } from "./TemplateList";
+import { Storage } from "@plasmohq/storage";
+
+const storage = new Storage();
 
 interface TemplateState {
 	currentTemplate: TemplateType;
@@ -15,7 +19,10 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 
 function Template() {
 	const [isEditing, setIsEditing] = useState(true);
+	const [oldTitle, setOldTitle] = useState("New Template");
+
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
+	const { templates, setTemplates } = useTemplates();
 
 	const { setIframeTitle } = useIframeTitleStore();
 
@@ -27,10 +34,29 @@ function Template() {
 			fields: currentTemplate.fields ?? [],
 			needsBackground: currentTemplate.needsBackground,
 		});
-		setIframeTitle(newTitle);
 	};
 
-	const saveTemplate = () => {};
+	const saveTemplate = () => {
+		const modifiedIndex = templates.findIndex(
+			(item) => item.title == oldTitle
+		);
+		console.log(modifiedIndex, currentTemplate);
+		const newTemplates = templates.toSpliced(
+			modifiedIndex,
+			1,
+			currentTemplate
+		);
+		setTemplates(newTemplates);
+		storage.set("templateList", newTemplates);
+	};
+
+	useEffect(() => {
+		setIframeTitle(currentTemplate.title);
+	}, [currentTemplate.title]);
+
+	useEffect(() => {
+		setOldTitle(currentTemplate.title);
+	});
 
 	return (
 		<div>

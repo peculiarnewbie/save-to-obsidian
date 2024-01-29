@@ -3,10 +3,10 @@ import cssText from "data-text:~style.css";
 import Header, { useIframeTitleStore } from "./Header";
 import { Views, type ViewsKeys, type TemplateType } from "../types";
 import TemplateList from "./Template/TemplateList";
-import Template, { useTemplateStore } from "./Template/Template";
 
 import { create } from "zustand";
 import Settings from "./Settings";
+import Template from "./Template/Template";
 
 interface ViewState {
 	currentView: ViewsKeys;
@@ -27,7 +27,6 @@ export const getStyle = () => {
 const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 	const { setIframeTitle } = useIframeTitleStore();
 	const { currentView, changeView } = useViewStore();
-	const { setCurrentTemplate } = useTemplateStore();
 
 	const goBack = () => {
 		if (

@@ -19,7 +19,9 @@ interface Templates {
 
 export const useTemplates = create<Templates>()((set) => ({
 	templates: [{ title: "example", directory: "", needsBackground: false }],
-	setTemplates: (list) => set({ templates: list }),
+	setTemplates: (list) => {
+		set({ templates: list });
+	},
 }));
 
 function TemplateList() {
