@@ -6,6 +6,7 @@ import TemplateList from "./Template/TemplateList";
 import Template, { useTemplateStore } from "./Template/Template";
 
 import { create } from "zustand";
+import Settings from "./Settings";
 
 interface ViewState {
 	currentView: ViewsKeys;
@@ -29,7 +30,11 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 	const { setCurrentTemplate } = useTemplateStore();
 
 	const goBack = () => {
-		if (currentView == Views.EditTemplate) changeView(Views.Main);
+		if (
+			currentView == Views.Template.EditNew ||
+			currentView == Views.Template.View
+		)
+			changeView(Views.Main);
 	};
 
 	const newTemplate = () => {};
@@ -44,7 +49,7 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 			case Views.Settings:
 				setIframeTitle("Settings");
 				break;
-			case Views.EditTemplate:
+			case Views.Template.EditNew:
 				setIframeTitle("New Template");
 				break;
 		}
@@ -69,8 +74,8 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 
 const MainContent = ({ currentView }: { currentView: ViewsKeys }) => {
 	if (currentView == Views.Main) return <TemplateList />;
-	else if (currentView == Views.Template || currentView == Views.EditTemplate)
-		return <Template />;
+	else if (currentView == Views.Settings) return <Settings />;
+	else return <Template />;
 };
 
 const BodyStyle = () => {

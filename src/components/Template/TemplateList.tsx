@@ -37,7 +37,7 @@ function TemplateList() {
 			directory: "",
 			needsBackground: false,
 		});
-		changeView(Views.EditTemplate);
+		changeView(Views.Template.EditNew);
 	};
 
 	const getList = async () => {
@@ -64,7 +64,7 @@ function TemplateList() {
 
 	const openTemplate = (title: string) => {
 		setCurrentTemplate(templates.find((item) => item.title == title));
-		changeView(Views.Template);
+		changeView(Views.Template.View);
 	};
 
 	return (

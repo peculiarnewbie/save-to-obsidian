@@ -30,11 +30,14 @@ function Template() {
 		setIframeTitle(newTitle);
 	};
 
+	const saveTemplate = () => {};
+
 	return (
 		<div>
 			<p>title</p>
 			<input onChange={setTitle} value={currentTemplate.title}></input>
 			<div>Template</div>
+			<button onClick={saveTemplate}>save template</button>
 		</div>
 	);
 }

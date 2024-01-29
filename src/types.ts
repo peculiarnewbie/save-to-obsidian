@@ -1,11 +1,17 @@
 export const Views = {
 	Main: "main",
 	Settings: "settings",
-	Template: "template",
-	EditTemplate: "editTemplate",
+	Template: {
+		View: "viewTemplate",
+		EditNew: "editNewTemplate",
+		EditExisting: "editExisting",
+	},
 } as const;
 
-export type ViewsKeys = (typeof Views)[keyof typeof Views];
+export type ViewsKeys =
+	| typeof Views.Main
+	| typeof Views.Settings
+	| (typeof Views.Template)[keyof typeof Views.Template];
 
 export const FieldTypes = {
 	Filename: "filename",
