@@ -25,10 +25,10 @@ export const FieldTypes = {
 
 export type FieldTypesKeys = (typeof FieldTypes)[keyof typeof FieldTypes];
 
-export type Field = {
+export type FieldType = {
 	key: string;
-	value: string;
-	finalValue: string;
+	value?: string;
+	finalValue?: string;
 	type: FieldTypesKeys;
 };
 
@@ -47,7 +47,7 @@ export type PathSteps = {
 	index: number;
 };
 
-export type PageElement = {
+export type PageElementType = {
 	key: string;
 	path: PathSteps[];
 	header?: boolean;
@@ -56,7 +56,7 @@ export type PageElement = {
 export type TemplateType = {
 	title: string;
 	directory: string;
-	fields?: Field[];
-	pageElements?: PageElement[];
+	fields?: FieldType[];
+	pageElements?: PageElementType[];
 	needsBackground: boolean;
 };

@@ -61,8 +61,6 @@ function TemplateList() {
 
 		setTemplates(pulledTemplates);
 
-		console.log(pulledTemplates);
-
 		if (!pulledTemplates || pulledTemplates.length == 0) {
 			generateExampleList();
 			await getList();
