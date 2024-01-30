@@ -29,26 +29,45 @@ function TemplateList() {
 	const { changeView } = useViewStore();
 	const { templates, setTemplates } = useTemplates();
 
-	const [templateList, setTemplateList] = useState([
-		{ title: templates[0].title, url: "" },
-	]);
+	const [templateList, setTemplateList] = useState([]);
 
-	const newTemplate = () => {
+	const createNewTemplate = () => {
 		setCurrentTemplate({
 			title: "New Template",
 			directory: "",
 			needsBackground: false,
+			isnew: true,
 		});
 		changeView(Views.Template.EditNew);
 	};
 
 	const getList = async () => {
+		const generateExampleList = () => {
+			const exampleTemplate: TemplateType = {
+				title: "example",
+				directory: "",
+				needsBackground: false,
+			};
+			const newTemplates = [exampleTemplate];
+			console.log(newTemplates);
+			storage.set("templateList", newTemplates);
+			console.log("generated example");
+		};
+
 		const pulledTemplates = (await storage.get(
 			"templateList"
 		)) as TemplateType[];
 		if (!pulledTemplates) return;
 
 		setTemplates(pulledTemplates);
+
+		console.log(pulledTemplates);
+
+		if (!pulledTemplates || pulledTemplates.length == 0) {
+			generateExampleList();
+			await getList();
+			return;
+		}
 
 		const newList = [] as TemplateListItem[];
 		pulledTemplates.forEach((template) => {
@@ -60,14 +79,21 @@ function TemplateList() {
 		setTemplateList(newList);
 	};
 
-	useEffect(() => {
-		getList();
-	}, [templates]);
-
 	const openTemplate = (title: string) => {
 		setCurrentTemplate(templates.find((item) => item.title == title));
 		changeView(Views.Template.View);
 	};
+
+	const deleteTemplate = (title: string) => {
+		const index = templates.findIndex((item) => item.title == title);
+		const newTemplates = templates.toSpliced(index, 1);
+		storage.set("templateList", newTemplates);
+		getList();
+	};
+
+	useEffect(() => {
+		getList();
+	}, []);
 
 	return (
 		<div>
@@ -81,10 +107,16 @@ function TemplateList() {
 						>
 							{item.title}
 						</button>
+						<button
+							onClick={() => deleteTemplate(item.title)}
+							className=" p-2 bg-obsidian-300"
+						>
+							delete
+						</button>
 					</div>
 				);
 			})}
-			<button onClick={newTemplate}>New Template</button>
+			<button onClick={createNewTemplate}>New Template</button>
 		</div>
 	);
 }

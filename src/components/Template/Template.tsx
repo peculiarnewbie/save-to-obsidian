@@ -8,8 +8,8 @@ import { Storage } from "@plasmohq/storage";
 const storage = new Storage();
 
 interface TemplateState {
-	currentTemplate: TemplateType;
-	setCurrentTemplate: (template: TemplateType) => void;
+	currentTemplate: TemplateType & { isnew?: boolean };
+	setCurrentTemplate: (template: TemplateType & { isnew?: boolean }) => void;
 }
 
 export const useTemplateStore = create<TemplateState>()((set) => ({
@@ -33,21 +33,39 @@ function Template() {
 			directory: currentTemplate.directory,
 			fields: currentTemplate.fields ?? [],
 			needsBackground: currentTemplate.needsBackground,
+			isnew: currentTemplate.isnew ?? false,
 		});
 	};
 
 	const saveTemplate = () => {
-		const modifiedIndex = templates.findIndex(
-			(item) => item.title == oldTitle
-		);
-		console.log(modifiedIndex, currentTemplate);
-		const newTemplates = templates.toSpliced(
-			modifiedIndex,
-			1,
-			currentTemplate
-		);
-		setTemplates(newTemplates);
-		storage.set("templateList", newTemplates);
+		const saveToStorage = (newTemplates: TemplateType[]) => {
+			setTemplates(newTemplates);
+			storage.set("templateList", newTemplates);
+		};
+
+		const newTemplate: TemplateType = {
+			title: currentTemplate.title,
+			directory: currentTemplate.directory,
+			fields: currentTemplate.fields,
+			needsBackground: currentTemplate.needsBackground,
+		};
+
+		if (currentTemplate.isnew) {
+			const newTemplates = [...templates];
+			newTemplates.push(newTemplate);
+			console.log(newTemplates);
+			saveToStorage(newTemplates);
+		} else {
+			const modifiedIndex = templates.findIndex(
+				(item) => item.title == oldTitle
+			);
+			const newTemplates = templates.toSpliced(
+				modifiedIndex,
+				1,
+				newTemplate
+			);
+			saveToStorage(newTemplates);
+		}
 	};
 
 	useEffect(() => {
