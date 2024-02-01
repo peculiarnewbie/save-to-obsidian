@@ -49,12 +49,7 @@ function Template() {
 			storage.set("templateList", newTemplates);
 		};
 
-		const newTemplate: TemplateType = {
-			title: currentTemplate.title,
-			directory: currentTemplate.directory,
-			fields: currentTemplate.fields,
-			needsBackground: currentTemplate.needsBackground,
-		};
+		const newTemplate = { ...currentTemplate };
 
 		if (currentTemplate.isnew) {
 			const newTemplates = [...templates];
@@ -104,30 +99,36 @@ function Template() {
 
 	useEffect(() => {
 		setOldTitle(currentTemplate.title);
-	});
+	}, []);
 
 	return (
 		<div>
 			<p>title</p>
 			<input onChange={setTitle} value={currentTemplate.title}></input>
-			<div>Template</div>
-			<button onClick={saveTemplate}>save template</button>
-			{// Field list
-			currentTemplate.fields?.map((field, i) => {
-				return (
-					<PropertyField key={field.key} field={field} index={i} />
-				);
-			})}
+			<div>Fields</div>
+			<FieldList>
+				{// Field list
+				currentTemplate.fields?.map((field, i) => {
+					return (
+						<PropertyField
+							key={field.key}
+							field={field}
+							index={i}
+						/>
+					);
+				})}
+			</FieldList>
 			<button onClick={addField}>Add Field</button>
 			<PageElementsList
 				pageElements={currentTemplate.pageElements}
 			></PageElementsList>
+			<button onClick={saveTemplate}>save template</button>
 		</div>
 	);
 }
 
-const FieldList = ({ fields }: { fields: FieldType[] }) => {
-	return <></>;
+const FieldList = ({ children }) => {
+	return <div className=" flex flex-col gap-2">{children}</div>;
 };
 
 const PageElementsList = ({

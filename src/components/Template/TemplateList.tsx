@@ -94,22 +94,22 @@ function TemplateList() {
 	}, []);
 
 	return (
-		<div>
+		<div className="p-2">
 			<div>List</div>
 			{templateList.map((item, i) => {
 				return (
-					<div key={item.title}>
+					<div key={item.title} className="px-0 py-1">
 						<button
 							onClick={() => openTemplate(item.title)}
-							className=" p-2 bg-obsidian-300"
+							className=" p-2 hover:bg-obsidian-300 flex justify-between items-center w-full rounded-md"
 						>
 							{item.title}
-						</button>
-						<button
-							onClick={() => deleteTemplate(item.title)}
-							className=" p-2 bg-obsidian-300"
-						>
-							delete
+							<button
+								onClick={() => deleteTemplate(item.title)}
+								className=" p-2 bg-obsidian-300"
+							>
+								delete
+							</button>
 						</button>
 					</div>
 				);
