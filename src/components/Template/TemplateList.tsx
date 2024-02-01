@@ -76,6 +76,7 @@ function TemplateList() {
 			});
 		});
 		setTemplateList(newList);
+		console.log(templates);
 	};
 
 	const openTemplate = (title: string) => {

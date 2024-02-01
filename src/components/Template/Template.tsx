@@ -10,6 +10,7 @@ import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
 import PropertyField from "./PropertyField";
+import { useViewStore } from "~components/MainFrameContainer";
 
 const storage = new Storage();
 
@@ -24,13 +25,14 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 }));
 
 function Template() {
-	const [isEditing, setIsEditing] = useState(true);
 	const [oldTitle, setOldTitle] = useState("New Template");
 
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { templates, setTemplates } = useTemplates();
 
 	const { setIframeTitle } = useIframeTitleStore();
+
+	const { currentView, changeView } = useViewStore();
 
 	const setTitle = (e: ChangeEvent) => {
 		const newTitle = (e.target as HTMLInputElement).value;
@@ -50,11 +52,12 @@ function Template() {
 		};
 
 		const newTemplate = { ...currentTemplate };
+		newTemplate.isnew = false;
 
 		if (currentTemplate.isnew) {
 			const newTemplates = [...templates];
 			newTemplates.push(newTemplate);
-			console.log(newTemplates);
+			console.log("saved new", newTemplates);
 			saveToStorage(newTemplates);
 		} else {
 			const modifiedIndex = templates.findIndex(
