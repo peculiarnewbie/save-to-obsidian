@@ -9,6 +9,7 @@ import {
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
+import PropertyField from "./PropertyField";
 
 const storage = new Storage();
 
@@ -97,16 +98,6 @@ function Template() {
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
-	const deleteField = (key: string) => {
-		const { fields, ...rest } = currentTemplate;
-
-		const index = fields.findIndex((field) => field.key == key);
-
-		const newFields = fields.toSpliced(index, 1);
-
-		setCurrentTemplate({ fields: newFields, ...rest });
-	};
-
 	useEffect(() => {
 		setIframeTitle(currentTemplate.title);
 	}, [currentTemplate.title]);
@@ -122,15 +113,9 @@ function Template() {
 			<div>Template</div>
 			<button onClick={saveTemplate}>save template</button>
 			{// Field list
-			currentTemplate.fields?.map((field) => {
+			currentTemplate.fields?.map((field, i) => {
 				return (
-					<div key={field.key}>
-						<p>{field.key}</p>
-						<p>{field.value}</p>
-						<button onClick={() => deleteField(field.key)}>
-							delete field
-						</button>
-					</div>
+					<PropertyField key={field.key} field={field} index={i} />
 				);
 			})}
 			<button onClick={addField}>Add Field</button>
