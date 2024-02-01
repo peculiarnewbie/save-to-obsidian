@@ -6,12 +6,17 @@ export const Views = {
 		EditNew: "editNewTemplate",
 		EditExisting: "editExisting",
 	},
+	Selection: {
+		Hover: "hoverSelect",
+		Detail: "detailSelect",
+	},
 } as const;
 
 export type ViewsKeys =
 	| typeof Views.Main
 	| typeof Views.Settings
-	| (typeof Views.Template)[keyof typeof Views.Template];
+	| (typeof Views.Template)[keyof typeof Views.Template]
+	| (typeof Views.Selection)[keyof typeof Views.Selection];
 
 export const FieldTypes = {
 	Filename: "filename",

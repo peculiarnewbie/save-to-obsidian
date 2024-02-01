@@ -24,15 +24,26 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 	setCurrentTemplate: (template) => set({ currentTemplate: template }),
 }));
 
+interface PageElementState {
+	currentPageElement: PageElementType;
+	setCurrentPageElement: (element: PageElementType) => void;
+}
+
+export const usePageElementStore = create<PageElementState>()((set) => ({
+	currentPageElement: {} as PageElementType,
+	setCurrentPageElement: (element) => {
+		set({ currentPageElement: element });
+	},
+}));
+
 function Template() {
 	const [oldTitle, setOldTitle] = useState("New Template");
 
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { templates, setTemplates } = useTemplates();
-
 	const { setIframeTitle } = useIframeTitleStore();
-
 	const { currentView, changeView } = useViewStore();
+	const { currentPageElement } = usePageElementStore();
 
 	const setTitle = (e: ChangeEvent) => {
 		const newTitle = (e.target as HTMLInputElement).value;
@@ -124,6 +135,8 @@ function Template() {
 			<PageElementsList
 				pageElements={currentTemplate.pageElements}
 			></PageElementsList>
+			<div>element</div>
+			<div>{currentPageElement.key}</div>
 			<button onClick={saveTemplate}>save template</button>
 		</div>
 	);

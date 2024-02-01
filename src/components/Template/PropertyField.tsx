@@ -1,9 +1,12 @@
 import { useState, type ChangeEvent } from "react";
-import type { FieldType } from "~types";
+import { Views, type FieldType } from "~types";
 import { useTemplateStore } from "./Template";
+import { useViewStore } from "~components/MainFrameContainer";
 
 function PropertyField({ field, index }: { field: FieldType; index: number }) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
+	const { currentView, changeView } = useViewStore();
+
 	const [tempField, setTempField] = useState({ ...field });
 
 	const handleKeyChange = (e: ChangeEvent) => {
@@ -34,6 +37,10 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
+	const handleSelectElement = () => {
+		changeView(Views.Selection.Hover);
+	};
+
 	return (
 		<div>
 			<div className=" flex gap-2">
@@ -45,6 +52,7 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 				<p>{tempField.key}</p>
 				<p>{tempField.value}</p>
 				<button onClick={deleteField}>delete field</button>
+				<button onPointerDown={handleSelectElement}>Select</button>
 			</div>
 		</div>
 	);

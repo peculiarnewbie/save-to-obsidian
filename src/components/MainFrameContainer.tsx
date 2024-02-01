@@ -36,8 +36,6 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 			changeView(Views.Main);
 	};
 
-	const newTemplate = () => {};
-
 	// =========================================================== delete this.
 	// just change the store wherever you're switching views
 	useEffect(() => {
@@ -58,7 +56,7 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 
 	return (
 		<>
-			<div className=" w-full h-full text-text-primary flex flex-col rounded-xl bg-obsidian-100 overflow-hidden">
+			<div className=" flex w-full h-full text-text-primary flex-col rounded-xl bg-obsidian-100 overflow-hidden">
 				<Header
 					closePopup={closePopup}
 					currentView={currentView}
