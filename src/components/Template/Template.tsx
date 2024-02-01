@@ -107,8 +107,7 @@ function Template() {
 			<input onChange={setTitle} value={currentTemplate.title}></input>
 			<div>Fields</div>
 			<FieldList>
-				{// Field list
-				currentTemplate.fields?.map((field, i) => {
+				{currentTemplate.fields?.map((field, i) => {
 					return (
 						<PropertyField
 							key={field.key}
