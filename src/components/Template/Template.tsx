@@ -133,6 +133,7 @@ function Template() {
 				})}
 			</FieldList>
 			<button onClick={addField}>Add Field</button>
+			<div>elements========================</div>
 			<PageElementsList>
 				{currentTemplate.pageElements?.map((pageElement, i) => {
 					return (
@@ -145,8 +146,6 @@ function Template() {
 					);
 				})}
 			</PageElementsList>
-			<div>element========================</div>
-			<div>{currentPageElement.value}</div>
 			<button onClick={saveTemplate}>save template</button>
 		</div>
 	);

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { PageElementType } from "~types";
 
 function PageElement({
@@ -7,9 +8,13 @@ function PageElement({
 	pageElement: PageElementType;
 	index: number;
 }) {
+	useEffect(() => {
+		console.log(pageElement);
+	}, []);
 	return (
 		<div>
-			<div></div>
+			<div>{index}</div>
+			<div>{pageElement.value}</div>
 		</div>
 	);
 }

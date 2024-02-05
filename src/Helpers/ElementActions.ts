@@ -72,7 +72,10 @@ export const generatePath = (selectedElement: HTMLElement) => {
 				});
 				break;
 			}
-		} else if (currentElement.className != "") {
+		} else if (
+			currentElement.className != "" &&
+			!(currentElement instanceof SVGElement) // this is incredibly silly
+		) {
 			if (validateClass(currentElement.className)) {
 				let queriedElements = document.getElementsByClassName(
 					currentElement.className

@@ -5,7 +5,7 @@ import {
 	usePageElementStore,
 	useTemplateStore,
 } from "~components/Template/Template";
-import { Views, type PathStep, IdType } from "~types";
+import { Views, type PathStep, IdType, type PageElementType } from "~types";
 
 function DetailSelector() {
 	const { currentPageElement, setCurrentPageElement } = usePageElementStore();
@@ -16,17 +16,16 @@ function DetailSelector() {
 		const generatedPath = generatePath(currentPageElement.element);
 		const valueFromPath = getElementValueFromPath(generatedPath, document);
 
-		setCurrentPageElement({
+		const newPageElement: PageElementType = {
 			path: generatedPath,
 			value: valueFromPath,
-		});
+		};
 
 		const { pageElements, ...rest } = { ...currentTemplate };
 		if (pageElements) {
-			pageElements.push(currentPageElement);
+			pageElements.push(newPageElement);
 			setCurrentTemplate({ pageElements, ...rest });
-		} else
-			setCurrentTemplate({ pageElements: [currentPageElement], ...rest });
+		} else setCurrentTemplate({ pageElements: [newPageElement], ...rest });
 
 		changeView(Views.Template.View);
 	};
