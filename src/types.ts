@@ -46,15 +46,17 @@ export const IdType = {
 
 type IdTypeKeys = (typeof IdType)[keyof typeof IdType];
 
-export type PathSteps = {
+export type PathStep = {
 	type: IdTypeKeys;
 	value: string;
 	index: number;
 };
 
 export type PageElementType = {
-	key: string;
-	path: PathSteps[];
+	element?: HTMLElement;
+	key?: string;
+	path?: PathStep[];
+	value?: string;
 	header?: boolean;
 };
 

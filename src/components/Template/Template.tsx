@@ -11,6 +11,7 @@ import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
 import PropertyField from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
+import PageElement from "./PageElement";
 
 const storage = new Storage();
 
@@ -132,11 +133,20 @@ function Template() {
 				})}
 			</FieldList>
 			<button onClick={addField}>Add Field</button>
-			<PageElementsList
-				pageElements={currentTemplate.pageElements}
-			></PageElementsList>
-			<div>element</div>
-			<div>{currentPageElement.key}</div>
+			<PageElementsList>
+				{currentTemplate.pageElements?.map((pageElement, i) => {
+					return (
+						<PageElement
+							// ======================= fix key to a generated one
+							key={i}
+							pageElement={pageElement}
+							index={i}
+						/>
+					);
+				})}
+			</PageElementsList>
+			<div>element========================</div>
+			<div>{currentPageElement.value}</div>
 			<button onClick={saveTemplate}>save template</button>
 		</div>
 	);
@@ -146,12 +156,8 @@ const FieldList = ({ children }) => {
 	return <div className=" flex flex-col gap-2">{children}</div>;
 };
 
-const PageElementsList = ({
-	pageElements,
-}: {
-	pageElements: PageElementType[];
-}) => {
-	return <></>;
+const PageElementsList = ({ children }) => {
+	return <div className="flex flex-col">{children}</div>;
 };
 
 export default Template;
