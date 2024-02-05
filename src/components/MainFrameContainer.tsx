@@ -24,7 +24,13 @@ export const getStyle = () => {
 	return style;
 };
 
-const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
+const MainFrameContainer = ({
+	closePopup,
+	hidden,
+}: {
+	closePopup: () => void;
+	hidden: boolean;
+}) => {
 	const { setIframeTitle } = useIframeTitleStore();
 	const { currentView, changeView } = useViewStore();
 
@@ -56,7 +62,9 @@ const MainFrameContainer = ({ closePopup }: { closePopup: () => void }) => {
 
 	return (
 		<>
-			<div className=" flex w-full h-full text-text-primary flex-col rounded-xl bg-obsidian-100 overflow-hidden">
+			<div
+				className={`${hidden ? "hidden" : "flex"} w-full h-full text-text-primary flex-col rounded-xl bg-obsidian-100 overflow-hidden`}
+			>
 				<Header
 					closePopup={closePopup}
 					currentView={currentView}

@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-const CustomIframe = ({ children }: { children: any }) => {
+const CustomIframe = ({
+	children,
+	isSelecting,
+}: {
+	children: any;
+	isSelecting: boolean;
+}) => {
 	const [contentRef, setContentRef] = useState(null);
 	const [mountNode, setMountNode] = useState(null);
 
