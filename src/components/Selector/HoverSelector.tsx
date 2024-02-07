@@ -39,13 +39,8 @@ function HoverSelector() {
 	}, []);
 
 	return (
-		<div className="absolute w-screen h-screen pointer-events-none active:pointer-events-auto">
+		<div className="absolute w-screen h-screen pointer-events-none top-0 left-0">
 			<HoverCanvas hoveredElement={hoveredElement} />
-			<div className="relative w-full h-full bg-obsidian-300/50">
-				<button onPointerDown={() => changeView(Views.Main)}>
-					back
-				</button>
-			</div>
 		</div>
 	);
 }
