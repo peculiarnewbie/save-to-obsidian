@@ -1,11 +1,4 @@
-import cssText from "data-text:~style.css";
 import DetailSelector from "./DetailSelector";
-
-export const getStyle = () => {
-	const style = document.createElement("style");
-	style.textContent = cssText;
-	return style;
-};
 
 function DetailFrameContainer({ shown }: { shown: boolean }) {
 	return (
@@ -19,13 +12,5 @@ function DetailFrameContainer({ shown }: { shown: boolean }) {
 		</>
 	);
 }
-
-const BodyStyle = () => {
-	return (
-		<>
-			<style>{cssText}</style>
-		</>
-	);
-};
 
 export default DetailFrameContainer;

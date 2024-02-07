@@ -6,11 +6,13 @@ import {
 	useTemplateStore,
 } from "~components/Template/Template";
 import { Views, type PathStep, IdType, type PageElementType } from "~types";
+import { useHoverElementStore } from "./HoverSelector";
 
 function DetailSelector() {
 	const { currentPageElement, setCurrentPageElement } = usePageElementStore();
 	const { changeView } = useViewStore();
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
+	const { hoveredElement, setHoveredElement } = useHoverElementStore();
 
 	const selectElement = async () => {
 		const generatedPath = generatePath(currentPageElement.element);
@@ -43,6 +45,9 @@ function DetailSelector() {
 				})}
 			</div>
 			<button onClick={selectElement}>Select</button>
+			<button onClick={() => changeView(Views.Selection.Hover)}>
+				back
+			</button>
 		</div>
 	);
 }

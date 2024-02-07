@@ -51,8 +51,10 @@ const OverlayParent = () => {
 						/>
 					</CustomIframe>
 				</div>
-				{isSelecting && currentView == Views.Selection.Hover ? (
-					<HoverSelector />
+				{isSelecting ? (
+					<HoverSelector
+						detail={currentView != Views.Selection.Hover}
+					/>
 				) : (
 					<></>
 				)}
