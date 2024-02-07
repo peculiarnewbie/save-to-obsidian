@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { Views, type ViewsKeys } from "../types";
+import backImage from "data-base64:~images/Back.svg";
 
 interface IframeTitleState {
 	iframeTitle: string;
@@ -25,7 +26,9 @@ function Header({
 		<div className=" flex justify-between bg-obsidian-300">
 			<div className="flex text-2xl text-white font-bold items-center">
 				{currentView != Views.Main && (
-					<button onClick={goBack}>back</button>
+					<button className="flex p-2" onClick={goBack}>
+						<img src={backImage} width="20px" />
+					</button>
 				)}
 				<div className=" pl-4">{iframeTitle}</div>
 			</div>
