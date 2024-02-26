@@ -64,7 +64,7 @@ export type TemplateType = {
 	title: string;
 	directory: string;
 	url?: string;
-	fields?: FieldType[];
-	pageElements?: PageElementType[];
+	fields: FieldType[];
+	pageElements: PageElementType[];
 	needsBackground: boolean;
 };

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useViewStore } from "~components/MainFrameContainer";
-import { Views } from "~types";
+import { Views, type PageElementType } from "~types";
 import HoverCanvas from "./HoverCanvas";
 import { create } from "zustand";
 import { usePageElementStore } from "./DetailSelector";
+import { generatePath, getElementValueFromPath } from "~Helpers/ElementActions";
 
 interface HoverElementState {
 	hoveredElement: HTMLElement | undefined;
@@ -26,8 +27,16 @@ function HoverSelector({ detail }: { detail: boolean }) {
 		e.stopPropagation();
 		e.preventDefault();
 
-		console.log("selected", el);
-		setCurrentPageElement({ element: el });
+		const generatedPath = generatePath(el);
+		const valueFromPath = getElementValueFromPath(generatedPath, document);
+
+		const newPageElement: PageElementType = {
+			element: el,
+			path: generatedPath,
+			value: valueFromPath,
+		};
+
+		setCurrentPageElement(newPageElement);
 		changeView(Views.Selection.Detail);
 	};
 
