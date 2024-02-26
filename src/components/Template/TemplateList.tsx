@@ -9,7 +9,7 @@ const storage = new Storage();
 
 interface TemplateListItem {
 	title: string;
-	url: string;
+	url?: string;
 }
 
 interface Templates {
@@ -81,7 +81,9 @@ function TemplateList() {
 	};
 
 	const openTemplate = (title: string) => {
-		setCurrentTemplate(templates.find((item) => item.title == title));
+		setCurrentTemplate(
+			templates.find((item) => item.title == title) as TemplateType
+		);
 		changeView(Views.Template.View);
 	};
 

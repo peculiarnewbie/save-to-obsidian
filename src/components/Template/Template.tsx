@@ -126,6 +126,7 @@ function Template() {
 							key={field.key}
 							field={field}
 							index={i}
+							isEditing={isEditing}
 						/>
 					);
 				})}

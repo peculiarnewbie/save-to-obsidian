@@ -4,12 +4,15 @@ import { useTemplateStore } from "./Template";
 import { useViewStore } from "~components/MainFrameContainer";
 import { isNumber } from "~Helpers/utils";
 
-function PropertyField({ field, index }: { field: FieldType; index: number }) {
+function PropertyField(props: {
+	field: FieldType;
+	index: number;
+	isEditing: boolean;
+}) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { currentView, changeView } = useViewStore();
 
-	const [isEditing, setIsEditing] = useState(true);
-	const [tempField, setTempField] = useState({ ...field });
+	const [tempField, setTempField] = useState({ ...props.field });
 
 	const handleKeyChange = (e: ChangeEvent) => {
 		const el = e.target as HTMLInputElement;
@@ -22,7 +25,11 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 	};
 
 	const updateTemplate = () => {
-		const newFields = currentTemplate.fields.toSpliced(index, 1, tempField);
+		const newFields = currentTemplate.fields.toSpliced(
+			props.index,
+			1,
+			tempField
+		);
 		const updatedTemplate = { ...currentTemplate };
 		updatedTemplate.fields = newFields;
 
@@ -31,7 +38,7 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 
 	const deleteField = () => {
 		const { fields, ...rest } = currentTemplate;
-		const newFields = fields.toSpliced(index, 1);
+		const newFields = fields.toSpliced(props.index, 1);
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
@@ -102,20 +109,12 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 		return parsedString;
 	};
 
-	useEffect(() => {
-		if (currentView == Views.Template.View) {
-			setIsEditing(false);
-		} else {
-			setIsEditing(true);
-		}
-	}, [currentView]);
-
 	/* 
 		might be better to do this everytime 
 		the field is updated instead 
 	*/
 	useEffect(() => {
-		if (!isEditing) {
+		if (!props.isEditing) {
 			const { finalValue, ...rest } = { ...tempField };
 			const newField = {
 				finalValue: parseInput(rest.value as string),
@@ -124,7 +123,7 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 			setTempField(newField);
 			updateTemplate();
 		}
-	}, [isEditing]);
+	}, [props.isEditing]);
 
 	return (
 		<div>
@@ -134,15 +133,15 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 					value={tempField.key}
 					onChange={handleKeyChange}
 					name="key"
-					disabled={!isEditing}
+					disabled={!props.isEditing}
 				/>
-				{isEditing ? (
+				{props.isEditing ? (
 					<input
 						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
 						value={tempField.value}
 						onChange={handleKeyChange}
 						name="value"
-						disabled={!isEditing}
+						disabled={!props.isEditing}
 					/>
 				) : (
 					<p>val: {tempField.finalValue}</p>
