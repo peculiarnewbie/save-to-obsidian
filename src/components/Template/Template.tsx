@@ -28,6 +28,7 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 
 function Template() {
 	const [oldTitle, setOldTitle] = useState("New Template");
+	const [isEditing, setIsEditing] = useState(false);
 
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { templates, setTemplates } = useTemplates();
@@ -105,6 +106,14 @@ function Template() {
 		setOldTitle(currentTemplate.title);
 	}, []);
 
+	useEffect(() => {
+		if (currentView == Views.Template.View) {
+			setIsEditing(false);
+		} else {
+			setIsEditing(true);
+		}
+	}, [currentView]);
+
 	return (
 		<div>
 			<p>title</p>
@@ -135,14 +144,23 @@ function Template() {
 					);
 				})}
 			</PageElementsList>
-			<button onClick={saveTemplate}>save templatee</button>
+			<div className="flex flex-col">
+				<button onClick={saveTemplate}>save templatee</button>
 
-			<button onClick={() => changeView(Views.Template.EditExisting)}>
-				Edit
-			</button>
-			<button onClick={() => changeView(Views.Template.View)}>
-				View
-			</button>
+				<button onClick={() => changeView(Views.Template.EditExisting)}>
+					Edit
+				</button>
+				<button onClick={() => changeView(Views.Template.View)}>
+					View
+				</button>
+				{isEditing ? (
+					<button onClick={() => changeView(Views.Selection.Hover)}>
+						Select
+					</button>
+				) : (
+					<></>
+				)}
+			</div>
 		</div>
 	);
 }

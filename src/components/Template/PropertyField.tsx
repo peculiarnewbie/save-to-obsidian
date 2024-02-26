@@ -21,15 +21,8 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 		setTempField(updatedField);
 	};
 
-	const handleUpdateKey = () => {
-		const newField = { ...field };
-		newField.key = tempField.key;
-
-		updateTemplate(newField);
-	};
-
-	const updateTemplate = (newField: FieldType) => {
-		const newFields = currentTemplate.fields.toSpliced(index, 1, newField);
+	const updateTemplate = () => {
+		const newFields = currentTemplate.fields.toSpliced(index, 1, tempField);
 		const updatedTemplate = { ...currentTemplate };
 		updatedTemplate.fields = newFields;
 
@@ -47,7 +40,6 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 	};
 
 	const parseInput = (input: string) => {
-		console.log("parsing", input);
 		if (!input) return "";
 		const checkElement = (index: number): number => {
 			let point = 1;
@@ -89,7 +81,6 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 				let element = -1;
 				try {
 					element = checkElement(i);
-					console.log("try", input[i], element);
 				} catch (e) {
 					console.error(e);
 				}
@@ -124,16 +115,14 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 		the field is updated instead 
 	*/
 	useEffect(() => {
-		console.log("isEditing", isEditing);
 		if (!isEditing) {
 			const { finalValue, ...rest } = { ...tempField };
 			const newField = {
 				finalValue: parseInput(rest.value as string),
 				...rest,
 			};
-			console.log("setting", newField);
 			setTempField(newField);
-			updateTemplate(newField);
+			updateTemplate();
 		}
 	}, [isEditing]);
 
@@ -144,7 +133,6 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
 					value={tempField.key}
 					onChange={handleKeyChange}
-					onBlur={() => handleUpdateKey()}
 					name="key"
 					disabled={!isEditing}
 				/>
@@ -153,7 +141,6 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
 						value={tempField.value}
 						onChange={handleKeyChange}
-						onBlur={() => handleUpdateKey()}
 						name="value"
 						disabled={!isEditing}
 					/>
@@ -162,7 +149,6 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 				)}
 
 				<button onClick={deleteField}>delete</button>
-				<button onPointerDown={handleSelectElement}>Select</button>
 			</div>
 			{JSON.stringify(tempField)}
 		</div>
