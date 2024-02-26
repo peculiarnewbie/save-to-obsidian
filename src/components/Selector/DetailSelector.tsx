@@ -1,12 +1,22 @@
 import { useEffect } from "react";
 import { generatePath, getElementValueFromPath } from "~Helpers/ElementActions";
 import { useViewStore } from "~components/MainFrameContainer";
-import {
-	usePageElementStore,
-	useTemplateStore,
-} from "~components/Template/Template";
+import { useTemplateStore } from "~components/Template/Template";
 import { Views, type PathStep, IdType, type PageElementType } from "~types";
 import { useHoverElementStore } from "./HoverSelector";
+import { create } from "zustand";
+
+interface PageElementState {
+	currentPageElement: PageElementType;
+	setCurrentPageElement: (element: PageElementType) => void;
+}
+
+export const usePageElementStore = create<PageElementState>()((set) => ({
+	currentPageElement: {} as PageElementType,
+	setCurrentPageElement: (element) => {
+		set({ currentPageElement: element });
+	},
+}));
 
 function DetailSelector() {
 	const { currentPageElement, setCurrentPageElement } = usePageElementStore();
@@ -15,6 +25,7 @@ function DetailSelector() {
 	const { hoveredElement, setHoveredElement } = useHoverElementStore();
 
 	const selectElement = async () => {
+		if (!currentPageElement.element) return;
 		const generatedPath = generatePath(currentPageElement.element);
 		const valueFromPath = getElementValueFromPath(generatedPath, document);
 
