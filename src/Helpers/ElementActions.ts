@@ -54,7 +54,7 @@ export const generatePath = (selectedElement: HTMLElement) => {
 
 	let currentElement = selectedElement;
 
-	if (currentElement.tagName == "META") {
+	if (currentElement?.tagName == "META") {
 		let type = currentElement.getAttribute("property") ?? "";
 		// if (type) type.splice(0, 3);
 		path.push({ type: IdType.Header, value: type, index: 0 });
@@ -63,7 +63,7 @@ export const generatePath = (selectedElement: HTMLElement) => {
 
 	while (currentElement != document.body) {
 		// console.log("while generating: currentElement: ", currentElement);
-		if (currentElement.id != "") {
+		if (currentElement.id) {
 			if (CheckForDuplicateIds(currentElement.id)) {
 				path.push({
 					type: IdType.Id,

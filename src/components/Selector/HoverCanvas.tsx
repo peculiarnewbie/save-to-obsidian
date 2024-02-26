@@ -1,18 +1,21 @@
 import { useEffect, useRef } from "react";
 
-function HoverCanvas({ hoveredElement }: { hoveredElement: HTMLElement }) {
-	const canvasRef = useRef();
+function HoverCanvas({
+	hoveredElement,
+}: {
+	hoveredElement: HTMLElement | undefined;
+}) {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	const highlightElement = (element: HTMLElement) => {
-		console.log(element.getBoundingClientRect());
-		console.log(element);
-
 		const canvas = canvasRef.current as HTMLCanvasElement;
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 
 		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
+
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		ctx.fillStyle = "rgba(50, 50, 255, 0.4)";

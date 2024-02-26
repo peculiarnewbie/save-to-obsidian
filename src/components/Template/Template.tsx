@@ -5,6 +5,7 @@ import {
 	type FieldType,
 	type PageElementType,
 	type TemplateType,
+	Views,
 } from "~types";
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
@@ -25,18 +26,6 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 	setCurrentTemplate: (template) => set({ currentTemplate: template }),
 }));
 
-interface PageElementState {
-	currentPageElement: PageElementType;
-	setCurrentPageElement: (element: PageElementType) => void;
-}
-
-export const usePageElementStore = create<PageElementState>()((set) => ({
-	currentPageElement: {} as PageElementType,
-	setCurrentPageElement: (element) => {
-		set({ currentPageElement: element });
-	},
-}));
-
 function Template() {
 	const [oldTitle, setOldTitle] = useState("New Template");
 
@@ -44,7 +33,6 @@ function Template() {
 	const { templates, setTemplates } = useTemplates();
 	const { setIframeTitle } = useIframeTitleStore();
 	const { currentView, changeView } = useViewStore();
-	const { currentPageElement } = usePageElementStore();
 
 	const setTitle = (e: ChangeEvent) => {
 		const newTitle = (e.target as HTMLInputElement).value;
@@ -52,6 +40,7 @@ function Template() {
 			title: newTitle,
 			directory: currentTemplate.directory,
 			fields: currentTemplate.fields ?? [],
+			pageElements: currentTemplate.pageElements ?? [],
 			needsBackground: currentTemplate.needsBackground,
 			isnew: currentTemplate.isnew ?? false,
 		});
@@ -146,7 +135,14 @@ function Template() {
 					);
 				})}
 			</PageElementsList>
-			<button onClick={saveTemplate}>save template</button>
+			<button onClick={saveTemplate}>save templatee</button>
+
+			<button onClick={() => changeView(Views.Template.EditExisting)}>
+				Edit
+			</button>
+			<button onClick={() => changeView(Views.Template.View)}>
+				View
+			</button>
 		</div>
 	);
 }

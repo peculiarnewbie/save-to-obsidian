@@ -15,6 +15,8 @@ const CustomIframe = ({
 
 	useEffect(() => {
 		setMountNode(contentRef?.contentWindow?.document?.body);
+
+		console.log("1");
 	}, [contentRef]);
 
 	return (
