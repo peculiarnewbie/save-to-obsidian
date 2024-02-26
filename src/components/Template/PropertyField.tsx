@@ -43,15 +43,15 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 
 	return (
 		<div>
-			<div className=" flex gap-2">
+			<div className=" w-full bg-obsidian-100 flex border rounded-md h-fit">
 				<input
+					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
 					value={tempField.key}
 					onChange={handleKeyChange}
 					onBlur={() => handleUpdateKey()}
 				/>
-				<p>{tempField.key}</p>
-				<p>{tempField.value}</p>
-				<button onClick={deleteField}>delete field</button>
+				<TextInput value={tempField.value} />
+				<button onClick={deleteField}>delete</button>
 				<button onPointerDown={handleSelectElement}>Select</button>
 			</div>
 		</div>
@@ -59,3 +59,11 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 }
 
 export default PropertyField;
+
+const TextInput = ({ value }: { value: string }) => {
+	return (
+		<div>
+			<p>{value}</p>
+		</div>
+	);
+};
