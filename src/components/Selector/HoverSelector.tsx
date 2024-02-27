@@ -17,7 +17,7 @@ export const useHoverElementStore = create<HoverElementState>()((set) => ({
 }));
 
 function HoverSelector({ detail }: { detail: boolean }) {
-	const { changeView } = useViewStore();
+	const { setCurrentView: setCurrentView } = useViewStore();
 
 	const { setCurrentPageElement } = usePageElementStore();
 	const { hoveredElement, setHoveredElement } = useHoverElementStore();
@@ -37,7 +37,7 @@ function HoverSelector({ detail }: { detail: boolean }) {
 		};
 
 		setCurrentPageElement(newPageElement);
-		changeView(Views.Selection.Detail);
+		setCurrentView(Views.Selection.Detail);
 	};
 
 	const addHoverEffect = (e: MouseEvent) => {

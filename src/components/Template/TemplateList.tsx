@@ -37,7 +37,7 @@ export const useTemplates = create<Templates>()((set) => ({
 
 function TemplateList() {
 	const { setCurrentTemplate } = useTemplateStore();
-	const { changeView } = useViewStore();
+	const { setCurrentView } = useViewStore();
 	const { templates, setTemplates } = useTemplates();
 
 	const [templateList, setTemplateList] = useState<TemplateListItem[]>([]);
@@ -45,7 +45,7 @@ function TemplateList() {
 
 	const createNewTemplate = () => {
 		setCurrentTemplate(emptyTemplate("New Template"));
-		changeView(Views.Template.EditNew);
+		setCurrentView(Views.Template.EditNew);
 	};
 
 	const getList = async () => {
@@ -84,7 +84,7 @@ function TemplateList() {
 		setCurrentTemplate(
 			templates.find((item) => item.title == title) as TemplateType
 		);
-		changeView(Views.Template.View);
+		setCurrentView(Views.Template.View);
 	};
 
 	const handleDeleteTemplate = (title: string, e: PointerEvent) => {

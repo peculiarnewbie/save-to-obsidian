@@ -46,7 +46,7 @@ function Template() {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { templates, setTemplates } = useTemplates();
 	const { setIframeTitle } = useIframeTitleStore();
-	const { currentView, changeView } = useViewStore();
+	const { currentView, setCurrentView } = useViewStore();
 
 	const setTitle = (e: ChangeEvent) => {
 		const { title, ...rest } = currentTemplate;
@@ -177,20 +177,32 @@ function Template() {
 				})}
 			</PageElementsList>
 			<div className="flex flex-col">
-				<button onClick={saveTemplate}>save templatee</button>
-
-				<button onClick={() => changeView(Views.Template.EditExisting)}>
-					Edit
-				</button>
-				<button onClick={() => changeView(Views.Template.View)}>
-					View
-				</button>
-				{templateState == TemplateState.editing ? (
-					<button onClick={() => changeView(Views.Selection.Hover)}>
-						Select
-					</button>
+				{templateState === TemplateState.editing ? (
+					<div>
+						<button
+							onClick={() => {
+								saveTemplate();
+								setCurrentView(Views.Template.View);
+							}}
+						>
+							save templatee
+						</button>
+						<button
+							onClick={() =>
+								setCurrentView(Views.Selection.Hover)
+							}
+						>
+							Select
+						</button>
+					</div>
 				) : (
-					<></>
+					<button
+						onClick={() =>
+							setCurrentView(Views.Template.EditExisting)
+						}
+					>
+						Edit
+					</button>
 				)}
 			</div>
 		</div>

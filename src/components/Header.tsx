@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { Views, type ViewsKeys } from "../types";
 import backImage from "data-base64:~images/Back.svg";
+import { useViewStore } from "./MainFrameContainer";
 
 interface IframeTitleState {
 	iframeTitle: string;
@@ -12,16 +13,27 @@ export const useIframeTitleStore = create<IframeTitleState>()((set) => ({
 	setIframeTitle: (title) => set({ iframeTitle: title }),
 }));
 
-function Header({
-	closePopup,
-	currentView,
-	goBack,
-}: {
-	closePopup: () => void;
-	currentView: ViewsKeys;
-	goBack: () => void;
-}) {
+function Header({ closePopup }: { closePopup: () => void }) {
+	const { currentView, setCurrentView } = useViewStore();
 	const { iframeTitle } = useIframeTitleStore();
+
+	const goBack = () => {
+		switch (currentView) {
+			case Views.Template.View:
+				setCurrentView(Views.Main);
+				break;
+			case Views.Template.EditNew:
+				confirmUnsavedChanges(Views.Main);
+			case Views.Template.EditExisting:
+				confirmUnsavedChanges(Views.Template.View);
+				break;
+		}
+	};
+
+	const confirmUnsavedChanges = (navTo: ViewsKeys) => {
+		setCurrentView(navTo);
+	};
+
 	return (
 		<div className=" flex justify-between bg-obsidian-300">
 			<div className="flex text-2xl text-white font-bold items-center">
