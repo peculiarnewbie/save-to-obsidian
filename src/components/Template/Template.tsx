@@ -10,7 +10,7 @@ import {
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
-import PropertyField, { parseInput } from "./PropertyField";
+import PropertyField from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
@@ -110,7 +110,6 @@ function Template() {
 
 	const toggleState = async (state: TemplateStateKeys) => {
 		await new Promise((resolve) => setTimeout(resolve, 0));
-		console.log("waiting");
 		setTemplateState(state);
 		// setIsEditing(edit);
 	};
@@ -196,24 +195,38 @@ function Template() {
 						</button>
 					</div>
 				) : (
-					<button
-						onClick={() =>
-							setCurrentView(Views.Template.EditExisting)
-						}
-					>
-						Edit
-					</button>
+					<div>
+						<button
+							onClick={() =>
+								setCurrentView(Views.Template.EditExisting)
+							}
+						>
+							Edit
+						</button>
+						<button onClick={() => downloadMD(currentTemplate)}>
+							Download
+						</button>
+					</div>
 				)}
 			</div>
 		</div>
 	);
 }
 
-const FieldList = ({ children }) => {
+const downloadMD = (template: TemplateType) => {
+	let mdValue = "---\n";
+	template.fields.map((field) => {
+		mdValue += field.key + ": " + field.finalValue + "\n";
+	});
+	mdValue += "---";
+	console.log(mdValue);
+};
+
+const FieldList = ({ children }: { children: React.ReactNode }) => {
 	return <div className=" flex flex-col gap-2">{children}</div>;
 };
 
-const PageElementsList = ({ children }) => {
+const PageElementsList = ({ children }: { children: React.ReactNode }) => {
 	return <div className="flex flex-col">{children}</div>;
 };
 
