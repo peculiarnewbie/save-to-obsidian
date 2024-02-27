@@ -17,6 +17,7 @@ function PropertyField(props: {
 	const { currentView, changeView } = useViewStore();
 
 	const [tempField, setTempField] = useState({ ...props.field });
+	const [isFocused, setIsFocused] = useState(false);
 
 	const handleKeyChange = (e: ChangeEvent) => {
 		const el = e.target as HTMLInputElement;
@@ -63,32 +64,52 @@ function PropertyField(props: {
 	}, [props.templateState]);
 
 	return (
-		<div>
-			<div className=" w-full bg-obsidian-100 flex border rounded-md h-fit">
-				<input
-					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-					value={tempField.key ?? ""}
-					onChange={handleKeyChange}
-					name="key"
-					onBlur={updateTemplate}
-					disabled={props.templateState !== TemplateState.editing}
-				/>
-				{props.templateState == TemplateState.editing ? (
-					<input
-						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-						value={tempField.value ?? ""}
-						onChange={handleKeyChange}
-						name="value"
-						onBlur={updateTemplate}
-						disabled={props.templateState !== TemplateState.editing}
-					/>
-				) : (
-					<p>val: {tempField.finalValue}</p>
-				)}
-
-				<button onClick={deleteField}>delete</button>
-			</div>
-			{JSON.stringify(tempField)}
+		<div
+			className={` w-full bg-obsidian-100 flex border-2 border-t-[3px] outline -outline-offset-1 rounded-md h-fit  hover:outline-1 outline-obsidian-500
+				${isFocused ? " border-obsidian-600 outline-1 " : "outline-0 border-transparent"}
+			`}
+		>
+			<input
+				className="font-normal text-sm text-white h-7 peer bg-transparent outline-none p-1 pr-2 w-1/4 focus:bg-obsidian-200"
+				value={tempField.key ?? ""}
+				onChange={handleKeyChange}
+				name="key"
+				onFocus={() => setIsFocused(true)}
+				onBlur={() => {
+					setIsFocused(false);
+					updateTemplate();
+				}}
+				disabled={props.templateState !== TemplateState.editing}
+			/>
+			<button
+				className="w-6 peer-focus:bg-obsidian-200 order-first"
+				onClick={deleteField}
+			>
+				d
+			</button>
+			{/* {props.templateState == TemplateState.editing ? ( */}
+			<input
+				className="grow min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2 focus:bg-obsidian-200"
+				value={
+					props.templateState === TemplateState.editing
+						? tempField.value ?? ""
+						: tempField.finalValue
+				}
+				onChange={handleKeyChange}
+				name={
+					props.templateState === TemplateState.editing
+						? "value"
+						: "finalValue"
+				}
+				onFocus={() => setIsFocused(true)}
+				onBlur={() => {
+					setIsFocused(false);
+					updateTemplate();
+				}}
+			/>
+			{/* ) : (
+					<p className="grow">val: {tempField.finalValue}</p>
+				)} */}
 		</div>
 	);
 }
