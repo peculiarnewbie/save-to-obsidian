@@ -65,30 +65,34 @@ function PropertyField(props: {
 	return (
 		<div>
 			<div className=" w-full bg-obsidian-100 flex border rounded-md h-fit">
+				<button className="w-6" onClick={deleteField}>
+					d
+				</button>
 				<input
-					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
+					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2 w-1/4"
 					value={tempField.key ?? ""}
 					onChange={handleKeyChange}
 					name="key"
 					onBlur={updateTemplate}
 					disabled={props.templateState !== TemplateState.editing}
 				/>
-				{props.templateState == TemplateState.editing ? (
-					<input
-						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-						value={tempField.value ?? ""}
-						onChange={handleKeyChange}
-						name="value"
-						onBlur={updateTemplate}
-						disabled={props.templateState !== TemplateState.editing}
-					/>
-				) : (
-					<p>val: {tempField.finalValue}</p>
-				)}
-
-				<button onClick={deleteField}>delete</button>
+				{/* {props.templateState == TemplateState.editing ? ( */}
+				<input
+					className="grow min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
+					value={
+						props.templateState === TemplateState.editing
+							? tempField.value ?? ""
+							: tempField.finalValue
+					}
+					onChange={handleKeyChange}
+					name="value"
+					onBlur={updateTemplate}
+					disabled={props.templateState !== TemplateState.editing}
+				/>
+				{/* ) : (
+					<p className="grow">val: {tempField.finalValue}</p>
+				)} */}
 			</div>
-			{JSON.stringify(tempField)}
 		</div>
 	);
 }
