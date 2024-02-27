@@ -112,7 +112,7 @@ export const generatePath = (selectedElement: HTMLElement) => {
 };
 
 export const getElementValueFromPath = (
-	path: PathStep[],
+	path: PathStep[] | undefined,
 	document: Document
 ) => {
 	const getHeaderElement = (type: string) => {
@@ -169,16 +169,16 @@ export const getElementValueFromPath = (
 		}
 	};
 
-	if (path?.length < 1) {
+	if (!path || path.length < 1) {
 		return "";
 	}
 
 	let element: Element;
-	element = getElementFromCurrentPath(path[0], document.body);
+	element = getElementFromCurrentPath(path[0], document.body) as Element;
 
 	for (let i = 1; i < path.length; i++) {
 		if (element) {
-			element = getElementFromCurrentPath(path[i], element);
+			element = getElementFromCurrentPath(path[i], element) as Element;
 		}
 	}
 

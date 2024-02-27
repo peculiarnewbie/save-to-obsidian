@@ -10,9 +10,10 @@ import {
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
-import PropertyField from "./PropertyField";
+import PropertyField, { parseInput } from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
+import { getElementValueFromPath } from "~Helpers/ElementActions";
 
 const storage = new Storage();
 
@@ -36,14 +37,11 @@ function Template() {
 	const { currentView, changeView } = useViewStore();
 
 	const setTitle = (e: ChangeEvent) => {
+		const { title, ...rest } = currentTemplate;
 		const newTitle = (e.target as HTMLInputElement).value;
 		setCurrentTemplate({
 			title: newTitle,
-			directory: currentTemplate.directory,
-			fields: currentTemplate.fields ?? [],
-			pageElements: currentTemplate.pageElements ?? [],
-			needsBackground: currentTemplate.needsBackground,
-			isnew: currentTemplate.isnew ?? false,
+			...rest,
 		});
 	};
 
@@ -108,6 +106,20 @@ function Template() {
 
 	useEffect(() => {
 		if (currentView == Views.Template.View) {
+			// ====== syncronously load element values and pass them to fields' finalValues
+
+			const { pageElements, ...rest } = currentTemplate;
+			const newElements = [...pageElements];
+
+			pageElements.map((element, i) => {
+				newElements[i].value = getElementValueFromPath(
+					element.path,
+					document
+				);
+			});
+
+			setCurrentTemplate({ pageElements: newElements, ...rest });
+
 			setIsEditing(false);
 		} else {
 			setIsEditing(true);

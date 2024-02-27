@@ -1,5 +1,10 @@
 import { useState, type ChangeEvent, useEffect } from "react";
-import { Views, type FieldType, type PageElementType } from "~types";
+import {
+	Views,
+	type FieldType,
+	type PageElementType,
+	type TemplateType,
+} from "~types";
 import { useTemplateStore } from "./Template";
 import { useViewStore } from "~components/MainFrameContainer";
 import { isNumber } from "~Helpers/utils";
@@ -30,10 +35,9 @@ function PropertyField(props: {
 			1,
 			tempField
 		);
-		const updatedTemplate = { ...currentTemplate };
-		updatedTemplate.fields = newFields;
+		const { fields, ...rest } = currentTemplate;
 
-		setCurrentTemplate(updatedTemplate);
+		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
 	const deleteField = () => {
@@ -46,69 +50,6 @@ function PropertyField(props: {
 		changeView(Views.Selection.Hover);
 	};
 
-	const parseInput = (input: string) => {
-		if (!input) return "";
-		const checkElement = (index: number): number => {
-			let point = 1;
-
-			if (input[index + point] === "{") {
-				let numString: string = "";
-				while (true) {
-					point++;
-					if (isNumber(input[index + point])) {
-						numString += input[index + point];
-						continue;
-					} else if (input[index + point] === "}") {
-						point++;
-						if (input[index + point] === "}") {
-							// if closing double brackets
-							if (numString) {
-								if (
-									currentTemplate.pageElements[
-										parseInt(numString)
-									]
-								)
-									return parseInt(numString);
-								else
-									throw new Error(
-										"specified element don't exist in elements list"
-									);
-							}
-						}
-					}
-					return -1;
-				}
-			}
-			return -1;
-		};
-
-		let elements: number[] = [];
-		for (let i = 0; i < input.length; i++) {
-			if (input[i] == "{") {
-				let element = -1;
-				try {
-					element = checkElement(i);
-				} catch (e) {
-					console.error(e);
-				}
-				if (element !== -1) elements.push(element);
-			}
-		}
-
-		if (elements.length === 0) return input;
-
-		let parsedString = input;
-
-		elements?.forEach((element) => {
-			parsedString = parsedString.replaceAll(
-				`{{${element}}}`,
-				currentTemplate.pageElements[element].value as string
-			);
-		});
-
-		return parsedString;
-	};
-
 	/* 
 		might be better to do this everytime 
 		the field is updated instead 
@@ -117,7 +58,7 @@ function PropertyField(props: {
 		if (!props.isEditing) {
 			const { finalValue, ...rest } = { ...tempField };
 			const newField = {
-				finalValue: parseInput(rest.value as string),
+				finalValue: parseInput(rest.value as string, currentTemplate),
 				...rest,
 			};
 			setTempField(newField);
@@ -163,4 +104,63 @@ const TextInput = ({ value }: { value: string }) => {
 			<p>{value}</p>
 		</div>
 	);
+};
+
+const parseInput = (input: string | undefined, template: TemplateType) => {
+	if (!input) return "";
+	const checkElement = (index: number): number => {
+		let point = 1;
+
+		if (input[index + point] === "{") {
+			let numString: string = "";
+			while (true) {
+				point++;
+				if (isNumber(input[index + point])) {
+					numString += input[index + point];
+					continue;
+				} else if (input[index + point] === "}") {
+					point++;
+					if (input[index + point] === "}") {
+						// if closing double brackets
+						if (numString) {
+							if (template.pageElements[parseInt(numString)])
+								return parseInt(numString);
+							else
+								throw new Error(
+									"specified element don't exist in elements list"
+								);
+						}
+					}
+				}
+				return -1;
+			}
+		}
+		return -1;
+	};
+
+	let elements: number[] = [];
+	for (let i = 0; i < input.length; i++) {
+		if (input[i] == "{") {
+			let element = -1;
+			try {
+				element = checkElement(i);
+			} catch (e) {
+				console.error(e);
+			}
+			if (element !== -1) elements.push(element);
+		}
+	}
+
+	if (elements.length === 0) return input;
+
+	let parsedString = input;
+
+	elements?.forEach((element) => {
+		parsedString = parsedString.replaceAll(
+			`{{${element}}}`,
+			template.pageElements[element].value as string
+		);
+	});
+
+	return parsedString;
 };

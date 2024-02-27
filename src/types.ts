@@ -3,6 +3,7 @@ export const Views = {
 	Settings: "settings",
 	Template: {
 		View: "viewTemplate",
+		Load: "loadTemplate",
 		EditNew: "editNewTemplate",
 		EditExisting: "editExisting",
 	},
