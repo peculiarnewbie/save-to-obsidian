@@ -60,10 +60,6 @@ function HoverSelector({ detail }: { detail: boolean }) {
 		};
 	}, [detail]);
 
-	useEffect(() => {
-		console.log(hoveredElement);
-	}, [hoveredElement]);
-
 	return (
 		<div className="absolute w-screen h-screen pointer-events-none top-0 left-0">
 			<HoverCanvas hoveredElement={hoveredElement} />

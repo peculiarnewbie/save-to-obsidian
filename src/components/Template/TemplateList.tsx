@@ -7,9 +7,20 @@ import { useEffect, useState, type PointerEvent } from "react";
 
 const storage = new Storage();
 
+const emptyTemplate = (title: string) => {
+	return {
+		title: title,
+		directory: "",
+		needsBackground: false,
+		isnew: true,
+		fields: [],
+		pageElements: [],
+	};
+};
+
 interface TemplateListItem {
 	title: string;
-	url: string;
+	url?: string;
 }
 
 interface Templates {
@@ -18,7 +29,7 @@ interface Templates {
 }
 
 export const useTemplates = create<Templates>()((set) => ({
-	templates: [{ title: "example", directory: "", needsBackground: false }],
+	templates: [emptyTemplate("example")],
 	setTemplates: (list) => {
 		set({ templates: list });
 	},
@@ -33,26 +44,16 @@ function TemplateList() {
 	const [templateToDelete, setTemplateToDelete] = useState("");
 
 	const createNewTemplate = () => {
-		setCurrentTemplate({
-			title: "New Template",
-			directory: "",
-			needsBackground: false,
-			isnew: true,
-		});
+		setCurrentTemplate(emptyTemplate("New Template"));
 		changeView(Views.Template.EditNew);
 	};
 
 	const getList = async () => {
 		const generateExampleList = () => {
-			const exampleTemplate: TemplateType = {
-				title: "example",
-				directory: "",
-				needsBackground: false,
-			};
+			const exampleTemplate: TemplateType = emptyTemplate("example");
 			const newTemplates = [exampleTemplate];
 			console.log(newTemplates);
 			storage.set("templateList", newTemplates);
-			console.log("generated example");
 		};
 
 		const pulledTemplates = (await storage.get(
@@ -80,7 +81,9 @@ function TemplateList() {
 	};
 
 	const openTemplate = (title: string) => {
-		setCurrentTemplate(templates.find((item) => item.title == title));
+		setCurrentTemplate(
+			templates.find((item) => item.title == title) as TemplateType
+		);
 		changeView(Views.Template.View);
 	};
 

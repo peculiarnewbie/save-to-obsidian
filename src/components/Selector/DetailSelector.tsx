@@ -31,7 +31,7 @@ function DetailSelector() {
 			value: valueFromPath,
 		};
 
-		const { pageElements, ...rest } = { ...currentTemplate };
+		const { pageElements, ...rest } = currentTemplate;
 		if (pageElements) {
 			pageElements.push(newPageElement);
 			setCurrentTemplate({ pageElements, ...rest });

@@ -1,15 +1,22 @@
 import { useState, type ChangeEvent, useEffect } from "react";
-import { Views, type FieldType, type PageElementType } from "~types";
-import { useTemplateStore } from "./Template";
+import { type FieldType, type TemplateType } from "~types";
+import {
+	useTemplateStore,
+	type TemplateStateKeys,
+	TemplateState,
+} from "./Template";
 import { useViewStore } from "~components/MainFrameContainer";
 import { isNumber } from "~Helpers/utils";
 
-function PropertyField({ field, index }: { field: FieldType; index: number }) {
+function PropertyField(props: {
+	field: FieldType;
+	index: number;
+	templateState: TemplateStateKeys;
+}) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { currentView, changeView } = useViewStore();
 
-	const [isEditing, setIsEditing] = useState(true);
-	const [tempField, setTempField] = useState({ ...field });
+	const [tempField, setTempField] = useState({ ...props.field });
 
 	const handleKeyChange = (e: ChangeEvent) => {
 		const el = e.target as HTMLInputElement;
@@ -21,148 +28,65 @@ function PropertyField({ field, index }: { field: FieldType; index: number }) {
 		setTempField(updatedField);
 	};
 
-	const handleUpdateKey = () => {
-		const newField = { ...field };
-		newField.key = tempField.key;
+	const updateTemplate = () => {
+		const newFields = currentTemplate.fields.toSpliced(
+			props.index,
+			1,
+			tempField
+		);
+		const { fields, ...rest } = currentTemplate;
 
-		updateTemplate(newField);
-	};
-
-	const updateTemplate = (newField: FieldType) => {
-		const newFields = currentTemplate.fields.toSpliced(index, 1, newField);
-		const updatedTemplate = { ...currentTemplate };
-		updatedTemplate.fields = newFields;
-
-		setCurrentTemplate(updatedTemplate);
+		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
 	const deleteField = () => {
 		const { fields, ...rest } = currentTemplate;
-		const newFields = fields.toSpliced(index, 1);
+		const newFields = fields.toSpliced(props.index, 1);
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
-
-	const handleSelectElement = () => {
-		changeView(Views.Selection.Hover);
-	};
-
-	const parseInput = (input: string) => {
-		console.log("parsing", input);
-		if (!input) return "";
-		const checkElement = (index: number): number => {
-			let point = 1;
-
-			if (input[index + point] === "{") {
-				let numString: string = "";
-				while (true) {
-					point++;
-					if (isNumber(input[index + point])) {
-						numString += input[index + point];
-						continue;
-					} else if (input[index + point] === "}") {
-						point++;
-						if (input[index + point] === "}") {
-							// if closing double brackets
-							if (numString) {
-								if (
-									currentTemplate.pageElements[
-										parseInt(numString)
-									]
-								)
-									return parseInt(numString);
-								else
-									throw new Error(
-										"specified element don't exist in elements list"
-									);
-							}
-						}
-					}
-					return -1;
-				}
-			}
-			return -1;
-		};
-
-		let elements: number[] = [];
-		for (let i = 0; i < input.length; i++) {
-			if (input[i] == "{") {
-				let element = -1;
-				try {
-					element = checkElement(i);
-					console.log("try", input[i], element);
-				} catch (e) {
-					console.error(e);
-				}
-				if (element !== -1) elements.push(element);
-			}
-		}
-
-		if (elements.length === 0) return input;
-
-		let parsedString = input;
-
-		elements?.forEach((element) => {
-			parsedString = parsedString.replaceAll(
-				`{{${element}}}`,
-				currentTemplate.pageElements[element].value as string
-			);
-		});
-
-		return parsedString;
-	};
-
-	useEffect(() => {
-		if (currentView == Views.Template.View) {
-			setIsEditing(false);
-		} else {
-			setIsEditing(true);
-		}
-	}, [currentView]);
 
 	/* 
 		might be better to do this everytime 
 		the field is updated instead 
 	*/
 	useEffect(() => {
-		console.log("isEditing", isEditing);
-		if (!isEditing) {
+		if (props.templateState == TemplateState.viewing) {
 			const { finalValue, ...rest } = { ...tempField };
 			const newField = {
-				finalValue: parseInput(rest.value as string),
+				finalValue: parseInput(rest.value as string, currentTemplate),
 				...rest,
 			};
-			console.log("setting", newField);
 			setTempField(newField);
-			updateTemplate(newField);
+
+			updateTemplate();
 		}
-	}, [isEditing]);
+	}, [props.templateState]);
 
 	return (
 		<div>
 			<div className=" w-full bg-obsidian-100 flex border rounded-md h-fit">
 				<input
 					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-					value={tempField.key}
+					value={tempField.key ?? ""}
 					onChange={handleKeyChange}
-					onBlur={() => handleUpdateKey()}
 					name="key"
-					disabled={!isEditing}
+					onBlur={updateTemplate}
+					disabled={props.templateState !== TemplateState.editing}
 				/>
-				{isEditing ? (
+				{props.templateState == TemplateState.editing ? (
 					<input
 						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-						value={tempField.value}
+						value={tempField.value ?? ""}
 						onChange={handleKeyChange}
-						onBlur={() => handleUpdateKey()}
 						name="value"
-						disabled={!isEditing}
+						onBlur={updateTemplate}
+						disabled={props.templateState !== TemplateState.editing}
 					/>
 				) : (
 					<p>val: {tempField.finalValue}</p>
 				)}
 
 				<button onClick={deleteField}>delete</button>
-				<button onPointerDown={handleSelectElement}>Select</button>
 			</div>
 			{JSON.stringify(tempField)}
 		</div>
@@ -178,4 +102,63 @@ const TextInput = ({ value }: { value: string }) => {
 			<p>{value}</p>
 		</div>
 	);
+};
+
+const parseInput = (input: string | undefined, template: TemplateType) => {
+	if (!input) return "";
+	const checkElement = (index: number): number => {
+		let point = 1;
+
+		if (input[index + point] === "{") {
+			let numString: string = "";
+			while (true) {
+				point++;
+				if (isNumber(input[index + point])) {
+					numString += input[index + point];
+					continue;
+				} else if (input[index + point] === "}") {
+					point++;
+					if (input[index + point] === "}") {
+						// if closing double brackets
+						if (numString) {
+							if (template.pageElements[parseInt(numString)])
+								return parseInt(numString);
+							else
+								throw new Error(
+									"specified element don't exist in elements list"
+								);
+						}
+					}
+				}
+				return -1;
+			}
+		}
+		return -1;
+	};
+
+	let elements: number[] = [];
+	for (let i = 0; i < input.length; i++) {
+		if (input[i] == "{") {
+			let element = -1;
+			try {
+				element = checkElement(i);
+			} catch (e) {
+				console.error(e);
+			}
+			if (element !== -1) elements.push(element);
+		}
+	}
+
+	if (elements.length === 0) return input;
+
+	let parsedString = input;
+
+	elements?.forEach((element) => {
+		parsedString = parsedString.replaceAll(
+			`{{${element}}}`,
+			template.pageElements[element].value as string
+		);
+	});
+
+	return parsedString;
 };

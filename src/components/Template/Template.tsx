@@ -10,9 +10,10 @@ import {
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
-import PropertyField from "./PropertyField";
+import PropertyField, { parseInput } from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
+import { getElementValueFromPath } from "~Helpers/ElementActions";
 
 const storage = new Storage();
 
@@ -26,8 +27,21 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 	setCurrentTemplate: (template) => set({ currentTemplate: template }),
 }));
 
+export const TemplateState = {
+	closed: 0,
+	loading: 1,
+	viewing: 2,
+	editing: 3,
+} as const;
+
+export type TemplateStateKeys =
+	(typeof TemplateState)[keyof typeof TemplateState];
+
 function Template() {
 	const [oldTitle, setOldTitle] = useState("New Template");
+	const [templateState, setTemplateState] = useState<TemplateStateKeys>(
+		TemplateState.closed
+	);
 
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { templates, setTemplates } = useTemplates();
@@ -35,14 +49,11 @@ function Template() {
 	const { currentView, changeView } = useViewStore();
 
 	const setTitle = (e: ChangeEvent) => {
+		const { title, ...rest } = currentTemplate;
 		const newTitle = (e.target as HTMLInputElement).value;
 		setCurrentTemplate({
 			title: newTitle,
-			directory: currentTemplate.directory,
-			fields: currentTemplate.fields ?? [],
-			pageElements: currentTemplate.pageElements ?? [],
-			needsBackground: currentTemplate.needsBackground,
-			isnew: currentTemplate.isnew ?? false,
+			...rest,
 		});
 	};
 
@@ -97,6 +108,13 @@ function Template() {
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
+	const toggleState = async (state: TemplateStateKeys) => {
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		console.log("waiting");
+		setTemplateState(state);
+		// setIsEditing(edit);
+	};
+
 	useEffect(() => {
 		setIframeTitle(currentTemplate.title);
 	}, [currentTemplate.title]);
@@ -104,6 +122,28 @@ function Template() {
 	useEffect(() => {
 		setOldTitle(currentTemplate.title);
 	}, []);
+
+	useEffect(() => {
+		if (currentView == Views.Template.View) {
+			// ====== syncronously load element values and pass them to fields' finalValues
+
+			const { pageElements, ...rest } = currentTemplate;
+			const newElements = [...pageElements];
+
+			pageElements.map((element, i) => {
+				newElements[i].value = getElementValueFromPath(
+					element.path,
+					document
+				);
+			});
+
+			setCurrentTemplate({ pageElements: newElements, ...rest });
+
+			toggleState(TemplateState.viewing);
+		} else {
+			toggleState(TemplateState.editing);
+		}
+	}, [currentView]);
 
 	return (
 		<div>
@@ -117,6 +157,7 @@ function Template() {
 							key={field.key}
 							field={field}
 							index={i}
+							templateState={templateState}
 						/>
 					);
 				})}
@@ -135,14 +176,23 @@ function Template() {
 					);
 				})}
 			</PageElementsList>
-			<button onClick={saveTemplate}>save templatee</button>
+			<div className="flex flex-col">
+				<button onClick={saveTemplate}>save templatee</button>
 
-			<button onClick={() => changeView(Views.Template.EditExisting)}>
-				Edit
-			</button>
-			<button onClick={() => changeView(Views.Template.View)}>
-				View
-			</button>
+				<button onClick={() => changeView(Views.Template.EditExisting)}>
+					Edit
+				</button>
+				<button onClick={() => changeView(Views.Template.View)}>
+					View
+				</button>
+				{templateState == TemplateState.editing ? (
+					<button onClick={() => changeView(Views.Selection.Hover)}>
+						Select
+					</button>
+				) : (
+					<></>
+				)}
+			</div>
 		</div>
 	);
 }
