@@ -7,6 +7,17 @@ import { useEffect, useState, type PointerEvent } from "react";
 
 const storage = new Storage();
 
+const emptyTemplate = (title: string) => {
+	return {
+		title: title,
+		directory: "",
+		needsBackground: false,
+		isnew: true,
+		fields: [],
+		pageElements: [],
+	};
+};
+
 interface TemplateListItem {
 	title: string;
 	url?: string;
@@ -23,17 +34,6 @@ export const useTemplates = create<Templates>()((set) => ({
 		set({ templates: list });
 	},
 }));
-
-const emptyTemplate = (title: string) => {
-	return {
-		title: title,
-		directory: "",
-		needsBackground: false,
-		isnew: true,
-		fields: [],
-		pageElements: [],
-	};
-};
 
 function TemplateList() {
 	const { setCurrentTemplate } = useTemplateStore();
