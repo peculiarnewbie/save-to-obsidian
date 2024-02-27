@@ -63,36 +63,38 @@ function PropertyField(props: {
 	}, [props.templateState]);
 
 	return (
-		<div>
-			<div className=" w-full bg-obsidian-100 flex border rounded-md h-fit">
-				<button className="w-6" onClick={deleteField}>
-					d
-				</button>
-				<input
-					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2 w-1/4"
-					value={tempField.key ?? ""}
-					onChange={handleKeyChange}
-					name="key"
-					onBlur={updateTemplate}
-					disabled={props.templateState !== TemplateState.editing}
-				/>
-				{/* {props.templateState == TemplateState.editing ? ( */}
-				<input
-					className="grow min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-					value={
-						props.templateState === TemplateState.editing
-							? tempField.value ?? ""
-							: tempField.finalValue
-					}
-					onChange={handleKeyChange}
-					name="value"
-					onBlur={updateTemplate}
-					disabled={props.templateState !== TemplateState.editing}
-				/>
-				{/* ) : (
+		<div
+			className={` w-full bg-obsidian-100 border-transparent flex border-[3px] border-b-2 outline outline-0 rounded-md h-fit  hover:outline-1 outline-obsidian-600
+				${false ? " hover:border-obsidian-500 " : ""}
+			`}
+		>
+			<button className="w-6" onClick={deleteField}>
+				d
+			</button>
+			<input
+				className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2 w-1/4"
+				value={tempField.key ?? ""}
+				onChange={handleKeyChange}
+				name="key"
+				onBlur={updateTemplate}
+				disabled={props.templateState !== TemplateState.editing}
+			/>
+			{/* {props.templateState == TemplateState.editing ? ( */}
+			<input
+				className="grow min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
+				value={
+					props.templateState === TemplateState.editing
+						? tempField.value ?? ""
+						: tempField.finalValue
+				}
+				onChange={handleKeyChange}
+				name="value"
+				onBlur={updateTemplate}
+				disabled={props.templateState !== TemplateState.editing}
+			/>
+			{/* ) : (
 					<p className="grow">val: {tempField.finalValue}</p>
 				)} */}
-			</div>
 		</div>
 	);
 }
