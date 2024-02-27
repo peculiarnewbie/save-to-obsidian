@@ -67,17 +67,19 @@ function PropertyField(props: {
 			<div className=" w-full bg-obsidian-100 flex border rounded-md h-fit">
 				<input
 					className="font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-					value={tempField.key}
+					value={tempField.key ?? ""}
 					onChange={handleKeyChange}
 					name="key"
+					onBlur={updateTemplate}
 					disabled={props.templateState !== TemplateState.editing}
 				/>
 				{props.templateState == TemplateState.editing ? (
 					<input
 						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
-						value={tempField.value}
+						value={tempField.value ?? ""}
 						onChange={handleKeyChange}
 						name="value"
+						onBlur={updateTemplate}
 						disabled={props.templateState !== TemplateState.editing}
 					/>
 				) : (
