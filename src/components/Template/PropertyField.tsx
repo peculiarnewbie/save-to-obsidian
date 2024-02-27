@@ -14,7 +14,7 @@ function PropertyField(props: {
 	templateState: TemplateStateKeys;
 }) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
-	const { currentView, changeView } = useViewStore();
+	const { currentView, setCurrentView } = useViewStore();
 
 	const [tempField, setTempField] = useState({ ...props.field });
 	const [isFocused, setIsFocused] = useState(false);

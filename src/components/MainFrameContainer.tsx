@@ -10,12 +10,12 @@ import Template from "./Template/Template";
 
 interface ViewState {
 	currentView: ViewsKeys;
-	changeView: (view: ViewsKeys) => void;
+	setCurrentView: (view: ViewsKeys) => void;
 }
 
 export const useViewStore = create<ViewState>()((set) => ({
 	currentView: Views.Main,
-	changeView: (view) => set({ currentView: view }),
+	setCurrentView: (view) => set({ currentView: view }),
 }));
 
 export const getStyle = () => {
@@ -32,15 +32,7 @@ const MainFrameContainer = ({
 	hidden: boolean;
 }) => {
 	const { setIframeTitle } = useIframeTitleStore();
-	const { currentView, changeView } = useViewStore();
-
-	const goBack = () => {
-		if (
-			currentView == Views.Template.EditNew ||
-			currentView == Views.Template.View
-		)
-			changeView(Views.Main);
-	};
+	const { currentView, setCurrentView } = useViewStore();
 
 	// =========================================================== delete this.
 	// just change the store wherever you're switching views
@@ -65,11 +57,7 @@ const MainFrameContainer = ({
 			<div
 				className={`${hidden ? "hidden" : "flex"} w-full h-full text-text-primary flex-col rounded-xl bg-obsidian-100 overflow-hidden`}
 			>
-				<Header
-					closePopup={closePopup}
-					currentView={currentView}
-					goBack={goBack}
-				/>
+				<Header closePopup={closePopup} />
 				<MainContent currentView={currentView} />
 			</div>
 			<BodyStyle />

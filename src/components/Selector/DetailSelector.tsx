@@ -18,7 +18,7 @@ export const usePageElementStore = create<PageElementState>()((set) => ({
 
 function DetailSelector() {
 	const { currentPageElement, setCurrentPageElement } = usePageElementStore();
-	const { changeView } = useViewStore();
+	const { setCurrentView: setCurrentView } = useViewStore();
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 
 	const selectElement = async () => {
@@ -37,7 +37,7 @@ function DetailSelector() {
 			setCurrentTemplate({ pageElements, ...rest });
 		} else setCurrentTemplate({ pageElements: [newPageElement], ...rest });
 
-		changeView(Views.Template.View);
+		setCurrentView(Views.Template.View);
 	};
 
 	return (
@@ -49,7 +49,7 @@ function DetailSelector() {
 				})}
 			</div>
 			<button onClick={selectElement}>Select</button>
-			<button onClick={() => changeView(Views.Selection.Hover)}>
+			<button onClick={() => setCurrentView(Views.Selection.Hover)}>
 				back
 			</button>
 		</div>
