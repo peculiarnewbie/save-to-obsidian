@@ -27,9 +27,21 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
 	setCurrentTemplate: (template) => set({ currentTemplate: template }),
 }));
 
+export const TemplateState = {
+	closed: 0,
+	loading: 1,
+	viewing: 2,
+	editing: 3,
+} as const;
+
+export type TemplateStateKeys =
+	(typeof TemplateState)[keyof typeof TemplateState];
+
 function Template() {
 	const [oldTitle, setOldTitle] = useState("New Template");
-	const [isEditing, setIsEditing] = useState(false);
+	const [templateState, setTemplateState] = useState<TemplateStateKeys>(
+		TemplateState.closed
+	);
 
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { templates, setTemplates } = useTemplates();
@@ -96,6 +108,13 @@ function Template() {
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
+	const toggleState = async (state: TemplateStateKeys) => {
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		console.log("waiting");
+		setTemplateState(state);
+		// setIsEditing(edit);
+	};
+
 	useEffect(() => {
 		setIframeTitle(currentTemplate.title);
 	}, [currentTemplate.title]);
@@ -120,9 +139,9 @@ function Template() {
 
 			setCurrentTemplate({ pageElements: newElements, ...rest });
 
-			setIsEditing(false);
+			toggleState(TemplateState.viewing);
 		} else {
-			setIsEditing(true);
+			toggleState(TemplateState.editing);
 		}
 	}, [currentView]);
 
@@ -138,7 +157,7 @@ function Template() {
 							key={field.key}
 							field={field}
 							index={i}
-							isEditing={isEditing}
+							templateState={templateState}
 						/>
 					);
 				})}
@@ -166,7 +185,7 @@ function Template() {
 				<button onClick={() => changeView(Views.Template.View)}>
 					View
 				</button>
-				{isEditing ? (
+				{templateState == TemplateState.editing ? (
 					<button onClick={() => changeView(Views.Selection.Hover)}>
 						Select
 					</button>

@@ -1,18 +1,17 @@
 import { useState, type ChangeEvent, useEffect } from "react";
+import { type FieldType, type TemplateType } from "~types";
 import {
-	Views,
-	type FieldType,
-	type PageElementType,
-	type TemplateType,
-} from "~types";
-import { useTemplateStore } from "./Template";
+	useTemplateStore,
+	type TemplateStateKeys,
+	TemplateState,
+} from "./Template";
 import { useViewStore } from "~components/MainFrameContainer";
 import { isNumber } from "~Helpers/utils";
 
 function PropertyField(props: {
 	field: FieldType;
 	index: number;
-	isEditing: boolean;
+	templateState: TemplateStateKeys;
 }) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 	const { currentView, changeView } = useViewStore();
@@ -46,25 +45,22 @@ function PropertyField(props: {
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
-	const handleSelectElement = () => {
-		changeView(Views.Selection.Hover);
-	};
-
 	/* 
 		might be better to do this everytime 
 		the field is updated instead 
 	*/
 	useEffect(() => {
-		if (!props.isEditing) {
+		if (props.templateState == TemplateState.viewing) {
 			const { finalValue, ...rest } = { ...tempField };
 			const newField = {
 				finalValue: parseInput(rest.value as string, currentTemplate),
 				...rest,
 			};
 			setTempField(newField);
+
 			updateTemplate();
 		}
-	}, [props.isEditing]);
+	}, [props.templateState]);
 
 	return (
 		<div>
@@ -74,15 +70,15 @@ function PropertyField(props: {
 					value={tempField.key}
 					onChange={handleKeyChange}
 					name="key"
-					disabled={!props.isEditing}
+					disabled={props.templateState !== TemplateState.editing}
 				/>
-				{props.isEditing ? (
+				{props.templateState == TemplateState.editing ? (
 					<input
 						className=" min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2"
 						value={tempField.value}
 						onChange={handleKeyChange}
 						name="value"
-						disabled={!props.isEditing}
+						disabled={props.templateState !== TemplateState.editing}
 					/>
 				) : (
 					<p>val: {tempField.finalValue}</p>
