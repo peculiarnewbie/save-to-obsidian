@@ -15,6 +15,7 @@ import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
 import { sendToBackground } from "@plasmohq/messaging";
+import { downloadMD } from "~background/messages/download";
 
 const storage = new Storage();
 
@@ -54,6 +55,14 @@ function Template() {
 		const newTitle = (e.target as HTMLInputElement).value;
 		setCurrentTemplate({
 			title: newTitle,
+			...rest,
+		});
+	};
+	const setDirectory = (e: ChangeEvent) => {
+		const { directory, ...rest } = currentTemplate;
+		const newDirectory = (e.target as HTMLInputElement).value;
+		setCurrentTemplate({
+			directory: newDirectory,
 			...rest,
 		});
 	};
@@ -148,8 +157,20 @@ function Template() {
 
 	return (
 		<div>
-			<p>title</p>
-			<input onChange={setTitle} value={currentTemplate.title}></input>
+			{templateState === TemplateState.editing && (
+				<div>
+					<p>title</p>
+					<input
+						onChange={setTitle}
+						value={currentTemplate.title}
+					></input>
+					<p>directory</p>
+					<input
+						onChange={setDirectory}
+						value={currentTemplate.directory}
+					></input>
+				</div>
+			)}
 			<PropertyField
 				field={currentTemplate.filename}
 				index={-1}
@@ -219,22 +240,6 @@ function Template() {
 		</div>
 	);
 }
-
-const downloadMD = async (template: TemplateType) => {
-	let mdValue = "---\n";
-	template.fields.map((field) => {
-		mdValue += field.key + ": " + field.finalValue + "\n";
-	});
-	mdValue += "---";
-	console.log(mdValue);
-
-	const resp = await sendToBackground({
-		name: "download",
-		body: {
-			value: mdValue,
-		},
-	});
-};
 
 const FieldList = ({ children }: { children: React.ReactNode }) => {
 	return <div className=" flex flex-col gap-2">{children}</div>;

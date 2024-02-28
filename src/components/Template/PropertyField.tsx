@@ -5,7 +5,6 @@ import {
 	type TemplateStateKeys,
 	TemplateState,
 } from "./Template";
-import { useViewStore } from "~components/MainFrameContainer";
 import { isNumber } from "~Helpers/utils";
 
 function PropertyField(props: {
@@ -14,7 +13,6 @@ function PropertyField(props: {
 	templateState: TemplateStateKeys;
 }) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
-	const { currentView, setCurrentView } = useViewStore();
 
 	const [tempField, setTempField] = useState({ ...props.field });
 	const [isFocused, setIsFocused] = useState(false);
@@ -30,14 +28,20 @@ function PropertyField(props: {
 	};
 
 	const updateTemplate = () => {
-		const newFields = currentTemplate.fields.toSpliced(
-			props.index,
-			1,
-			tempField
-		);
-		const { fields, ...rest } = currentTemplate;
+		if (props.index === -1) {
+			const { filename, ...rest } = currentTemplate;
+			setCurrentTemplate({ filename: tempField, ...rest });
+		} else {
+			const { fields, ...rest } = currentTemplate;
 
-		setCurrentTemplate({ fields: newFields, ...rest });
+			const newFields = currentTemplate.fields.toSpliced(
+				props.index,
+				1,
+				tempField
+			);
+
+			setCurrentTemplate({ fields: newFields, ...rest });
+		}
 	};
 
 	const deleteField = () => {
@@ -79,14 +83,19 @@ function PropertyField(props: {
 					setIsFocused(false);
 					updateTemplate();
 				}}
-				disabled={props.templateState !== TemplateState.editing}
+				disabled={
+					props.templateState !== TemplateState.editing ||
+					props.index === -1
+				}
 			/>
-			<button
-				className="w-6 peer-focus:bg-obsidian-200 order-first"
-				onClick={deleteField}
-			>
-				d
-			</button>
+			{props.index !== -1 && (
+				<button
+					className="w-6 peer-focus:bg-obsidian-200 order-first"
+					onClick={deleteField}
+				>
+					d
+				</button>
+			)}
 			{/* {props.templateState == TemplateState.editing ? ( */}
 			<input
 				className="grow min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2 focus:bg-obsidian-200"
