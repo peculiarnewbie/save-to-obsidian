@@ -8,7 +8,8 @@ function PageElement(props: { pageElement: PageElementType; index: number }) {
 	const { setCurrentView } = useViewStore();
 
 	const reselect = () => {
-		setCurrentPageElement(props.pageElement);
+		console.log("reselect", props.index);
+		setCurrentPageElement({ index: props.index, ...props.pageElement });
 		setCurrentView(Views.Selection.Hover);
 	};
 

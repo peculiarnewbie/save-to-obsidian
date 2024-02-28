@@ -1,25 +1,4 @@
-import { sendToBackground, type PlasmoMessaging } from "@plasmohq/messaging";
-import type { TemplateType } from "~types";
-
-export const downloadMD = async (template: TemplateType) => {
-	let mdValue = "---\n";
-	template.fields.map((field) => {
-		mdValue += field.key + ": " + field.finalValue + "\n";
-	});
-	mdValue += "---";
-
-	const filename = template.directory + template.filename.finalValue;
-
-	console.log(mdValue, filename);
-
-	const resp = await sendToBackground({
-		name: "download",
-		body: {
-			value: mdValue,
-			filename: filename,
-		},
-	});
-};
+import type { PlasmoMessaging } from "@plasmohq/messaging";
 
 const handler: PlasmoMessaging.PortHandler = async (req, res) => {
 	console.log(req.body);
