@@ -141,7 +141,7 @@ function TemplateList() {
 						</div>
 					);
 				})}
-				<button onClick={createNewTemplate}>New Template</button>
+				<MyButton onClick={createNewTemplate}>New Template</MyButton>
 			</div>
 			{templateToDelete != "" ? (
 				<div className=" absolute z-10 top-0 w-full h-full bg-obsidian-100/80 flex flex-col items-center justify-center">
