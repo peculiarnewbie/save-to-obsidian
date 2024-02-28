@@ -14,6 +14,7 @@ import PropertyField from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
+import { sendToBackground } from "@plasmohq/messaging";
 
 const storage = new Storage();
 
@@ -221,21 +222,12 @@ const downloadMD = async (template: TemplateType) => {
 	mdValue += "---";
 	console.log(mdValue);
 
-	var element = document.createElement("a");
-	element.setAttribute(
-		"href",
-		"data:text/plain;charset=utf-8," + encodeURIComponent(mdValue)
-	);
-	element.setAttribute("download", "markdown");
-
-	element.style.display = "none";
-	document.body.appendChild(element);
-
-	element.click();
-
-	document.body.removeChild(element);
-
-	console.log("dun");
+	const resp = await sendToBackground({
+		name: "download",
+		body: {
+			value: mdValue,
+		},
+	});
 };
 
 const FieldList = ({ children }: { children: React.ReactNode }) => {
