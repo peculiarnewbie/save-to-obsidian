@@ -195,7 +195,7 @@ function Template() {
 						</button>
 					</div>
 				) : (
-					<div>
+					<div className="flex gap-4">
 						<button
 							onClick={() =>
 								setCurrentView(Views.Template.EditExisting)
@@ -213,13 +213,29 @@ function Template() {
 	);
 }
 
-const downloadMD = (template: TemplateType) => {
+const downloadMD = async (template: TemplateType) => {
 	let mdValue = "---\n";
 	template.fields.map((field) => {
 		mdValue += field.key + ": " + field.finalValue + "\n";
 	});
 	mdValue += "---";
 	console.log(mdValue);
+
+	var element = document.createElement("a");
+	element.setAttribute(
+		"href",
+		"data:text/plain;charset=utf-8," + encodeURIComponent(mdValue)
+	);
+	element.setAttribute("download", "markdown");
+
+	element.style.display = "none";
+	document.body.appendChild(element);
+
+	element.click();
+
+	document.body.removeChild(element);
+
+	console.log("dun");
 };
 
 const FieldList = ({ children }: { children: React.ReactNode }) => {
