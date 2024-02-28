@@ -69,6 +69,10 @@ function PropertyField(props: {
 	// 	}
 	// }, [props.templateState]);
 
+	useEffect(() => {
+		setTempField(props.field);
+	}, [props.field]);
+
 	return (
 		<div
 			className={` w-full bg-obsidian-100 flex border-2 border-t-[3px] outline -outline-offset-1 rounded-md h-fit  hover:outline-1 outline-obsidian-500
