@@ -1,12 +1,6 @@
 import { useEffect, type ChangeEvent, useState } from "react";
 import { useIframeTitleStore } from "../Header";
-import {
-	FieldTypes,
-	type FieldType,
-	type PageElementType,
-	type TemplateType,
-	Views,
-} from "~types";
+import { FieldTypes, type FieldType, type TemplateType, Views } from "~types";
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
@@ -14,7 +8,6 @@ import PropertyField from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
-import { sendToBackground } from "@plasmohq/messaging";
 import { downloadMD } from "~background/messages/download";
 
 const storage = new Storage();
@@ -135,8 +128,6 @@ function Template() {
 
 	useEffect(() => {
 		if (currentView == Views.Template.View) {
-			// ====== syncronously load element values and pass them to fields' finalValues
-
 			const { pageElements, ...rest } = currentTemplate;
 			const newElements = [...pageElements];
 

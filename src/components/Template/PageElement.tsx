@@ -1,20 +1,25 @@
 import { useEffect } from "react";
-import type { PageElementType } from "~types";
+import { useViewStore } from "~components/MainFrameContainer";
+import { usePageElementStore } from "~components/Selector/DetailSelector";
+import { Views, type PageElementType } from "~types";
 
-function PageElement({
-	pageElement,
-	index,
-}: {
-	pageElement: PageElementType;
-	index: number;
-}) {
+function PageElement(props: { pageElement: PageElementType; index: number }) {
+	const { setCurrentPageElement } = usePageElementStore();
+	const { setCurrentView } = useViewStore();
+
+	const reselect = () => {
+		setCurrentPageElement(props.pageElement);
+		setCurrentView(Views.Selection.Hover);
+	};
+
 	useEffect(() => {
-		console.log(pageElement);
+		console.log(props.pageElement);
 	}, []);
 	return (
 		<div>
-			<div>{index}</div>
-			<div>{pageElement.value}</div>
+			<div>{props.index}</div>
+			<div>{props.pageElement.value}</div>
+			<button onClick={reselect}>Reselect</button>
 		</div>
 	);
 }
