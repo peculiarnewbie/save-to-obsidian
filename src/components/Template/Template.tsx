@@ -9,6 +9,7 @@ import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
 import { sendToBackground } from "@plasmohq/messaging";
+import MyButton from "~components/Elements/MyButton";
 
 const storage = new Storage();
 
@@ -206,40 +207,42 @@ function Template() {
 			</PageElementsList>
 			<div className="flex flex-col">
 				{templateState === TemplateState.editing ? (
-					<div>
-						<button
-							onClick={() => {
-								saveTemplate();
-								setCurrentView(Views.Template.View);
-							}}
-						>
-							save templatee
-						</button>
-						<button
+					<div className="flex flex-col gap-4">
+						<MyButton
 							onClick={() =>
 								setCurrentView(Views.Selection.Hover)
 							}
 						>
 							Select
-						</button>
+						</MyButton>
+						<MyButton
+							onClick={() => {
+								saveTemplate();
+								setCurrentView(Views.Template.View);
+							}}
+							accented
+						>
+							Save
+						</MyButton>
 					</div>
 				) : (
-					<div className="flex gap-4 flex-col">
-						<button
+					<div className="flex gap-4">
+						<MyButton
 							onClick={() =>
 								setCurrentView(Views.Template.EditExisting)
 							}
 						>
 							Edit
-						</button>
-						<button
+						</MyButton>
+						<MyButton
 							onClick={() => {
 								console.log(currentTemplate);
 								downloadMD(currentTemplate);
 							}}
+							accented={true}
 						>
 							Download
-						</button>
+						</MyButton>
 					</div>
 				)}
 			</div>
