@@ -3,7 +3,8 @@ import { Storage } from "@plasmohq/storage";
 import { useTemplateStore } from "./Template";
 import { Views, type TemplateType, FieldTypes } from "~types";
 import { create } from "zustand";
-import { useEffect, useState, type PointerEvent } from "react";
+import { useEffect, useState, type PointerEvent, type MouseEvent } from "react";
+import MyButton from "~components/Elements/MyButton";
 
 const storage = new Storage();
 
@@ -92,7 +93,7 @@ function TemplateList() {
 		setCurrentView(Views.Template.View);
 	};
 
-	const handleDeleteTemplate = (title: string, e: PointerEvent) => {
+	const handleDeleteTemplate = (title: string, e: MouseEvent) => {
 		e.stopPropagation();
 		e.preventDefault();
 		setTemplateToDelete(title);
@@ -129,14 +130,13 @@ function TemplateList() {
 										{"/" + (item.url ? item.url : "")}
 									</p>
 								</div>
-								<button
-									onPointerDown={(e) =>
+								<MyButton
+									onClick={(e) =>
 										handleDeleteTemplate(item.title, e)
 									}
-									className=" p-2 bg-obsidian-300"
 								>
 									delete
-								</button>
+								</MyButton>
 							</div>
 						</div>
 					);
@@ -149,13 +149,13 @@ function TemplateList() {
 						<p>Delete this template?</p>
 						<div className="flex gap-8">
 							<button
-								onPointerDown={deleteTemplate}
+								onClick={deleteTemplate}
 								className=" bg-red-500 rounded-md py-2 px-4"
 							>
 								delete
 							</button>
 							<button
-								onPointerDown={() => setTemplateToDelete("")}
+								onClick={() => setTemplateToDelete("")}
 								className=" py-2 px-4 rounded-sm"
 							>
 								cancel
