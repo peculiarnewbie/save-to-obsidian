@@ -1,17 +1,22 @@
 import { useViewStore } from "~components/MainFrameContainer";
 import { Storage } from "@plasmohq/storage";
 import { useTemplateStore } from "./Template";
-import { Views, type TemplateType } from "~types";
+import { Views, type TemplateType, FieldTypes } from "~types";
 import { create } from "zustand";
 import { useEffect, useState, type PointerEvent } from "react";
 
 const storage = new Storage();
 
-const emptyTemplate = (title: string) => {
+const emptyTemplate = (title: string): TemplateType & { isnew?: boolean } => {
 	return {
 		title: title,
 		directory: "",
 		needsBackground: false,
+		filename: {
+			key: "filename",
+			type: FieldTypes.Filename,
+			finalValue: "example filename",
+		},
 		isnew: true,
 		fields: [],
 		pageElements: [],

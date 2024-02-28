@@ -149,6 +149,11 @@ function Template() {
 		<div>
 			<p>title</p>
 			<input onChange={setTitle} value={currentTemplate.title}></input>
+			<PropertyField
+				field={currentTemplate.filename}
+				index={-1}
+				templateState={templateState}
+			/>
 			<div>Fields</div>
 			<FieldList>
 				{currentTemplate.fields?.map((field, i) => {

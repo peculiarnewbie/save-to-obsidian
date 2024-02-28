@@ -37,7 +37,11 @@ function DetailSelector() {
 			setCurrentTemplate({ pageElements, ...rest });
 		} else setCurrentTemplate({ pageElements: [newPageElement], ...rest });
 
-		setCurrentView(Views.Template.View);
+		setCurrentView(
+			currentTemplate.isnew
+				? Views.Template.EditNew
+				: Views.Template.EditExisting
+		);
 	};
 
 	return (
