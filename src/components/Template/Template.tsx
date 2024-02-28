@@ -66,6 +66,7 @@ function Template() {
 
 		const newTemplate = { ...currentTemplate };
 		newTemplate.isnew = false;
+		setCurrentTemplate(newTemplate);
 
 		if (currentTemplate.isnew) {
 			const newTemplates = [...templates];
