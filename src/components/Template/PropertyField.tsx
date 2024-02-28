@@ -27,17 +27,19 @@ function PropertyField(props: {
 		setTempField(updatedField);
 	};
 
-	const updateTemplate = () => {
+	const updateTemplate = (newField: FieldType) => {
+		// console.log("update template", newField);
 		if (props.index === -1) {
+			console.log("update filename", newField);
 			const { filename, ...rest } = currentTemplate;
-			setCurrentTemplate({ filename: tempField, ...rest });
+			setCurrentTemplate({ filename: newField, ...rest });
 		} else {
 			const { fields, ...rest } = currentTemplate;
 
 			const newFields = currentTemplate.fields.toSpliced(
 				props.index,
 				1,
-				tempField
+				newField
 			);
 
 			setCurrentTemplate({ fields: newFields, ...rest });
@@ -54,18 +56,18 @@ function PropertyField(props: {
 		might be better to do this everytime 
 		the field is updated instead 
 	*/
-	useEffect(() => {
-		if (props.templateState == TemplateState.viewing) {
-			const { finalValue, ...rest } = { ...tempField };
-			const newField = {
-				finalValue: parseInput(rest.value as string, currentTemplate),
-				...rest,
-			};
-			setTempField(newField);
+	// useEffect(() => {
+	// 	if (props.templateState == TemplateState.viewing) {
+	// 		const { finalValue, ...rest } = { ...tempField };
+	// 		const newField = {
+	// 			finalValue: parseInput(rest.value as string, currentTemplate),
+	// 			...rest,
+	// 		};
+	// 		setTempField(newField);
 
-			updateTemplate();
-		}
-	}, [props.templateState]);
+	// 		updateTemplate(newField);
+	// 	}
+	// }, [props.templateState]);
 
 	return (
 		<div
@@ -81,7 +83,7 @@ function PropertyField(props: {
 				onFocus={() => setIsFocused(true)}
 				onBlur={() => {
 					setIsFocused(false);
-					updateTemplate();
+					updateTemplate(tempField);
 				}}
 				disabled={
 					props.templateState !== TemplateState.editing ||
@@ -113,7 +115,7 @@ function PropertyField(props: {
 				onFocus={() => setIsFocused(true)}
 				onBlur={() => {
 					setIsFocused(false);
-					updateTemplate();
+					updateTemplate(tempField);
 				}}
 			/>
 			{/* ) : (
@@ -134,7 +136,10 @@ const TextInput = ({ value }: { value: string }) => {
 	);
 };
 
-const parseInput = (input: string | undefined, template: TemplateType) => {
+export const parseInput = (
+	input: string | undefined,
+	template: TemplateType
+) => {
 	if (!input) return "";
 	const checkElement = (index: number): number => {
 		let point = 1;

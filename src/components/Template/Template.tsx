@@ -1,21 +1,14 @@
 import { useEffect, type ChangeEvent, useState } from "react";
 import { useIframeTitleStore } from "../Header";
-import {
-	FieldTypes,
-	type FieldType,
-	type PageElementType,
-	type TemplateType,
-	Views,
-} from "~types";
+import { FieldTypes, type FieldType, type TemplateType, Views } from "~types";
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
-import PropertyField from "./PropertyField";
+import PropertyField, { parseInput } from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
 import { sendToBackground } from "@plasmohq/messaging";
-import { downloadMD } from "~background/messages/download";
 
 const storage = new Storage();
 
@@ -98,8 +91,6 @@ function Template() {
 	const addField = () => {
 		const { fields, ...rest } = currentTemplate;
 
-		let newFields: FieldType[];
-
 		let unusedIndex = 1;
 		while (
 			fields?.find((field) => field.key == `field ${unusedIndex}`) !=
@@ -113,6 +104,7 @@ function Template() {
 			type: FieldTypes.Text,
 		};
 
+		let newFields: FieldType[];
 		if (fields) newFields = fields.toSpliced(fields.length, 0, newField);
 		else newFields = [newField];
 
@@ -135,19 +127,28 @@ function Template() {
 
 	useEffect(() => {
 		if (currentView == Views.Template.View) {
-			// ====== syncronously load element values and pass them to fields' finalValues
+			const newTemplate = { ...currentTemplate };
 
-			const { pageElements, ...rest } = currentTemplate;
-			const newElements = [...pageElements];
-
-			pageElements.map((element, i) => {
-				newElements[i].value = getElementValueFromPath(
+			currentTemplate.pageElements.map((element, i) => {
+				newTemplate.pageElements[i].value = getElementValueFromPath(
 					element.path,
 					document
 				);
 			});
 
-			setCurrentTemplate({ pageElements: newElements, ...rest });
+			currentTemplate.fields.map((field, i) => {
+				newTemplate.fields[i].finalValue = parseInput(
+					currentTemplate.fields[i].value,
+					newTemplate
+				);
+			});
+
+			newTemplate.filename.finalValue = parseInput(
+				currentTemplate.filename.value,
+				newTemplate
+			);
+
+			setCurrentTemplate(newTemplate);
 
 			toggleState(TemplateState.viewing);
 		} else {
@@ -223,7 +224,7 @@ function Template() {
 						</button>
 					</div>
 				) : (
-					<div className="flex gap-4">
+					<div className="flex gap-4 flex-col">
 						<button
 							onClick={() =>
 								setCurrentView(Views.Template.EditExisting)
@@ -231,7 +232,12 @@ function Template() {
 						>
 							Edit
 						</button>
-						<button onClick={() => downloadMD(currentTemplate)}>
+						<button
+							onClick={() => {
+								console.log(currentTemplate);
+								downloadMD(currentTemplate);
+							}}
+						>
 							Download
 						</button>
 					</div>
@@ -240,6 +246,26 @@ function Template() {
 		</div>
 	);
 }
+
+const downloadMD = async (template: TemplateType) => {
+	let mdValue = "---\n";
+	template.fields.map((field) => {
+		mdValue += field.key + ": " + field.finalValue + "\n";
+	});
+	mdValue += "---";
+
+	const filename = template.directory + template.filename.finalValue;
+
+	console.log(mdValue, filename, template);
+
+	const resp = await sendToBackground({
+		name: "download",
+		body: {
+			value: mdValue,
+			filename: filename,
+		},
+	});
+};
 
 const FieldList = ({ children }: { children: React.ReactNode }) => {
 	return <div className=" flex flex-col gap-2">{children}</div>;

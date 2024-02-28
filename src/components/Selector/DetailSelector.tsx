@@ -5,19 +5,21 @@ import { Views, type PathStep, IdType, type PageElementType } from "~types";
 import { create } from "zustand";
 
 interface PageElementState {
-	currentPageElement: PageElementType;
-	setCurrentPageElement: (element: PageElementType) => void;
+	currentPageElement: PageElementType & { index?: number };
+	setCurrentPageElement: (
+		element: PageElementType & { index?: number }
+	) => void;
 }
 
 export const usePageElementStore = create<PageElementState>()((set) => ({
-	currentPageElement: {} as PageElementType,
+	currentPageElement: {},
 	setCurrentPageElement: (element) => {
 		set({ currentPageElement: element });
 	},
 }));
 
 function DetailSelector() {
-	const { currentPageElement, setCurrentPageElement } = usePageElementStore();
+	const { currentPageElement } = usePageElementStore();
 	const { setCurrentView: setCurrentView } = useViewStore();
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 
@@ -33,9 +35,17 @@ function DetailSelector() {
 
 		const { pageElements, ...rest } = currentTemplate;
 		if (pageElements) {
-			pageElements.push(newPageElement);
+			if (currentPageElement.index !== undefined)
+				pageElements.splice(
+					currentPageElement.index,
+					1,
+					newPageElement
+				);
+			else pageElements.push(newPageElement);
 			setCurrentTemplate({ pageElements, ...rest });
-		} else setCurrentTemplate({ pageElements: [newPageElement], ...rest });
+		} else {
+			setCurrentTemplate({ pageElements: [newPageElement], ...rest });
+		}
 
 		setCurrentView(
 			currentTemplate.isnew
@@ -46,6 +56,7 @@ function DetailSelector() {
 
 	return (
 		<div>
+			<div>index: {currentPageElement.index}</div>
 			<div>{currentPageElement.value}</div>
 			<div>
 				{currentPageElement.path?.map((path, i) => {
@@ -54,7 +65,7 @@ function DetailSelector() {
 			</div>
 			<button onClick={selectElement}>Select</button>
 			<button onClick={() => setCurrentView(Views.Selection.Hover)}>
-				back
+				Back
 			</button>
 		</div>
 	);

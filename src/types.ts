@@ -55,7 +55,6 @@ export type PathStep = {
 
 export type PageElementType = {
 	element?: HTMLElement;
-	key?: string;
 	path?: PathStep[];
 	value?: string;
 	header?: boolean;
