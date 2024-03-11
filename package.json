@@ -13,10 +13,9 @@
     "@plasmohq/messaging": "^0.6.1",
     "@plasmohq/storage": "^1.9.0",
     "msgpackr": "^1.10.1",
-    "plasmo": "0.84.2",
+    "plasmo": "^0.85.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tailwindcss": "3.4.1",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
@@ -26,7 +25,9 @@
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
     "postcss": "8.4.33",
-    "prettier": "3.2.4",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.12",
+    "tailwindcss": "3.4.1",
     "typescript": "5.3.3"
   },
   "manifest": {
