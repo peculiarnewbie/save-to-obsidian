@@ -12,6 +12,7 @@ module.exports = {
 				primary: "#EEEEF0",
 			},
 			red: {
+				400: "#f87171",
 				500: "#ef4444",
 			},
 			obsidian: {

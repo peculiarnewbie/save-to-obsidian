@@ -99,7 +99,7 @@ function TemplateList() {
 		setTemplateToDelete(title);
 	};
 
-	const deleteTemplate = () => {
+	const deleteTemplate = (e: MouseEvent) => {
 		const index = templates.findIndex(
 			(item) => item.title == templateToDelete
 		);
@@ -121,7 +121,7 @@ function TemplateList() {
 					return (
 						<div key={item.title} className="px-0 py-1">
 							<div
-								onPointerDown={() => openTemplate(item.title)}
+								onClick={() => openTemplate(item.title)}
 								className=" p-2 hover:bg-obsidian-300 flex justify-between items-center w-full rounded-md"
 							>
 								<div className=" flex flex-col ">
@@ -145,21 +145,15 @@ function TemplateList() {
 			</div>
 			{templateToDelete != "" ? (
 				<div className=" absolute z-10 top-0 w-full h-full bg-obsidian-100/80 flex flex-col items-center justify-center">
-					<div className="w-3/4 h-fit flex flex-col justify-center items-center gap-2 bg-obsidian-300 rounded-md py-4 ">
+					<div className="w-3/4 h-fit flex flex-col justify-center items-center gap-2 bg-obsidian-300 rounded-md py-4 border shadow-lg border-obsidian-600">
 						<p>Delete this template?</p>
 						<div className="flex gap-8">
-							<button
-								onClick={deleteTemplate}
-								className=" bg-red-500 rounded-md py-2 px-4"
-							>
+							<MyButton onClick={deleteTemplate} warning>
 								delete
-							</button>
-							<button
-								onClick={() => setTemplateToDelete("")}
-								className=" py-2 px-4 rounded-sm"
-							>
+							</MyButton>
+							<MyButton onClick={() => setTemplateToDelete("")}>
 								cancel
-							</button>
+							</MyButton>
 						</div>
 					</div>
 					<div className=" h-1/4" />
