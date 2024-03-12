@@ -1,10 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { create } from "zustand";
+
+interface CanvasRefState {
+	canvasRef: HTMLCanvasElement;
+	setCanvasRef: (canvas: HTMLCanvasElement) => void;
+}
+
+export const useCanvasRef = create<CanvasRefState>()((set) => ({
+	canvasRef: document.createElement("canvas"),
+	setCanvasRef: (element) => {
+		set({ canvasRef: element });
+	},
+}));
 
 function HoverCanvas({
 	hoveredElement,
 }: {
 	hoveredElement: HTMLElement | undefined;
 }) {
+	const { setCanvasRef } = useCanvasRef();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	useEffect(() => {
@@ -12,6 +26,10 @@ function HoverCanvas({
 			highlightElement(hoveredElement, canvasRef.current);
 		}
 	}, [hoveredElement]);
+
+	useLayoutEffect(() => {
+		setCanvasRef(canvasRef.current as HTMLCanvasElement);
+	}, []);
 
 	return (
 		<canvas

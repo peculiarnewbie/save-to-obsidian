@@ -6,7 +6,7 @@ import { create } from "zustand";
 import MyButton from "~components/Elements/MyButton";
 import { useState } from "react";
 import { getPageElement } from "./HoverSelector";
-import { highlightElement } from "./HoverCanvas";
+import { highlightElement, useCanvasRef } from "./HoverCanvas";
 
 interface PageElementState {
 	currentPageElement: PageElementType & { index?: number };
@@ -26,6 +26,8 @@ function DetailSelector() {
 	const { currentPageElement, setCurrentPageElement } = usePageElementStore();
 	const { setCurrentView: setCurrentView } = useViewStore();
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
+	const { canvasRef } = useCanvasRef();
+
 	const [isDetailSelecting, setIsDetailSelecting] = useState(false);
 
 	const selectElement = async () => {
@@ -62,6 +64,7 @@ function DetailSelector() {
 	const detailSelect = (node: Node, index: number) => {
 		if (node.nodeType === 1) {
 			const el = node as HTMLElement;
+			highlightElement(el, canvasRef);
 
 			setCurrentPageElement({
 				...getPageElement(el),
@@ -90,11 +93,13 @@ function DetailSelector() {
 			IdType.Node
 		) {
 			console.log(currentPageElement);
+			const { path, ...rest } = currentPageElement;
+			setCurrentPageElement({
+				...rest,
+				path: path.toSpliced(path.length - 1, 1),
+			});
 		} else {
-			console.log(
-				"selecting parent",
-				document.getElementById("plasmoHoverCanvas"),
-			);
+			console.log("selecting parent", canvasRef);
 			setCurrentPageElement({
 				...getPageElement(
 					currentPageElement.element?.parentElement as HTMLElement,
@@ -103,9 +108,7 @@ function DetailSelector() {
 			});
 			highlightElement(
 				currentPageElement.element?.parentElement as HTMLElement,
-				document.getElementById(
-					"plasmoHoverCanvas",
-				) as HTMLCanvasElement,
+				canvasRef,
 			);
 		}
 	};
