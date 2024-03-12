@@ -71,12 +71,13 @@ function DetailSelector() {
 				index: currentPageElement.index,
 			});
 		} else {
-			const { path, ...rest } = currentPageElement;
+			const { path, value, ...rest } = currentPageElement;
 			const newPath = path ?? ([] as PathStep[]);
 			newPath.push({ type: IdType.Node, value: "", index: index });
 
 			const newPageElement: PageElementType = {
 				...rest,
+				value: node.nodeValue as string,
 				path: newPath,
 			};
 
@@ -92,14 +93,11 @@ function DetailSelector() {
 			currentPageElement.path[currentPageElement.path.length - 1].type ===
 			IdType.Node
 		) {
-			console.log(currentPageElement);
-			const { path, ...rest } = currentPageElement;
 			setCurrentPageElement({
-				...rest,
-				path: path.toSpliced(path.length - 1, 1),
+				...getPageElement(currentPageElement.element as HTMLElement),
+				index: currentPageElement.index,
 			});
 		} else {
-			console.log("selecting parent", canvasRef);
 			setCurrentPageElement({
 				...getPageElement(
 					currentPageElement.element?.parentElement as HTMLElement,
@@ -136,24 +134,34 @@ function DetailSelector() {
 			</MyButton>
 			{isDetailSelecting ? (
 				<div className="flex flex-col">
-					{[
-						...(currentPageElement.element?.childNodes as NodeList),
-					].map((node, i) => {
-						if (node.nodeType === 1)
-							return (
-								<MyButton onClick={() => detailSelect(node, i)}>
-									{(node as HTMLElement).tagName +
-										": " +
-										(node as HTMLElement).innerText}
-								</MyButton>
-							);
-						else if (node.nodeType === 3)
-							return (
-								<MyButton onClick={() => detailSelect(node, i)}>
-									text: {node.nodeValue}
-								</MyButton>
-							);
-					})}
+					{currentPageElement.path[currentPageElement.path.length - 1]
+						.type !== IdType.Node ? (
+						[
+							...(currentPageElement.element
+								?.childNodes as NodeList),
+						].map((node, i) => {
+							if (node.nodeType === 1)
+								return (
+									<MyButton
+										onClick={() => detailSelect(node, i)}
+									>
+										{(node as HTMLElement).tagName +
+											": " +
+											(node as HTMLElement).innerText}
+									</MyButton>
+								);
+							else if (node.nodeType === 3)
+								return (
+									<MyButton
+										onClick={() => detailSelect(node, i)}
+									>
+										text: {node.nodeValue}
+									</MyButton>
+								);
+						})
+					) : (
+						<></>
+					)}
 					<MyButton onClick={selectParent}>Select Parent</MyButton>
 				</div>
 			) : (
