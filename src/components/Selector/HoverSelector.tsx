@@ -27,17 +27,8 @@ function HoverSelector({ detail }: { detail: boolean }) {
 		e.stopPropagation();
 		e.preventDefault();
 
-		const generatedPath = generatePath(el);
-		const valueFromPath = getElementValueFromPath(generatedPath, document);
-
-		const newPageElement: PageElementType = {
-			element: el,
-			path: generatedPath,
-			value: valueFromPath,
-		};
-
 		setCurrentPageElement({
-			...newPageElement,
+			...getPageElement(el),
 			index: currentPageElement.index,
 		});
 		setCurrentView(Views.Selection.Detail);
@@ -64,10 +55,21 @@ function HoverSelector({ detail }: { detail: boolean }) {
 	}, [detail]);
 
 	return (
-		<div className="absolute w-screen h-screen pointer-events-none top-0 left-0">
+		<div className="pointer-events-none absolute left-0 top-0 h-screen w-screen">
 			<HoverCanvas hoveredElement={hoveredElement} />
 		</div>
 	);
 }
 
 export default HoverSelector;
+
+export const getPageElement = (el: HTMLElement) => {
+	const generatedPath = generatePath(el);
+	const valueFromPath = getElementValueFromPath(generatedPath, document);
+
+	return {
+		element: el,
+		path: generatedPath,
+		value: valueFromPath,
+	} as PageElementType;
+};

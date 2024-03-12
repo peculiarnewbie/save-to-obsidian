@@ -43,6 +43,7 @@ export const IdType = {
 	Class: "class",
 	Index: "index",
 	Header: "header",
+	Node: "node",
 } as const;
 
 type IdTypeKeys = (typeof IdType)[keyof typeof IdType];
@@ -55,8 +56,8 @@ export type PathStep = {
 
 export type PageElementType = {
 	element?: HTMLElement;
-	path?: PathStep[];
-	value?: string;
+	path: PathStep[];
+	value: string;
 	header?: boolean;
 };
 
