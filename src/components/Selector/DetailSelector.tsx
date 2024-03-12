@@ -3,11 +3,12 @@ import { useViewStore } from "~components/MainFrameContainer";
 import { useTemplateStore } from "~components/Template/Template";
 import { Views, type PathStep, IdType, type PageElementType } from "~types";
 import { create } from "zustand";
+import MyButton from "~components/Elements/MyButton";
 
 interface PageElementState {
 	currentPageElement: PageElementType & { index?: number };
 	setCurrentPageElement: (
-		element: PageElementType & { index?: number }
+		element: PageElementType & { index?: number },
 	) => void;
 }
 
@@ -39,7 +40,7 @@ function DetailSelector() {
 				pageElements.splice(
 					currentPageElement.index,
 					1,
-					newPageElement
+					newPageElement,
 				);
 			else pageElements.push(newPageElement);
 			setCurrentTemplate({ pageElements, ...rest });
@@ -50,7 +51,7 @@ function DetailSelector() {
 		setCurrentView(
 			currentTemplate.isnew
 				? Views.Template.EditNew
-				: Views.Template.EditExisting
+				: Views.Template.EditExisting,
 		);
 	};
 
@@ -63,10 +64,18 @@ function DetailSelector() {
 					return <div key={i}>{path.type}</div>;
 				})}
 			</div>
-			<button onClick={selectElement}>Select</button>
-			<button onClick={() => setCurrentView(Views.Selection.Hover)}>
-				Back
-			</button>
+			<MyButton onClick={selectElement} accented>
+				Select
+			</MyButton>
+			<MyButton onClick={() => setCurrentView(Views.Selection.Hover)}>
+				Reselect
+			</MyButton>
+			<MyButton onClick={() => setCurrentView(Views.Template.View)}>
+				Cancel
+			</MyButton>
+			<MyButton onClick={() => setCurrentView(Views.Selection.Hover)}>
+				Specific
+			</MyButton>
 		</div>
 	);
 }
