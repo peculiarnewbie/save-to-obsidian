@@ -20,7 +20,7 @@ export const generatePath = (selectedElement: HTMLElement) => {
 
 	const searchElements = (
 		elements: HTMLCollectionOf<Element>,
-		element: HTMLElement
+		element: HTMLElement,
 	) => {
 		for (let i = 0; i < elements.length; i++) {
 			if (elements[i] == element) {
@@ -78,12 +78,12 @@ export const generatePath = (selectedElement: HTMLElement) => {
 		) {
 			if (validateClass(currentElement.className)) {
 				let queriedElements = document.getElementsByClassName(
-					currentElement.className
+					currentElement.className,
 				);
 				if (queriedElements.length < 5) {
 					searchResult = searchElements(
 						queriedElements,
-						currentElement
+						currentElement,
 					);
 					path.push({
 						type: IdType.Class,
@@ -100,7 +100,7 @@ export const generatePath = (selectedElement: HTMLElement) => {
 				type: IdType.Index,
 				value: "",
 				index: Array.from(
-					currentElement.parentElement.children
+					currentElement.parentElement.children,
 				).indexOf(currentElement),
 			});
 			currentElement = currentElement.parentElement;
@@ -113,21 +113,21 @@ export const generatePath = (selectedElement: HTMLElement) => {
 
 export const getElementValueFromPath = (
 	path: PathStep[] | undefined,
-	document: Document
+	document: Document,
 ) => {
 	const getHeaderElement = (type: string) => {
 		switch (type) {
 			case "title":
 				return document.querySelector(
-					'meta[property="og:title"]'
+					'meta[property="og:title"]',
 				) as HTMLMetaElement;
 			case "url":
 				return document.querySelector(
-					'meta[property="og:url"]'
+					'meta[property="og:url"]',
 				) as HTMLMetaElement;
 			case "image":
 				return document.querySelector(
-					'meta[property="og:image"]'
+					'meta[property="og:image"]',
 				) as HTMLMetaElement;
 		}
 	};
@@ -150,7 +150,7 @@ export const getElementValueFromPath = (
 
 	const getElementFromCurrentPath = (
 		currentPath: PathStep,
-		currentElement: Element
+		currentElement: Element,
 	) => {
 		if (!currentElement) return;
 		switch (currentPath.type) {
@@ -182,14 +182,14 @@ export const getElementValueFromPath = (
 		}
 	}
 
-	return determineElementValue(element);
+	return determineElementValue(element) ?? "";
 };
 
 /** collect values from current doc on the dom. If headDoc is provided, it will fetch the meta elements from headDoc */
 export const collectValues = (
 	pageElements: PageElementType[],
 	doc: Document,
-	headDoc?: Document
+	headDoc?: Document,
 ) => {
 	let newPageElements = [...pageElements];
 	// console.log("fields in fetcher: ", fields, "doc: ", doc);

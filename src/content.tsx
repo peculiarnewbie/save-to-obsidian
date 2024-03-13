@@ -3,8 +3,8 @@ import type { PlasmoCSConfig } from "plasmo";
 import OverlayParent from "./components/IframeWrapper/OverlayParent";
 
 export const config: PlasmoCSConfig = {
-	//matches: ["https://*/*"],
-	matches: ["https://www.google.com/*", "https://www.youtube.com/*"],
+	matches: ["https://*/*"],
+	// matches: ["https://www.google.com/*", "https://www.youtube.com/*"],
 };
 
 export const getStyle = () => {
