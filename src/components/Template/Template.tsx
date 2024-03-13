@@ -10,6 +10,7 @@ import PageElement from "./PageElement";
 import { getElementValueFromPath } from "~Helpers/ElementActions";
 import { sendToBackground } from "@plasmohq/messaging";
 import MyButton from "~components/Elements/MyButton";
+import { usePageElementStore } from "~components/Selector/DetailSelector";
 
 const storage = new Storage();
 
@@ -43,6 +44,7 @@ function Template() {
 	const { templates, setTemplates } = useTemplates();
 	const { setIframeTitle } = useIframeTitleStore();
 	const { currentView, setCurrentView } = useViewStore();
+	const { resetCurrentPageElement } = usePageElementStore();
 
 	const setTitle = (e: ChangeEvent) => {
 		const { title, ...rest } = currentTemplate;
@@ -209,9 +211,10 @@ function Template() {
 				{templateState === TemplateState.editing ? (
 					<div className="flex flex-col gap-4">
 						<MyButton
-							onClick={() =>
-								setCurrentView(Views.Selection.Hover)
-							}
+							onClick={() => {
+								resetCurrentPageElement();
+								setCurrentView(Views.Selection.Hover);
+							}}
 						>
 							Select
 						</MyButton>

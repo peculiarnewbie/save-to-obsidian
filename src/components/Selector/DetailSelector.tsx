@@ -13,12 +13,16 @@ interface PageElementState {
 	setCurrentPageElement: (
 		element: PageElementType & { index?: number },
 	) => void;
+	resetCurrentPageElement: () => void;
 }
 
 export const usePageElementStore = create<PageElementState>()((set) => ({
 	currentPageElement: { path: [], value: "" },
 	setCurrentPageElement: (element) => {
 		set({ currentPageElement: element });
+	},
+	resetCurrentPageElement: () => {
+		set({ currentPageElement: { path: [], value: "" } });
 	},
 }));
 
