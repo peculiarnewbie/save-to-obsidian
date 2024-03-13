@@ -46,7 +46,6 @@ export const highlightElement = (
 	element: HTMLElement,
 	canvas: HTMLCanvasElement,
 ) => {
-	console.log(canvas);
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 

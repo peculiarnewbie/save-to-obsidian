@@ -4,7 +4,8 @@ import CustomIframe from "./CustomIframe";
 import MainFrameContainer, { useViewStore } from "../MainFrameContainer";
 import { Views } from "~types";
 import HoverSelector from "~components/Selector/HoverSelector";
-import DetailFrameContainer from "~components/Selector/DetailFrameContainer";
+import DetailSelector from "~components/Selector/DetailSelector";
+import cssText from "data-text:~style.css";
 
 const OverlayParent = () => {
 	const { currentView } = useViewStore();
@@ -34,21 +35,22 @@ const OverlayParent = () => {
 		return (
 			<div>
 				<div
-					className={`appearance-none z-40 fixed top-3 right-3 bg-transparent
+					className={`fixed right-3 top-3 z-40 appearance-none bg-transparent
 				${currentView == Views.Selection.Hover ? "hidden" : "flex"}
 			`}
 				>
-					<CustomIframe isSelecting={isSelecting}>
+					<CustomIframe>
 						<MainFrameContainer
 							hidden={isSelecting}
 							closePopup={closePopup}
 						/>
-						<DetailFrameContainer
+						<DetailSelector
 							shown={
 								isSelecting &&
 								currentView == Views.Selection.Detail
 							}
 						/>
+						<BodyStyle />
 					</CustomIframe>
 				</div>
 				{isSelecting ? (
@@ -65,3 +67,11 @@ const OverlayParent = () => {
 };
 
 export default OverlayParent;
+
+const BodyStyle = () => {
+	return (
+		<>
+			<style>{cssText}</style>
+		</>
+	);
+};

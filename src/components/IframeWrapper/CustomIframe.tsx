@@ -1,24 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useViewStore } from "~components/MainFrameContainer";
+import { Views } from "~types";
 
-const CustomIframe = ({
-	children,
-	isSelecting,
-}: {
-	children: any;
-	isSelecting: boolean;
-}) => {
-	const [contentRef, setContentRef] = useState(null);
-	const [mountNode, setMountNode] = useState(null);
-
-	const [isActive, setIsActive] = useState(false);
+const CustomIframe = ({ children }: { children: any }) => {
+	const contentRef = useRef(null);
+	const [mountNode, setMountNode] = useState<HTMLBodyElement>();
+	const { currentView } = useViewStore();
 
 	useEffect(() => {
-		setMountNode(contentRef?.contentWindow?.document?.body);
+		if (contentRef.current)
+			setMountNode(
+				(contentRef.current as HTMLIFrameElement).contentWindow
+					?.document?.body as HTMLBodyElement,
+			);
 	}, [contentRef]);
 
 	return (
-		<iframe ref={setContentRef} className=" w-[450px] h-[700px]">
+		<iframe
+			ref={contentRef}
+			className={`${currentView === Views.Selection.Detail ? " h-[450px] w-[250px]" : "h-[700px] w-[450px]"} `}
+		>
 			{mountNode != null && mountNode != undefined ? (
 				createPortal(children, mountNode)
 			) : (

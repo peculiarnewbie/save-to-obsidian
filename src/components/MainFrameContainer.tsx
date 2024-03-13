@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import cssText from "data-text:~style.css";
 import Header, { useIframeTitleStore } from "./Header";
 import { Views, type ViewsKeys, type TemplateType } from "../types";
 import TemplateList from "./Template/TemplateList";
@@ -17,12 +16,6 @@ export const useViewStore = create<ViewState>()((set) => ({
 	currentView: Views.Main,
 	setCurrentView: (view) => set({ currentView: view }),
 }));
-
-export const getStyle = () => {
-	const style = document.createElement("style");
-	style.textContent = cssText;
-	return style;
-};
 
 const MainFrameContainer = ({
 	closePopup,
@@ -55,12 +48,11 @@ const MainFrameContainer = ({
 	return (
 		<>
 			<div
-				className={`${hidden ? "hidden" : "flex"} w-full h-full text-text-primary flex-col rounded-xl bg-obsidian-100 overflow-hidden`}
+				className={`${hidden ? "hidden" : "flex"} h-full w-full flex-col overflow-hidden rounded-xl bg-obsidian-100 text-text-primary`}
 			>
 				<Header closePopup={closePopup} />
 				<MainContent currentView={currentView} />
 			</div>
-			<BodyStyle />
 		</>
 	);
 };
@@ -69,14 +61,6 @@ const MainContent = ({ currentView }: { currentView: ViewsKeys }) => {
 	if (currentView == Views.Main) return <TemplateList />;
 	else if (currentView == Views.Settings) return <Settings />;
 	else return <Template />;
-};
-
-const BodyStyle = () => {
-	return (
-		<>
-			<style>{cssText}</style>
-		</>
-	);
 };
 
 export default MainFrameContainer;

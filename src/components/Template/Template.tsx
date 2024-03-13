@@ -36,7 +36,7 @@ export type TemplateStateKeys =
 function Template() {
 	const [oldTitle, setOldTitle] = useState("New Template");
 	const [templateState, setTemplateState] = useState<TemplateStateKeys>(
-		TemplateState.closed
+		TemplateState.closed,
 	);
 
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
@@ -78,12 +78,12 @@ function Template() {
 			saveToStorage(newTemplates);
 		} else {
 			const modifiedIndex = templates.findIndex(
-				(item) => item.title == oldTitle
+				(item) => item.title == oldTitle,
 			);
 			const newTemplates = templates.toSpliced(
 				modifiedIndex,
 				1,
-				newTemplate
+				newTemplate,
 			);
 			saveToStorage(newTemplates);
 		}
@@ -133,20 +133,20 @@ function Template() {
 			currentTemplate.pageElements.map((element, i) => {
 				newTemplate.pageElements[i].value = getElementValueFromPath(
 					element.path,
-					document
+					document,
 				);
 			});
 
 			currentTemplate.fields.map((field, i) => {
 				newTemplate.fields[i].finalValue = parseInput(
 					currentTemplate.fields[i].value,
-					newTemplate
+					newTemplate,
 				);
 			});
 
 			newTemplate.filename.finalValue = parseInput(
 				currentTemplate.filename.value,
-				newTemplate
+				newTemplate,
 			);
 
 			setCurrentTemplate(newTemplate);
@@ -158,7 +158,7 @@ function Template() {
 	}, [currentView]);
 
 	return (
-		<div>
+		<div className="overflow-y-auto p-2">
 			{templateState === TemplateState.editing && (
 				<div>
 					<p>title</p>
