@@ -1,26 +1,50 @@
+import Icons, { IconsKeys } from "~Helpers/Icons";
 import { useViewStore } from "~components/MainFrameContainer";
 import { usePageElementStore } from "~components/Selector/DetailSelector";
+import {
+	highlightElement,
+	useCanvasRef,
+} from "~components/Selector/HoverCanvas";
 import { Views, type PageElementType } from "~types";
-import { SelectIcon } from "~Helpers/Icons";
 
 function PageElement(props: { pageElement: PageElementType; index: number }) {
 	const { setCurrentPageElement } = usePageElementStore();
 	const { setCurrentView } = useViewStore();
+
+	const { canvasRef } = useCanvasRef();
 
 	const reselect = () => {
 		setCurrentPageElement({ index: props.index, ...props.pageElement });
 		setCurrentView(Views.Selection.Hover);
 	};
 
+	const deleteElement = () => {};
+
+	const hoverElement = () => {
+		console.log(props.pageElement);
+		if (canvasRef) {
+			highlightElement(
+				props.pageElement.element as HTMLElement,
+				canvasRef,
+			);
+		}
+	};
+
 	return (
-		<div className="flex">
+		<div className="flex gap-2" onPointerEnter={hoverElement}>
 			<div>{props.index}</div>
-			<div>{props.pageElement.value}</div>
+			<div onMouseEnter={hoverElement}>{props.pageElement.value}</div>
 			<button
 				className="input-shadow hover:hover-shadow flex items-center justify-center rounded-md bg-obsidian-300 p-1 hover:bg-obsidian-350"
 				onClick={reselect}
 			>
-				<SelectIcon />
+				<Icons name={IconsKeys.Select} />
+			</button>
+			<button
+				className="input-shadow hover:hover-shadow flex items-center justify-center rounded-md bg-obsidian-300 p-1 hover:bg-obsidian-350"
+				onClick={reselect}
+			>
+				<Icons name={IconsKeys.Delete} />
 			</button>
 		</div>
 	);
