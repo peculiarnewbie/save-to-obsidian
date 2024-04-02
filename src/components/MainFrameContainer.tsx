@@ -37,9 +37,6 @@ const MainFrameContainer = ({
 			case Views.Settings:
 				setIframeTitle("Settings");
 				break;
-			case Views.Template.EditNew:
-				setIframeTitle("New Template");
-				break;
 		}
 	}, [currentView]);
 

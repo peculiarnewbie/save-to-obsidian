@@ -194,7 +194,8 @@ function Template() {
 				})}
 			</FieldList>
 			<button onClick={addField}>Add Field</button>
-			<div>elements========================</div>
+			<div className="pt-4">elements========================</div>
+
 			<PageElementsList>
 				{currentTemplate.pageElements?.map((pageElement, i) => {
 					return (
@@ -207,6 +208,7 @@ function Template() {
 					);
 				})}
 			</PageElementsList>
+
 			<div className="flex flex-col">
 				{templateState === TemplateState.editing ? (
 					<div className="flex flex-col gap-4">
