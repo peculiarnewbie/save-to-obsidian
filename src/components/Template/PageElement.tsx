@@ -5,6 +5,7 @@ import {
 	highlightElement,
 	useCanvasRef,
 } from "~components/Selector/HoverCanvas";
+import { getPageElement } from "~components/Selector/HoverSelector";
 import { Views, type PageElementType } from "~types";
 
 function PageElement(props: { pageElement: PageElementType; index: number }) {
@@ -21,7 +22,7 @@ function PageElement(props: { pageElement: PageElementType; index: number }) {
 	const deleteElement = () => {};
 
 	const hoverElement = () => {
-		console.log(props.pageElement);
+		const el = getPageElement;
 		if (canvasRef) {
 			highlightElement(
 				props.pageElement.element as HTMLElement,

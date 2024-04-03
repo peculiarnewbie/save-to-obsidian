@@ -1,4 +1,4 @@
-import { generatePath, getElementValueFromPath } from "~Helpers/ElementActions";
+import { generatePath, getElementFromPath } from "~Helpers/ElementActions";
 import { useViewStore } from "~components/MainFrameContainer";
 import { useTemplateStore } from "~components/Template/Template";
 import { Views, type PathStep, IdType, type PageElementType } from "~types";

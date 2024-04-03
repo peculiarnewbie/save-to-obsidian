@@ -4,7 +4,7 @@ import { Views, type PageElementType } from "~types";
 import HoverCanvas from "./HoverCanvas";
 import { create } from "zustand";
 import { usePageElementStore } from "./DetailSelector";
-import { generatePath, getElementValueFromPath } from "~Helpers/ElementActions";
+import { generatePath, getElementFromPath } from "~Helpers/ElementActions";
 
 interface HoverElementState {
 	hoveredElement: HTMLElement | undefined;
@@ -65,7 +65,7 @@ export default HoverSelector;
 
 export const getPageElement = (el: HTMLElement) => {
 	const generatedPath = generatePath(el);
-	const valueFromPath = getElementValueFromPath(generatedPath, document);
+	const valueFromPath = getElementFromPath(generatedPath, document);
 
 	return {
 		element: el,
