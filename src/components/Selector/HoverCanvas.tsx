@@ -13,19 +13,17 @@ export const useCanvasRef = create<CanvasRefState>()((set) => ({
 	},
 }));
 
-function HoverCanvas({
-	hoveredElement,
-}: {
-	hoveredElement: HTMLElement | undefined;
+export default function HoverCanvas(props: {
+	hoveredElement?: HTMLElement | undefined;
 }) {
 	const { setCanvasRef } = useCanvasRef();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	useEffect(() => {
-		if (canvasRef.current && hoveredElement) {
-			highlightElement(hoveredElement, canvasRef.current);
+		if (canvasRef.current && props.hoveredElement) {
+			highlightElement(props.hoveredElement, canvasRef.current);
 		}
-	}, [hoveredElement]);
+	}, [props.hoveredElement]);
 
 	useLayoutEffect(() => {
 		setCanvasRef(canvasRef.current as HTMLCanvasElement);
@@ -39,8 +37,6 @@ function HoverCanvas({
 		/>
 	);
 }
-
-export default HoverCanvas;
 
 export const highlightElement = (
 	element: HTMLElement,

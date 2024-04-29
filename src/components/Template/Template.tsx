@@ -7,7 +7,10 @@ import { Storage } from "@plasmohq/storage";
 import PropertyField, { parseInput } from "./PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import PageElement from "./PageElement";
-import { getElementValueFromPath } from "~Helpers/ElementActions";
+import {
+	determineElementValue,
+	getElementFromPath,
+} from "~Helpers/ElementActions";
 import { sendToBackground } from "@plasmohq/messaging";
 import MyButton from "~components/Elements/MyButton";
 import { usePageElementStore } from "~components/Selector/DetailSelector";
@@ -133,10 +136,11 @@ function Template() {
 			const newTemplate = { ...currentTemplate };
 
 			currentTemplate.pageElements.map((element, i) => {
-				newTemplate.pageElements[i].value = getElementValueFromPath(
-					element.path,
-					document,
-				);
+				const el = getElementFromPath(element.path, document);
+				newTemplate.pageElements[i].element = el;
+				newTemplate.pageElements[i].value = el
+					? determineElementValue(el)
+					: "";
 			});
 
 			currentTemplate.fields.map((field, i) => {
@@ -194,7 +198,8 @@ function Template() {
 				})}
 			</FieldList>
 			<button onClick={addField}>Add Field</button>
-			<div>elements========================</div>
+			<div className="pt-4">elements========================</div>
+
 			<PageElementsList>
 				{currentTemplate.pageElements?.map((pageElement, i) => {
 					return (
@@ -207,6 +212,7 @@ function Template() {
 					);
 				})}
 			</PageElementsList>
+
 			<div className="flex flex-col">
 				{templateState === TemplateState.editing ? (
 					<div className="flex flex-col gap-4">

@@ -6,6 +6,7 @@ import { Views } from "~types";
 import HoverSelector from "~components/Selector/HoverSelector";
 import DetailSelector from "~components/Selector/DetailSelector";
 import cssText from "data-text:~style.css";
+import HoverCanvas from "~components/Selector/HoverCanvas";
 
 const OverlayParent = () => {
 	const { currentView } = useViewStore();
@@ -58,7 +59,9 @@ const OverlayParent = () => {
 						detail={currentView != Views.Selection.Hover}
 					/>
 				) : (
-					<></>
+					<>
+						<HoverCanvas />
+					</>
 				)}
 			</div>
 		);

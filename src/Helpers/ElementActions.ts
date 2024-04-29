@@ -111,7 +111,7 @@ export const generatePath = (selectedElement: HTMLElement) => {
 	return path.reverse();
 };
 
-export const getElementValueFromPath = (
+export const getElementFromPath = (
 	path: PathStep[] | undefined,
 	document: Document,
 ) => {
@@ -130,22 +130,6 @@ export const getElementValueFromPath = (
 					'meta[property="og:image"]',
 				) as HTMLMetaElement;
 		}
-	};
-
-	const determineElementValue = (element: Element) => {
-		if (!element) return;
-		console.log("determining element: ", element);
-		if (element.nodeName == "META" && element instanceof HTMLMetaElement) {
-			return element.content;
-		} else if (
-			element.nodeName == "IMG" &&
-			element instanceof HTMLImageElement
-		) {
-			return element.src;
-		} else if (element instanceof HTMLElement) {
-			return element.innerText;
-		}
-		// ============ should we handle other Element types??
 	};
 
 	const getElementFromCurrentPath = (
@@ -170,19 +154,49 @@ export const getElementValueFromPath = (
 	};
 
 	if (!path || path.length < 1) {
-		return "";
+		return;
 	}
 
-	let element: Element;
-	element = getElementFromCurrentPath(path[0], document.body) as Element;
+	let element: HTMLElement;
+	element = getElementFromCurrentPath(path[0], document.body) as HTMLElement;
 
 	for (let i = 1; i < path.length; i++) {
 		if (element) {
-			element = getElementFromCurrentPath(path[i], element) as Element;
+			element = getElementFromCurrentPath(
+				path[i],
+				element,
+			) as HTMLElement;
 		}
 	}
 
-	return determineElementValue(element) ?? "";
+	return element;
+};
+
+export const determineElementValue = (element: Element) => {
+	if (!element) return "";
+	console.log("determining element: ", element);
+	if (element.nodeName == "META" && element instanceof HTMLMetaElement) {
+		return element.content ?? "";
+	} else if (
+		element.nodeName == "IMG" &&
+		element instanceof HTMLImageElement
+	) {
+		return element.src ?? "";
+	} else if (element instanceof HTMLElement) {
+		return element.innerText ?? "";
+	}
+
+	return "";
+	// ============ should we handle other Element types??
+};
+
+export const getElementValueFromPath = (
+	path: PathStep[] | undefined,
+	document: Document,
+) => {
+	const element = getElementFromPath(path, document);
+	if (element) return determineElementValue(element) ?? "";
+	return "";
 };
 
 /** collect values from current doc on the dom. If headDoc is provided, it will fetch the meta elements from headDoc */
