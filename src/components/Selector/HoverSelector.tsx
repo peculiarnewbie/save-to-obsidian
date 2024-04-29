@@ -4,7 +4,7 @@ import { Views, type PageElementType } from "~types";
 import HoverCanvas from "./HoverCanvas";
 import { create } from "zustand";
 import { usePageElementStore } from "./DetailSelector";
-import { generatePath, getElementFromPath } from "~Helpers/ElementActions";
+import { generatePath, getElementFromPath, getElementValueFromPath } from "~Helpers/ElementActions";
 
 interface HoverElementState {
 	hoveredElement: HTMLElement | undefined;
@@ -55,7 +55,7 @@ function HoverSelector({ detail }: { detail: boolean }) {
 	}, [detail]);
 
 	return (
-		<div className="pointer-events-none absolute left-0 top-0 h-screen w-screen">
+		<div id="HoverSelector" className="pointer-events-none absolute left-0 top-0 h-screen w-screen">
 			<HoverCanvas hoveredElement={hoveredElement} />
 		</div>
 	);
@@ -65,7 +65,7 @@ export default HoverSelector;
 
 export const getPageElement = (el: HTMLElement) => {
 	const generatedPath = generatePath(el);
-	const valueFromPath = getElementFromPath(generatedPath, document);
+	const valueFromPath = getElementValueFromPath(generatedPath, document);
 
 	return {
 		element: el,
