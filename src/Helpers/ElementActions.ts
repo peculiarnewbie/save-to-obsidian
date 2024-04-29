@@ -3,6 +3,7 @@ import {
 	type FieldType,
 	type PathStep,
 	type PageElementType,
+	FieldTypes,
 } from "~types";
 
 export const generatePath = (selectedElement: HTMLElement) => {
@@ -235,4 +236,26 @@ export const fetchDocument = async (url: string) => {
 	const resText = await res.text();
 
 	return resText;
+};
+
+export const deletePageElement = (
+	index: number,
+	pageElements: PageElementType[],
+	fields: FieldType[],
+) => {
+	const newElements = pageElements.toSpliced(index, 1);
+
+	const newFields = [...fields];
+
+	for (let i = 0; i < newFields.length; i++) {
+		for (let j = index; j < pageElements.length; j++) {
+			const newValue = newFields[i].value?.replaceAll(
+				`{{${j}}}`,
+				`{{${j - 1}}}`,
+			);
+			newFields[i].value = newValue;
+		}
+	}
+
+	return { newElements, newFields };
 };
