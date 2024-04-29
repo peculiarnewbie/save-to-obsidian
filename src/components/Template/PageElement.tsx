@@ -22,12 +22,8 @@ function PageElement(props: { pageElement: PageElementType; index: number }) {
 	const deleteElement = () => {};
 
 	const hoverElement = () => {
-		const el = getPageElement;
-		if (canvasRef) {
-			highlightElement(
-				props.pageElement.element as HTMLElement,
-				canvasRef,
-			);
+		if (canvasRef && props.pageElement.element) {
+			highlightElement(props.pageElement.element, canvasRef);
 		}
 	};
 
