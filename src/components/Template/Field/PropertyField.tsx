@@ -1,10 +1,10 @@
-import { useState, type ChangeEvent, useEffect } from "react";
+import { useState, type ChangeEvent, useEffect, useRef } from "react";
 import { type FieldType, type TemplateType } from "~types";
 import {
 	useTemplateStore,
 	type TemplateStateKeys,
 	TemplateState,
-} from "./Template";
+} from "../Template";
 import { isNumber } from "~Helpers/utils";
 
 function PropertyField(props: {
@@ -16,6 +16,9 @@ function PropertyField(props: {
 
 	const [tempField, setTempField] = useState({ ...props.field });
 	const [isFocused, setIsFocused] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
+
+	const fieldRef = useRef<HTMLDivElement>(null);
 
 	const handleKeyChange = (e: ChangeEvent) => {
 		const el = e.target as HTMLInputElement;
@@ -39,7 +42,7 @@ function PropertyField(props: {
 			const newFields = currentTemplate.fields.toSpliced(
 				props.index,
 				1,
-				newField
+				newField,
 			);
 
 			setCurrentTemplate({ fields: newFields, ...rest });
@@ -71,16 +74,30 @@ function PropertyField(props: {
 
 	useEffect(() => {
 		setTempField(props.field);
+		console.log(fieldRef.current);
 	}, [props.field]);
+
+	const handleDrag = () => {
+		setIsDragging(true);
+		console.log(fieldRef.current);
+	};
+
+	const handleEndDrag = () => {
+		setIsDragging(false);
+	};
 
 	return (
 		<div
-			className={` w-full bg-obsidian-100 flex border-2 border-t-[3px] outline -outline-offset-1 rounded-md h-fit  hover:outline-1 outline-obsidian-500
-				${isFocused ? " border-obsidian-600 outline-1 " : "outline-0 border-transparent"}
+			className={` flex h-fit w-full rounded-md border-2 border-t-[3px] outline -outline-offset-1  outline-obsidian-500 hover:outline-1
+				${isFocused ? " border-obsidian-600 outline-1 " : "border-transparent outline-0"} ${isDragging ? "bg-accent-500" : "bg-obsidian-100"}
 			`}
+			draggable="true"
+			ref={fieldRef}
+			onDrag={handleDrag}
+			onDragEnd={handleEndDrag}
 		>
 			<input
-				className="font-normal text-sm text-white h-7 peer bg-transparent outline-none p-1 pr-2 w-1/4 focus:bg-obsidian-200"
+				className="peer h-7 w-1/4 bg-transparent p-1 pr-2 text-sm font-normal text-white outline-none focus:bg-obsidian-200"
 				value={tempField.key ?? ""}
 				onChange={handleKeyChange}
 				name="key"
@@ -96,7 +113,7 @@ function PropertyField(props: {
 			/>
 			{props.index !== -1 && (
 				<button
-					className="w-6 peer-focus:bg-obsidian-200 order-first"
+					className="order-first w-6 peer-focus:bg-obsidian-200"
 					onClick={deleteField}
 				>
 					d
@@ -104,7 +121,7 @@ function PropertyField(props: {
 			)}
 			{/* {props.templateState == TemplateState.editing ? ( */}
 			<input
-				className="grow min-w-8 font-normal text-sm text-white h-7 bg-transparent outline-none p-1 pr-2 focus:bg-obsidian-200"
+				className="h-7 min-w-8 grow bg-transparent p-1 pr-2 text-sm font-normal text-white outline-none focus:bg-obsidian-200"
 				value={
 					props.templateState === TemplateState.editing
 						? tempField.value ?? ""
@@ -142,7 +159,7 @@ const TextInput = ({ value }: { value: string }) => {
 
 export const parseInput = (
 	input: string | undefined,
-	template: TemplateType
+	template: TemplateType,
 ) => {
 	if (!input) return "";
 	const checkElement = (index: number): number => {
@@ -164,7 +181,7 @@ export const parseInput = (
 								return parseInt(numString);
 							else
 								throw new Error(
-									"specified element don't exist in elements list"
+									"specified element don't exist in elements list",
 								);
 						}
 					}
@@ -195,7 +212,7 @@ export const parseInput = (
 	elements?.forEach((element) => {
 		parsedString = parsedString.replaceAll(
 			`{{${element}}}`,
-			template.pageElements[element].value as string
+			template.pageElements[element].value as string,
 		);
 	});
 

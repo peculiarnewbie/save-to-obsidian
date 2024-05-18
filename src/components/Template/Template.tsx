@@ -4,7 +4,7 @@ import { FieldTypes, type FieldType, type TemplateType, Views } from "~types";
 import { create } from "zustand";
 import { useTemplates } from "./TemplateList";
 import { Storage } from "@plasmohq/storage";
-import PropertyField, { parseInput } from "./PropertyField";
+import PropertyField, { parseInput } from "./Field/PropertyField";
 import { useViewStore } from "~components/MainFrameContainer";
 import {
 	determineElementValue,
@@ -14,6 +14,7 @@ import { sendToBackground } from "@plasmohq/messaging";
 import MyButton from "~components/Elements/MyButton";
 import { usePageElementStore } from "~components/Selector/DetailSelector";
 import PageElementsList from "./PageElement/PageElementsList";
+import FieldList from "./Field/FieldList";
 
 const storage = new Storage();
 
@@ -185,18 +186,7 @@ function Template() {
 				templateState={templateState}
 			/>
 			<div>Fields</div>
-			<FieldList>
-				{currentTemplate.fields?.map((field, i) => {
-					return (
-						<PropertyField
-							key={field.key}
-							field={field}
-							index={i}
-							templateState={templateState}
-						/>
-					);
-				})}
-			</FieldList>
+			<FieldList templateState={templateState} />
 			<button onClick={addField}>Add Field</button>
 			<div className="pt-4">elements========================</div>
 
@@ -266,10 +256,6 @@ const downloadMD = async (template: TemplateType) => {
 			filename: filename,
 		},
 	});
-};
-
-const FieldList = ({ children }: { children: React.ReactNode }) => {
-	return <div className=" flex flex-col gap-2">{children}</div>;
 };
 
 export default Template;
