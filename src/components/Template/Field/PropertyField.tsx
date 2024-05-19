@@ -102,7 +102,7 @@ function PropertyField(props: {
 			onDrag={handleDrag}
 		>
 			<div
-				className={`absolute h-full w-full ${isDragging ? "bg-accent-800" : "bgt-transparent"}`}
+				className={`pointer-events-none absolute h-full w-full ${isDragging ? "bg-accent-800" : "bgt-transparent"}`}
 			/>
 
 			<div className="flex h-full w-full">
