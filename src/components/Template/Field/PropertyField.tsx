@@ -1,4 +1,11 @@
-import { useState, type ChangeEvent, useEffect, useRef } from "react";
+import {
+	useState,
+	type ChangeEvent,
+	useEffect,
+	useRef,
+	type DragEventHandler,
+	type DragEvent,
+} from "react";
 import { type FieldType, type TemplateType } from "~types";
 import {
 	useTemplateStore,
@@ -11,6 +18,8 @@ function PropertyField(props: {
 	field: FieldType;
 	index: number;
 	templateState: TemplateStateKeys;
+	fieldsCount: number;
+	reorderFields: (index: number, newIndex: number) => void;
 }) {
 	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 
@@ -31,7 +40,6 @@ function PropertyField(props: {
 	};
 
 	const updateTemplate = (newField: FieldType) => {
-		// console.log("update template", newField);
 		if (props.index === -1) {
 			console.log("update filename", newField);
 			const { filename, ...rest } = currentTemplate;
@@ -55,93 +63,93 @@ function PropertyField(props: {
 		setCurrentTemplate({ fields: newFields, ...rest });
 	};
 
-	/* 
-		might be better to do this everytime 
-		the field is updated instead 
-	*/
-	// useEffect(() => {
-	// 	if (props.templateState == TemplateState.viewing) {
-	// 		const { finalValue, ...rest } = { ...tempField };
-	// 		const newField = {
-	// 			finalValue: parseInput(rest.value as string, currentTemplate),
-	// 			...rest,
-	// 		};
-	// 		setTempField(newField);
-
-	// 		updateTemplate(newField);
-	// 	}
-	// }, [props.templateState]);
-
 	useEffect(() => {
 		setTempField(props.field);
 		console.log(fieldRef.current);
 	}, [props.field]);
 
-	const handleDrag = () => {
+	const handleStartDrag = () => {
 		setIsDragging(true);
-		console.log(fieldRef.current);
 	};
 
 	const handleEndDrag = () => {
 		setIsDragging(false);
 	};
 
+	const handleDrag = (e: DragEvent) => {
+		if (!fieldRef.current) return;
+		if (
+			props.index > 0 &&
+			e.pageY < fieldRef.current.getBoundingClientRect().top - 4
+		)
+			props.reorderFields(props.index, props.index - 1);
+		if (
+			props.index < props.fieldsCount - 1 &&
+			e.pageY > fieldRef.current.getBoundingClientRect().bottom + 4
+		)
+			props.reorderFields(props.index, props.index + 1);
+		e.preventDefault();
+	};
+
 	return (
 		<div
-			className={` flex h-fit w-full rounded-md border-2 border-t-[3px] outline -outline-offset-1  outline-obsidian-500 hover:outline-1
-				${isFocused ? " border-obsidian-600 outline-1 " : "border-transparent outline-0"} ${isDragging ? "bg-accent-500" : "bg-obsidian-100"}
-			`}
+			className={`relative h-fit w-full overflow-hidden rounded-md border-2 border-t-[3px] outline  -outline-offset-1 outline-obsidian-500 hover:outline-1
+				${isFocused ? " border-obsidian-600 outline-1 " : "border-transparent outline-0"} ${isDragging ? "outline-0" : "outline"}`}
 			draggable="true"
 			ref={fieldRef}
-			onDrag={handleDrag}
+			onDragStart={handleStartDrag}
 			onDragEnd={handleEndDrag}
+			onDrag={handleDrag}
 		>
-			<input
-				className="peer h-7 w-1/4 bg-transparent p-1 pr-2 text-sm font-normal text-white outline-none focus:bg-obsidian-200"
-				value={tempField.key ?? ""}
-				onChange={handleKeyChange}
-				name="key"
-				onFocus={() => setIsFocused(true)}
-				onBlur={() => {
-					setIsFocused(false);
-					updateTemplate(tempField);
-				}}
-				disabled={
-					props.templateState !== TemplateState.editing ||
-					props.index === -1
-				}
+			<div
+				className={`absolute h-full w-full ${isDragging ? "bg-accent-800" : "bgt-transparent"}`}
 			/>
-			{props.index !== -1 && (
-				<button
-					className="order-first w-6 peer-focus:bg-obsidian-200"
-					onClick={deleteField}
-				>
-					d
-				</button>
-			)}
-			{/* {props.templateState == TemplateState.editing ? ( */}
-			<input
-				className="h-7 min-w-8 grow bg-transparent p-1 pr-2 text-sm font-normal text-white outline-none focus:bg-obsidian-200"
-				value={
-					props.templateState === TemplateState.editing
-						? tempField.value ?? ""
-						: tempField.finalValue
-				}
-				onChange={handleKeyChange}
-				name={
-					props.templateState === TemplateState.editing
-						? "value"
-						: "finalValue"
-				}
-				onFocus={() => setIsFocused(true)}
-				onBlur={() => {
-					setIsFocused(false);
-					updateTemplate(tempField);
-				}}
-			/>
-			{/* ) : (
-					<p className="grow">val: {tempField.finalValue}</p>
-				)} */}
+
+			<div className="flex h-full w-full">
+				<input
+					className="peer h-7 w-1/4 bg-transparent p-1 pr-2 text-sm font-normal text-white outline-none focus:bg-obsidian-200"
+					value={tempField.key ?? ""}
+					onChange={handleKeyChange}
+					name="key"
+					onFocus={() => setIsFocused(true)}
+					onBlur={() => {
+						setIsFocused(false);
+						updateTemplate(tempField);
+					}}
+					disabled={
+						props.templateState !== TemplateState.editing ||
+						props.index === -1
+					}
+				/>
+				{props.index !== -1 && (
+					<button
+						className="order-first w-6 peer-focus:bg-obsidian-200"
+						onClick={deleteField}
+					>
+						d
+					</button>
+				)}
+				{/* {props.templateState == TemplateState.editing ? ( */}
+				<input
+					className="h-7 min-w-8 grow bg-transparent p-1 pr-2 text-sm font-normal text-white outline-none focus:bg-obsidian-200"
+					value={
+						props.templateState === TemplateState.editing
+							? tempField.value ?? ""
+							: tempField.finalValue
+					}
+					onChange={handleKeyChange}
+					name={
+						props.templateState === TemplateState.editing
+							? "value"
+							: "finalValue"
+					}
+					onFocus={() => setIsFocused(true)}
+					onBlur={() => {
+						setIsFocused(false);
+						updateTemplate(tempField);
+					}}
+				/>
+			</div>
 		</div>
 	);
 }

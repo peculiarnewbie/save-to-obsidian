@@ -1,12 +1,18 @@
 import type { FieldType } from "~types";
 import { useTemplateStore, type TemplateStateKeys } from "../Template";
 import PropertyField from "./PropertyField";
+import { useState } from "react";
 
 export default function FieldList(props: { templateState: TemplateStateKeys }) {
-	const { currentTemplate } = useTemplateStore();
+	const { currentTemplate, setCurrentTemplate } = useTemplateStore();
 
-	const findHovered = (y: position) => {
-		console.log(y);
+	const reorderFields = (index: number, newIndex: number) => {
+		const { fields, ...rest } = currentTemplate;
+		const newFields = [...currentTemplate.fields];
+		newFields[newIndex] = currentTemplate.fields[index];
+		newFields[index] = currentTemplate.fields[newIndex];
+		setCurrentTemplate({ fields: newFields, ...rest });
+		console.log(index, "to", newIndex);
 	};
 
 	return (
@@ -18,6 +24,8 @@ export default function FieldList(props: { templateState: TemplateStateKeys }) {
 						field={field}
 						index={i}
 						templateState={props.templateState}
+						reorderFields={reorderFields}
+						fieldsCount={currentTemplate.fields?.length ?? 0}
 					/>
 				);
 			})}
