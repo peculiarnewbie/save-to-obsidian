@@ -1,0 +1,25 @@
+@layer global;
+
+@layer tokenami {
+  :root {
+    --_grid: .25rem;
+    --color_primary: blue;
+  }
+
+  [style] {
+    --padding: initial;
+    --background-color: initial;
+  }
+
+  @layer tk1 {
+    [style] {
+      padding: var(--padding, revert-layer);
+    }
+  }
+
+  @layer tk2 {
+    [style] {
+      background-color: var(--background-color, revert-layer);
+    }
+  }
+}

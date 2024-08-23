@@ -1,20 +1,9 @@
 {
-  "extends": "plasmo/templates/tsconfig.base",
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    ".plasmo/index.d.ts",
-    "./**/*.ts",
-    "./**/*.svelte"
-  ],
-  "compilerOptions": {
-    "paths": {
-      "~*": [
-        "./*"
-      ]
-    },
-    "baseUrl": ".",
-    "types": ["svelte"]
-  }
+	"include": [".tokenami/tokenami.env.d.ts", "**/*.ts", "**/*.tsx", ".wxt/wxt.d.ts"],
+	"extends": "./.wxt/tsconfig.json",
+	"compilerOptions": {
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"plugins": [{ "name": "@tokenami/ts-plugin" }]
+	}
 }
