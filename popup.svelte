@@ -12,9 +12,7 @@
 </script>
 
 <div>
-  <h2 class="text-center">
-    thossgg
-  </h2>
+  <h2 class="text-center">pls</h2>
   <div class="container">
     <button on:click={decrement}>-</button>
     <p>count: <b>{count}</b></p>
