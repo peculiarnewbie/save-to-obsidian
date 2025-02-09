@@ -1,5 +1,5 @@
-> [!NOTE]  
-> I am currently rewriting this extension using [Plasmo](https://www.plasmo.com/). Go to [this branch](https://github.com/peculiarnewbie/save-to-obsidian/tree/old-svelte) to see the code that is used for current release
+> [!WARNING]  
+> Deprecated, go ahead and use the official and absolutely incredible [Obsidian Web Clipper](https://obsidian.md/clipper)
 
 # Save to Obsidian
 
